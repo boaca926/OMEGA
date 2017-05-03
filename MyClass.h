@@ -381,7 +381,7 @@ MyClass::MyClass(TTree *tree) : fChain(0)
    // initializing vaiables
    speedc=29.9792458;
    massneupion=134.977;
-   masschpion=139.57;
+   masschpion=139.57; //
 }
 
 MyClass::~MyClass()
