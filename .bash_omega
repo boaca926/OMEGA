@@ -1,0 +1,1 @@
+alias updatefiles='cd omega; git add MyClass.C MyClass.h mckslpath compile.C merge.sh mcksloutpath .bash_omega Gettree.C Getname.C; git commit -m "updates"; git push'

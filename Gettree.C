@@ -7,6 +7,8 @@ using namespace std;
 
 int Gettree() 
 {
+	TFile ftree("./tree.root","recreate");
+	Double_t IMthreepi = 0.;
 	// tree names
 	TString OMEGAPI = gettreename(0); 
 	TString KPM = gettreename(1); //std::cout<<gettreename(1)<<endl
@@ -36,11 +38,11 @@ int Gettree()
 		tree_temp->Branch(SIMthreepi+"_MC",&IMthreepi,SIMthreepi+"/D");
 	}	
 	// define chains
-	TChain *omegapi = new TChain(THREEPIGAM+"_MC");
-	TChain *etagam = new TChain(ETAGAM+"_MC");
+	TChain *omegam_mc = new TChain(THREEPIGAM+"_MC");
+	TChain *etagam_mc = new TChain(ETAGAM+"_MC");
 	// create chain list
 	TCollection* chainlist = new TList; 
-	chainlist->Add(omegapi);
+	chainlist->Add(omegam_mc);
 	//
 	string line;
    ifstream filelist("./mcksloutpath");
@@ -49,8 +51,8 @@ int Gettree()
       while (!filelist.eof()) {
          if (getline(filelist, line, '\n')){
             if (line[0] != '!') {            	
-               omegapi->Add(line.data());
-               etagam->Add(line.data());
+               omegam_mc->Add(line.data());
+               etagam_mc->Add(line.data());
                cout << "Adding file: " << line << " to the chain of files" << endl;   
                // add trees into TList						          
             
@@ -58,9 +60,9 @@ int Gettree()
 					TObject* chainout=0;
 					TIter chainliter(chainlist);
 					while((chainout=chainliter.Next()) !=0) {
-						treeout->Print();
+						//chainout->Print();
 						TTree* chain_temp=dynamic_cast<TTree*>(chainout);
-						omegapi->Branch(SIMthreepi+"_MC",&IMthreepi,SIMthreepi+"/D");
+						omegam_mc->SetBranchAddress(SIMthreepi,&IMthreepi);
 					}	
                
             }
@@ -71,4 +73,26 @@ int Gettree()
       cout << "Unable to open filelist" << endl;
       return 0;
    }
+   
+   Int_t omegamNb_MC=0;
+   for (Int_t irow=0;irow<omegam_mc->GetEntries();irow++) {
+   	omegamNb_MC++; 
+   	omegam_mc->GetEntry(irow); 
+   	//cout<<IMthreepi<<endl;
+   	TTHREEPIGAM_MC->Fill();
+   } 
+   
+   printf("# ThreePiGam = %d \n", omegamNb_MC);
+   TTHREEPIGAM_MC->Write();
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
 }
