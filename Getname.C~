@@ -1,0 +1,38 @@
+const int NbTree = 8, NbVar = 3;
+
+Int_t mctype = 0;
+Double_t IMthreepi = 0., Eisr = 0.;
+
+TString gettreename(Int_t index) {
+	TString myArr[NbTree] = {"OMEGAPI","KPM","KSL","THREEPIGAM", "THREEPI", "ETAGAM", "BKGSUM1", "BKGSUM2"}; 
+	
+	TString st = myArr[index]; 
+	return st;
+}
+
+// get names
+TString OMEGAPI = gettreename(0); 
+TString KPM = gettreename(1); //std::cout<<gettreename(1)<<endl
+TString KSL = gettreename(2);
+TString THREEPIGAM = gettreename(3);
+TString THREEPI = gettreename(4);
+TString ETAGAM = gettreename(5);
+TString BKGSUM1 = gettreename(6);
+TString BKGSUM2 = gettreename(7);
+
+TString getbraname(Int_t index) {
+	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr"}; 
+	
+	TString st = myArr[index]; 
+	return st;
+}
+
+
+void Getname() {
+	TString a = gettreename(0);
+	//std::cout<<a<<endl; 
+	
+	
+}
+
+

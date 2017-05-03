@@ -11,8 +11,8 @@
 
 void MyClass::Main()
 {
-	//Int_t mctype = 0;
-	//Double_t IMthreepi = 0., Eisr = 0.;
+	Int_t mctype = 0;
+	Double_t IMthreepi = 0., Eisr = 0.;
 	// get names
 	TString OMEGAPI = gettreename(0); 
 	TString KPM = gettreename(1); //std::cout<<gettreename(1)<<endl

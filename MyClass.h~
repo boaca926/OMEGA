@@ -342,6 +342,7 @@ public :
    TBranch        *b_beta_parts;   //!
    
    Double_t speedc;
+   Double_t speedc;
 	Double_t massneupion;
    Double_t masschpion;
    
