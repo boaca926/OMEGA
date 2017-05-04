@@ -6,7 +6,7 @@ using namespace std;
 
 void getree() 
 {
-	TFile ftree("./TREE.root","recreate");
+	
 	Int_t mctype = 0;
 	Double_t threepiIM = 0.;
 	Double_t isrE = 0.;
@@ -45,7 +45,8 @@ void getree()
 	treelist->Add(TTHREEPIGAM_MC);
 	treelist->Add(TETAGAM_MC);
 	treelist->Add(TBKGSUM1_MC);
-	treelist->Add(TBKGSUM2_MC);
+	treelist->Add(TBKGSUM2_MC); 
+	treelist->Add(TMCSUM_MC);
 	// scan the list and add branches	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -122,47 +123,96 @@ void getree()
       return 0;
    }
 
-	// fill globle trees
+	/// fill trees
+	/// generated MC events ///
+	// signal
    Int_t mcsumNb_MC=0;
    Int_t omegamNb_MC=0;
    for (Int_t irow=0;irow<allchainrho_mc->GetEntries();irow++) {
    	allchainrho_mc->GetEntry(irow); 
    	if (mctype == 4) {
-   		omegamNb_MC++;
+   		omegamNb_MC++; mcsumNb_MC++;
    		TTHREEPIGAM_MC->Fill();
+   		TMCSUM_MC->Fill();
    	}	
 
    }
-   //
-   Int_t omegapiNb_MC=0, kpmNb_MC=0;
+   // all physics
+   Int_t omegapiNb_MC=0, kpmNb_MC=0, kslNb_MC=0, threepiNb_MC=0, etagamNb_MC=0, bkgsum1Nb_MC=0;
    for (Int_t irow=0;irow<allchainksl_mc->GetEntries();irow++) {
    	allchainksl_mc->GetEntry(irow); 
    	if (mctype == 1) {
-   		omegapiNb_MC++;
+   		omegapiNb_MC++; mcsumNb_MC++;
    		TOMEGAPI_MC->Fill();
+   		TMCSUM_MC->Fill();
    	}	
    	else if (mctype == 2) {
-   		kpmNb_MC++;
+   		kpmNb_MC++; mcsumNb_MC++;
    		TKPM_MC->Fill();
+   		TMCSUM_MC->Fill();
    	}
-
+   	else if (mctype == 3) {
+   		kslNb_MC++; mcsumNb_MC++;
+   		TKSL_MC->Fill();
+   		TMCSUM_MC->Fill();
+   	}
+   	else if (mctype == 5) {
+   		threepiNb_MC++; mcsumNb_MC++;
+   		TTHREEPI_MC->Fill();
+   		TMCSUM_MC->Fill();
+   	}
+		else if (mctype == 7) {
+			etagamNb_MC++; mcsumNb_MC++;
+			TETAGAM_MC->Fill();
+			TMCSUM_MC->Fill();
+		}
+		else if (mctype==6 || mctype==8 || mctype==9) {
+			bkgsum1Nb_MC++; mcsumNb_MC++;
+			TBKGSUM1_MC->Fill();
+			TMCSUM_MC->Fill();
+		}
    }
+   // eeg
+   
+   // data
+   
+   /// pre-selected MC events (with all cuts) ///
+   // signal
+   
+   // allphysics
+   
+   // eeg
+   
+   /// pre-selected Reconstr. events ///
+   // signal
+   
+   // allphysics
+   
+   // eeg
+   
+   // data
 
 	printf("=================Generated=================\n");
    printf("# OMEGAPI_MC = %d \n", omegapiNb_MC);
    printf("# KPM_MC = %d \n", kpmNb_MC);
-   //printf("# KSL_MC = %d \n", kslNb_MC);
+   printf("# KSL_MC = %d \n", kslNb_MC);
    printf("# ThreePiGam_MC = %d \n", omegamNb_MC);  
-   //printf("# ThreePi_MC = %d \n", threepiNb_MC); 
-   //printf("# ETAGam_MC = %d \n", etagamNb_MC);
-   //printf("# BKGSUM1_MC = %d \n", bkgsum1Nb_MC);
+   printf("# ThreePi_MC = %d \n", threepiNb_MC); 
+   printf("# ETAGam_MC = %d \n", etagamNb_MC);
+   printf("# BKGSUM1_MC = %d \n", bkgsum1Nb_MC);
    //printf("# BKGSUM2_MC = %d \n", bkgsum2Nb_MC);
    printf("============================================\n");
-   //printf("# MCSUM_MC = %d \n", mcsumNb_MC);
+   printf("# MCSUM_MC = %d \n", mcsumNb_MC);
+   TFile ftree("./TREE_Gen.root","recreate");
 	TTHREEPIGAM_MC->Write();
 	TOMEGAPI_MC->Write();
+	TKSL_MC->Write();
+	TTHREEPI_MC->Write();
+	TETAGAM_MC->Write();
+	TBKGSUM1_MC->Write();
+	TMCSUM_MC->Write();
 
-
+	TFile ftree("./TREE.root","recreate");
 
 
 
