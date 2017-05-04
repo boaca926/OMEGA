@@ -11,8 +11,15 @@
 
 void MyClass::Main()
 {
-	//Int_t mctype = 0;
-	//Double_t IMthreepi = 0., Eisr = 0.;
+	Int_t mctype = 0;
+	Double_t IMthreepi = 0., Eisr = 0.;
+	
+	// define structure
+	typedef struct {		
+		Double_t threepiIM, isrE;
+	
+	} EVTCLASS;
+	static EVTCLASS omegam_mc;
 	// get names
 	TString OMEGAPI = gettreename(0); 
 	TString KPM = gettreename(1); //std::cout<<gettreename(1)<<endl
@@ -61,6 +68,7 @@ void MyClass::Main()
 		tree_temp->Branch(SEisr,&Eisr,SEisr+"/D");
 		//cout<<1<<endl;
 	}	
+
 	///
 	
    if (fChain == 0) return;
@@ -83,15 +91,21 @@ void MyClass::Main()
       TLorentzVector truepi0(0.,0.,0.,0.), truepipl(0.,0.,0.,0.), truepimi(0.,0.,0.,0.), trueisr(0.,0.,0.,0.), truepipho1(0.,0.,0.,0.), truepipho2(0.,0.,0.,0.);
       TLorentzVector truepi0_eta(0.,0.,0.,0.), truepipl_eta(0.,0.,0.,0.), truepimi_eta(0.,0.,0.,0.), trueisr_eta(0.,0.,0.,0.), truepipho1_eta(0.,0.,0.,0.), truepipho2_eta(0.,0.,0.,0.);
       if (phid == 0) { // omega pi
-      	mctype = 1;
+      	mctype = 1; 
+      	IMthreepi = 0.;
+      	Eisr = 0.;
       	OMEGAMPI_MC.Fill();
       }
       else if (phid == 1) {
       	mctype = 2;
+      	IMthreepi = 0.;
+      	Eisr = 0.;
       	KPM_MC.Fill();
       }
       else if (phid == 2) {
       	mctype = 3;
+      	IMthreepi = 0.;
+      	Eisr = 0.;
       	KSL_MC.Fill();
       }
       else if (phid==3) {
@@ -131,7 +145,9 @@ void MyClass::Main()
 			   if (pi0nb == 1 && piplnb == 1 && piminb == 1 && isr1nb == 1 ) {	 
 			   	mctype = 4;
 			      Eisr=trueisr.E();			      
-			      IMthreepi=true3pi.M();			     
+			      IMthreepi=true3pi.M();	
+			      //omegam_mc.threepiIM=true3pi.M();	
+			      //omegam_mc.isrE=trueisr.E();		     
 			      THREEPIGAM_MC.Fill();
       		}
       		else {
