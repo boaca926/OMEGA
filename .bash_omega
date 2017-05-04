@@ -1,4 +1,4 @@
-alias updatefiles='cd omega; git add MyClass.C MyClass.h Analys_new.C compile.C merge.sh .bash_omega batch_ksl.sh Gettree.C Getname.C mckslpath mcksloutpath batch_rho.sh mcrhopath mcrhoutpath; git add Analys.C git commit -m "updates"; git push'
+alias updatefiles='cd omega; git add MyClass.C MyClass.h Analys_new.C compile.C merge.sh .bash_omega batch_ksl.sh Gettree.C Getname.C mckslpath mcksloutpath batch_rho.sh mcrhopath mcrhoutpath; git add Analys.C; git commit -m "updates"; git push'
 alias Check_ksl='cd /home/bo/omega/mckslout; ls -1 | wc -l'
 alias Check_rpi='cd /home/bo/omega/mcrpiout; ls -1 | wc -l'
 alias Merge='cd /home/bo/omega; ./merge.sh; source merge.sh'
