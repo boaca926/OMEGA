@@ -29,6 +29,7 @@ void MyClass::Main()
 	TString ETAGAM = gettreename(5);
 	TString BKGSUM1 = gettreename(6);
 	TString BKGSUM2 = gettreename(7);
+	TString ALLCHAIN = gettreename(8);
 
 	// creat trees and add to TList
 	// MC
@@ -97,14 +98,14 @@ void MyClass::Main()
       	OMEGAMPI_MC.Fill();
       }
       else if (phid == 1) {
-      	mctype = 2;
-      	IMthreepi = 0.;
+      	mctype = 2; 
+      	IMthreepi = 0.; 
       	Eisr = 0.;
       	KPM_MC.Fill();
       }
       else if (phid == 2) {
-      	mctype = 3;
-      	IMthreepi = 0.;
+      	mctype = 3; 
+      	IMthreepi = 0.; 
       	Eisr = 0.;
       	KSL_MC.Fill();
       }
@@ -143,22 +144,22 @@ void MyClass::Main()
       		}
       		true3pi=truepipl+truepimi+truepi0;
 			   if (pi0nb == 1 && piplnb == 1 && piminb == 1 && isr1nb == 1 ) {	 
-			   	mctype = 4;
+			   	mctype = 4;  
 			      Eisr=trueisr.E();			      
-			      IMthreepi=true3pi.M();	
+			      IMthreepi = true3pi.M(); 
 			      //omegam_mc.threepiIM=true3pi.M();	
 			      //omegam_mc.isrE=trueisr.E();		     
 			      THREEPIGAM_MC.Fill();
       		}
       		else {
-      			mctype = 5; // three pi
-			      IMthreepi=true3pi.M(); 
+      			mctype = 5;  // three pi
+			      IMthreepi = true3pi.M(); 
 			      Eisr=trueisr.E();
       			THREEPI_MC.Fill();
       		}
       	}
       	else {
-      		mctype=6; 
+      		mctype=6;  
       	}   
       }
       else if (phid==5) {
@@ -189,9 +190,9 @@ void MyClass::Main()
 			      }  
 			   }
 			   true3pi_eta=truepipl_eta+truepimi_eta+truepi0_eta;	
-			   IMthreepi=true3pi_eta.M(); 
+			   IMthreepi = true3pi_eta.M(); 
 			   Eisr=trueisr_eta.E();		   
-      		mctype=7;// eta gamma
+      		mctype=7;  // eta gamma
       		//threepiIM_MC=true3pi_eta.M(); 
       		ETAGAM_MC.Fill();
       	}
@@ -207,7 +208,8 @@ void MyClass::Main()
       
       }
       else {
-      	mctype=10;
+      	mctype=10; 
+      	IMthreepi = 0.; 
       	BKGSUM1_MC.Fill();
       }
       
@@ -215,10 +217,10 @@ void MyClass::Main()
       
       }
       else {
-      	mctype=11;
+      	mctype=11; 
+      	IMthreepi = 0.; 
       	BKGSUM2_MC.Fill();
       }
-      
       
       
       

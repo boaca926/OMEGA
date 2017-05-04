@@ -1,13 +1,13 @@
 #!/bin/bash
 
-FILELIST=/home/bo/omega/mcrhopath
+FILELIST=/home/bo/Desktop/omega/mcrhopath
 
 # 0 for all files in FILELIST; everything else for desired number
 numberOfFilesToAnalyse=0
 
 root -b compile.C
-rm /home/bo/omega/mcrhoout/*
-rm /home/bo/omega/mcrhooutpath
+rm /home/bo/Desktop/omega/mcrhout/*
+rm /home/bo/Desktop/omega/mcrhoutpath
 
 #FileNb=$(ls -1 | wc -l)
 #echo $FileNb
@@ -32,7 +32,7 @@ while read FILE; do
   echo '#!/bin/bash' > $jobscript
   #echo 'export PATH=$PATH:/usr/local/bin/' >> $jobscript
   echo '. /usr/local/bin/thisroot.sh' >> $jobscript
-  echo 'cd /home/bo/omega' >> $jobscript
+  echo 'cd /home/bo/Desktop/omega' >> $jobscript
   echo "root -b run$iFile.C" >> $jobscript
   echo "rm run$iFile.C" >> $jobscript 
   echo "mv output$iFile.root mcrhout/" >> $jobscript
@@ -43,13 +43,13 @@ while read FILE; do
   
 
 
-  qsub -q batch -e /home/bo/omega/log -o /home/bo/omega/log $jobscript
+  qsub -q batch -e /home/bo/Desktop/omega/log -o /home/bo/Desktop/omega/log $jobscript
   rm $jobscript	
   let iFile++
 done < $FILELIST
 
 COUNT=$(expr $iFile - $COUNT0)
-#cd /home/bo/omega/mcrhoout/
+#cd /home/bo/omega/mcrhout/
 #hadd ../outputall3.root ./*.root
 #echo "$COUNT"
 

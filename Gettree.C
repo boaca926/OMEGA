@@ -41,7 +41,7 @@ void Gettree()
 		tree_temp->Branch(SIMthreepi+"_MC",&threepiIM,SIMthreepi+"/D");
 		tree_temp->Branch(SEisr+"_MC",&isrE,SEisr+"/D");
 	}	
-	// define chains
+	// define chain
 	TChain *ksl_mc = new TChain(KSL+"_MC");
 	TChain *threepigam_mc = new TChain(THREEPIGAM+"_MC");
 	TChain *etagam_mc = new TChain(ETAGAM+"_MC");	
@@ -50,16 +50,43 @@ void Gettree()
 	chainlist->Add(ksl_mc);
 	chainlist->Add(threepigam_mc);
 	chainlist->Add(etagam_mc);	
-	//
+	// mcrho samples, threepi-isr hadronic events
 	string line;
    ifstream filelist("./mcrhoutpath");
    //  ifstream filelist("filelist.txt");
    if (filelist.is_open()) {
       while (!filelist.eof()) {
          if (getline(filelist, line, '\n')){
+            if (line[0] != '!') {          	
+               threepigam_mc->Add(line.data());                            
+               cout << "Adding file: " << line << " to the chain of files" << endl;       
+               // scan the list and add branches	
+					TObject* chainout=0;
+					TIter chainliter(chainlist);
+					while((chainout=chainliter.Next()) !=0) {
+						//chainout->Print();
+						TTree* chain_temp=dynamic_cast<TTree*>(chainout);
+						chain_temp->SetBranchAddress(SIMthreepi,&threepiIM);
+						chain_temp->SetBranchAddress(SEisr,&isrE);
+					}	
+               
+            }
+         }
+      }
+      filelist.close();
+   } else {
+      cout << "Unable to open filelist" << endl;
+      return 0;
+   }
+   // mcksl samples, all physics bkg
+   string line;
+   ifstream filelist("./mcksloutpath");
+   //  ifstream filelist("filelist.txt");
+   if (filelist.is_open()) {
+      while (!filelist.eof()) {
+         if (getline(filelist, line, '\n')){
             if (line[0] != '!') {          
             	ksl_mc->Add(line.data());  	
-               threepigam_mc->Add(line.data());
                etagam_mc->Add(line.data());              
                cout << "Adding file: " << line << " to the chain of files" << endl;       
                // scan the list and add branches	
@@ -80,7 +107,12 @@ void Gettree()
       cout << "Unable to open filelist" << endl;
       return 0;
    }
+   // mceeg samples, barhbar bkg
    
+   // data samples
+   
+   
+   // fill globle trees
    Int_t kslNb_MC=0;
    for (Int_t irow=0;irow<ksl_mc->GetEntries();irow++) {
    	kslNb_MC++; 
@@ -92,7 +124,7 @@ void Gettree()
    Int_t omegamNb_MC=0;
    for (Int_t irow=0;irow<threepigam_mc->GetEntries();irow++) {
    	omegamNb_MC++; 
-   	threepigam_mc->GetEntry(irow); 
+   	//threepigam_mc->GetEntry(irow); 
    	cout<<threepiIM<<endl;
    	TTHREEPIGAM_MC->Fill();
    } 
