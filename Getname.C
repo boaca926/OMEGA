@@ -1,4 +1,5 @@
-const int NbTree = 10, NbVar = 3;
+const int NbTree = 10, NbVar = 5;
+const double chi2cut = 20.;
 
 TString gettreename(Int_t index) {
 	TString myArr[NbTree] = {"OMEGAPI","KPM","KSL","THREEPIGAM", "THREEPI", "ETAGAM", "BKGSUM1", "BKGSUM2", "MCSUM", "ALLCHAIN"}; 
@@ -8,7 +9,7 @@ TString gettreename(Int_t index) {
 }
 
 TString getbraname(Int_t index) {
-	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr"}; 
+	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue"}; 
 	
 	TString st = myArr[index]; 
 	return st;

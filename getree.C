@@ -10,6 +10,7 @@ void getree()
 	Int_t mctype = 0;
 	Double_t threepiIM = 0.;
 	Double_t isrE = 0.;
+	Double_t chi2value = 0.;
 	// tree names
 	TString OMEGAPI = gettreename(0); //
 	TString KPM = gettreename(1); //
@@ -25,6 +26,7 @@ void getree()
 	TString Smctype = getbraname(0);
 	TString SIMthreepi = getbraname(1); //std::cout<<getbraname(1)<<endl;
 	TString SEisr = getbraname(2); //std::cout<<getbraname(2)<<endl;
+	TString Schi2value = getbraname(3);
 	
 	TTree *TOMEGAPI_MC = new TTree("T"+OMEGAPI+"_MC","recreate");
 	TTree *TKPM_MC = new TTree("T"+KPM+"_MC","recreate");
@@ -35,6 +37,8 @@ void getree()
 	TTree *TBKGSUM1_MC = new TTree("T"+BKGSUM1+"_MC","recreate");
 	TTree *TBKGSUM2_MC = new TTree("T"+BKGSUM2+"_MC","recreate");
 	TTree *TMCSUM_MC = new TTree("T"+MCSUM+"_MC","recreate");
+	
+	TTree *TTHREEPIGAM_Pre = new TTree("T"+THREEPIGAM+"_Pre","recreate");
 	
 	// add trees into TList
 	TCollection* treelist = new TList;
@@ -47,6 +51,8 @@ void getree()
 	treelist->Add(TBKGSUM1_MC);
 	treelist->Add(TBKGSUM2_MC); 
 	treelist->Add(TMCSUM_MC);
+	
+	treelist->Add(TTHREEPIGAM_Pre);
 	// scan the list and add branches	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -55,16 +61,21 @@ void getree()
 		TTree* tree_temp=dynamic_cast<TTree*>(treeout);
 		tree_temp->Branch(SIMthreepi+"_MC",&threepiIM,SIMthreepi+"/D");
 		tree_temp->Branch(SEisr+"_MC",&isrE,SEisr+"/D");
+		tree_temp->Branch(Schi2value,&chi2value,Schi2value+"/D");
 	}
 	
 	// define chain
 	TChain *allchainrho_mc = new TChain(ALLCHAIN+"_MC");
 	TChain *allchainksl_mc = new TChain(ALLCHAIN+"_MC");
+	
+	TChain *allchainrho_pre = new TChain(ALLCHAIN+"_Pre");
 
 	// create chain list
 	TCollection* chainlist = new TList; 
 	chainlist->Add(allchainrho_mc);
 	chainlist->Add(allchainksl_mc);
+	
+	chainlist->Add(allchainrho_pre);
 
 	// mcrho samples, threepi-isr hadronic events
 	string line;
@@ -75,7 +86,8 @@ void getree()
       while (!filelist.eof()) {
          if (getline(filelist, line, '\n')){
             if (line[0] != '!') {          	
-               allchainrho_mc->Add(line.data());                            
+               allchainrho_mc->Add(line.data()); 
+               allchainrho_pre->Add(line.data());                            
                cout << "Adding file: " << line << " to the chain of files" << endl;       
                // scan the list and add branches	
 					TObject* chainout=0;
@@ -86,6 +98,7 @@ void getree()
 						chain_temp->SetBranchAddress(SIMthreepi,&threepiIM);
 						chain_temp->SetBranchAddress(SEisr,&isrE);
 						chain_temp->SetBranchAddress(Smctype,&mctype);
+						chain_temp->SetBranchAddress(Schi2value,&chi2value);
 					}	
                
             }
@@ -178,7 +191,17 @@ void getree()
    
    /// pre-selected MC events (with all cuts) ///
    // signal
-   
+   Int_t mcsumNb_Pre=0;
+   Int_t omegamNb_Pre=0;
+   for (Int_t irow=0;irow<allchainrho_pre->GetEntries();irow++) {
+   	allchainrho_pre->GetEntry(irow); 
+   	if (mctype == 4) {
+   		omegamNb_Pre++; mcsumNb_Pre++;
+   		TTHREEPIGAM_Pre->Fill();
+   		//TMCSUM_Pre->Fill();
+   	}	
+
+   }
    // allphysics
    
    // eeg
@@ -203,6 +226,19 @@ void getree()
    //printf("# BKGSUM2_MC = %d \n", bkgsum2Nb_MC);
    printf("============================================\n");
    printf("# MCSUM_MC = %d \n", mcsumNb_MC);
+   printf("=================Pre-selected=================\n");
+   //printf("# OMEGAPI_MC = %d \n", omegapiNb_MC);
+   //printf("# KPM_MC = %d \n", kpmNb_MC);
+   //printf("# KSL_MC = %d \n", kslNb_MC);
+   printf("# ThreePiGam_Pre = %d \n", omegamNb_Pre);  
+   //printf("# ThreePi_MC = %d \n", threepiNb_MC); 
+   //printf("# ETAGam_MC = %d \n", etagamNb_MC);
+   //printf("# BKGSUM1_MC = %d \n", bkgsum1Nb_MC);
+   //printf("# BKGSUM2_MC = %d \n", bkgsum2Nb_MC);
+   printf("============================================\n");
+   //printf("# MCSUM_MC = %d \n", mcsumNb_MC);
+   
+   
    TFile ftree("./TREE_Gen.root","recreate");
 	TTHREEPIGAM_MC->Write();
 	TOMEGAPI_MC->Write();
@@ -213,7 +249,7 @@ void getree()
 	TMCSUM_MC->Write();
 
 	TFile ftree("./TREE.root","recreate");
-
+	TTHREEPIGAM_Pre->Write();
 
 
 
