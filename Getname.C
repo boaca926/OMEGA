@@ -1,7 +1,7 @@
-const int NbTree = 9, NbVar = 3;
+const int NbTree = 10, NbVar = 3;
 
 TString gettreename(Int_t index) {
-	TString myArr[NbTree] = {"OMEGAPI","KPM","KSL","THREEPIGAM", "THREEPI", "ETAGAM", "BKGSUM1", "BKGSUM2", "ALLCHAIN"}; 
+	TString myArr[NbTree] = {"OMEGAPI","KPM","KSL","THREEPIGAM", "THREEPI", "ETAGAM", "BKGSUM1", "BKGSUM2", "MCSUM", "ALLCHAIN"}; 
 	
 	TString st = myArr[index]; 
 	return st;

@@ -13,13 +13,7 @@ void MyClass::Main()
 {
 	Int_t mctype = 0;
 	Double_t IMthreepi = 0., Eisr = 0.;
-	
-	// define structure
-	typedef struct {		
-		Double_t threepiIM, isrE;
-	
-	} EVTCLASS;
-	static EVTCLASS omegam_mc;
+
 	// get names
 	TString OMEGAPI = gettreename(0); 
 	TString KPM = gettreename(1); //std::cout<<gettreename(1)<<endl
@@ -29,7 +23,7 @@ void MyClass::Main()
 	TString ETAGAM = gettreename(5);
 	TString BKGSUM1 = gettreename(6);
 	TString BKGSUM2 = gettreename(7);
-	TString ALLCHAIN = gettreename(8);
+	TString ALLCHAIN = gettreename(9);
 
 	// creat trees and add to TList
 	// MC
@@ -41,6 +35,7 @@ void MyClass::Main()
 	TTree ETAGAM_MC(ETAGAM+"_MC","recreate");
 	TTree BKGSUM1_MC(BKGSUM1+"_MC","recreate");
 	TTree BKGSUM2_MC(BKGSUM2+"_MC","recreate");
+	TTree ALLCHAIN_MC(ALLCHAIN+"_MC","recreate");
 	
 	TCollection* treelist = new TList; 
 	treelist->Add(&OMEGAMPI_MC);
@@ -49,8 +44,9 @@ void MyClass::Main()
 	treelist->Add(&THREEPIGAM_MC);
 	treelist->Add(&THREEPI_MC);
 	treelist->Add(&ETAGAM_MC); 
-	treelist->Add(&BKGSUM1_MC);
-	treelist->Add(&BKGSUM2_MC);
+	treelist->Add(&BKGSUM1_MC); 
+	treelist->Add(&BKGSUM2_MC); 
+	treelist->Add(&ALLCHAIN_MC);
 	// pre selected
 	// define branches
 	TString Smctype = getbraname(0);
@@ -97,13 +93,13 @@ void MyClass::Main()
       	Eisr = 0.;
       	OMEGAMPI_MC.Fill();
       }
-      else if (phid == 1) {
-      	mctype = 2; 
+      else if (phid == 1) {// kpm
+      	mctype = 2;  //cout<<mctype<<endl;
       	IMthreepi = 0.; 
       	Eisr = 0.;
       	KPM_MC.Fill();
       }
-      else if (phid == 2) {
+      else if (phid == 2) {// ksl
       	mctype = 3; 
       	IMthreepi = 0.; 
       	Eisr = 0.;
@@ -143,7 +139,7 @@ void MyClass::Main()
 			      }			      
       		}
       		true3pi=truepipl+truepimi+truepi0;
-			   if (pi0nb == 1 && piplnb == 1 && piminb == 1 && isr1nb == 1 ) {	 
+			   if (pi0nb == 1 && piplnb == 1 && piminb == 1 && isr1nb == 1 ) {// threepigam
 			   	mctype = 4;  
 			      Eisr=trueisr.E();			      
 			      IMthreepi = true3pi.M(); 
@@ -204,25 +200,16 @@ void MyClass::Main()
       	mctype=9; 
       }	
       
-      if (mctype==1 || mctype==2 || mctype==3 || mctype==4 || mctype==5 || mctype==7) {
       
-      }
-      else {
-      	mctype=10; 
-      	IMthreepi = 0.; 
+      if (mctype==6 || mctype==8 || mctype==9 ) {
       	BKGSUM1_MC.Fill();
       }
-      
-      if (mctype==1 || mctype==3 || mctype==4 ) {
-      
-      }
-      else {
-      	mctype=11; 
-      	IMthreepi = 0.; 
-      	BKGSUM2_MC.Fill();
+
+		if (mctype==2 || mctype==3 || mctype==5 || mctype==6 ||  mctype==8 || mctype==9) {
+      	BKGSUM2_MC.Fill();	
       }
       
-      
+      ALLCHAIN_MC.Fill();	
       
    }
    printf("speed of light = %lf \n",speedc);
@@ -236,6 +223,7 @@ void MyClass::Main()
    ETAGAM_MC.Write();
    BKGSUM1_MC.Write();
    BKGSUM2_MC.Write();
+   ALLCHAIN_MC.Write();
 }
 
 TLorentzVector MyClass::GetLorentzVector(TVector3 vector, Double_t mass) {
