@@ -52,7 +52,7 @@ void Gettree()
 	chainlist->Add(etagam_mc);	
 	//
 	string line;
-   ifstream filelist("./mcksloutpath");
+   ifstream filelist("./mcrhoutpath");
    //  ifstream filelist("filelist.txt");
    if (filelist.is_open()) {
       while (!filelist.eof()) {

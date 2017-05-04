@@ -1,13 +1,10 @@
-<<<<<<< HEAD
-alias updatefiles='cd omega; git add MyClass.C MyClass.h compile.C merge.sh .bash_omega Gettree.C Getname.C mcksloutpath mcrhoutpath; git commit -m "updates"; git push'
+alias updatefiles='cd omega; git add MyClass.C MyClass.h compile.C merge.sh .bash_omega batch_ksl.sh Gettree.C Getname.C mckslpath mcksloutpath bathch_rho.sh mcrhopath mcrhoutpath; git commit -m "updates"; git push'
 alias Check_ksl='cd /home/bo/omega/mckslout; ls -1 | wc -l'
 alias Check_rpi='cd /home/bo/omega/mcrpiout; ls -1 | wc -l'
 alias Merge='cd /home/bo/omega; ./merge.sh; source merge.sh'
-=======
 alias updatefiles='cd omega; git add MyClass.C MyClass.h compile.C merge.sh .bash_omega Gettree.C Getname.C; git commit -m "updates"; git push'
 alias Check_ksl='cd /home/bo/Desktop/omega/mckslout; ls -1 | wc -l'
 alias Check_rpi='cd /home/bo/Desktop/omega/mcrpiout; ls -1 | wc -l'
 alias Merge='cd /home/bo/Desktop/omega; ./merge.sh; source merge.sh'
->>>>>>> 073c2f1e812c71cec4fb724f513588cb630ec51a
 
 alias kloeext='ssh -X -L 8000:kloeslow.lnf.infn.it:8000 -L 8080:kloeslow.lnf.infn.it:8080 -L 8081:dafne.lnf.infn.it:80 -L 8090:pcadesantis2.lnf.infn.it:80 -l bcao lxgw.lnf.infn.it'
