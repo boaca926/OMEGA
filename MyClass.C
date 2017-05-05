@@ -12,8 +12,8 @@
 void MyClass::Main()
 {
 	Int_t mctype = 0;
-	Int_t cutype = 0;
-	Double_t IMthreepi = 0., Eisr = 0.;
+	Int_t cutype[2] = {0, 0};
+	Double_t IMthreepi_MC = 0., Eisr = 0.;
 	Double_t chi2value = 0., pvalue = 0.;
 
 	// get names
@@ -38,7 +38,6 @@ void MyClass::Main()
 	TTree BKGSUM1_MC(BKGSUM1+"_MC","recreate");
 	TTree BKGSUM2_MC(BKGSUM2+"_MC","recreate");
 	TTree ALLCHAIN_MC(ALLCHAIN+"_MC","recreate");
-	TTree ALLCHAIN_MC_Pre(ALLCHAIN+"_MC_Pre","recreate");
 	TTree ALLCHAIN_Pre(ALLCHAIN+"_Pre","recreate");
 	
 	TCollection* treelist = new TList; 
@@ -51,7 +50,6 @@ void MyClass::Main()
 	treelist->Add(&BKGSUM1_MC); 
 	treelist->Add(&BKGSUM2_MC); 
 	treelist->Add(&ALLCHAIN_MC);
-	treelist->Add(&ALLCHAIN_MC_Pre);	
 	treelist->Add(&ALLCHAIN_Pre);
 	// pre selected
 	// define branches
@@ -66,7 +64,7 @@ void MyClass::Main()
 		//treeout->Print();
 		TTree* tree_temp=dynamic_cast<TTree*>(treeout);
 		tree_temp->Branch(Smctype,&mctype,Smctype+"/I");
-		tree_temp->Branch(SIMthreepi,&IMthreepi,SIMthreepi+"/D");
+		tree_temp->Branch(SIMthreepi+"_MC",&IMthreepi_MC,SIMthreepi+"_MC/D");
 		tree_temp->Branch(SEisr,&Eisr,SEisr+"/D");
 		tree_temp->Branch(Schi2value,&chi2value,Schi2value+"/D");
 		tree_temp->Branch(Schi2value+"_cut",&cutype,Schi2value+"_cut/I");
@@ -96,19 +94,19 @@ void MyClass::Main()
       TLorentzVector truepi0_eta(0.,0.,0.,0.), truepipl_eta(0.,0.,0.,0.), truepimi_eta(0.,0.,0.,0.), trueisr_eta(0.,0.,0.,0.), truepipho1_eta(0.,0.,0.,0.), truepipho2_eta(0.,0.,0.,0.);
       if (phid == 0) { // omega pi
       	mctype = 1; 
-      	IMthreepi = 0.;
+      	IMthreepi_MC = 0.;
       	Eisr = 0.;
       	OMEGAMPI_MC.Fill();
       }
       else if (phid == 1) {// kpm
       	mctype = 2;  //cout<<mctype<<endl;
-      	IMthreepi = 0.; 
+      	IMthreepi_MC = 0.; 
       	Eisr = 0.;
       	KPM_MC.Fill();
       }
       else if (phid == 2) {// ksl
       	mctype = 3; 
-      	IMthreepi = 0.; 
+      	IMthreepi_MC = 0.; 
       	Eisr = 0.;
       	KSL_MC.Fill();
       }
@@ -149,14 +147,14 @@ void MyClass::Main()
 			   if (pi0nb == 1 && piplnb == 1 && piminb == 1 && isr1nb == 1 ) {// threepigam
 			   	mctype = 4;  
 			      Eisr=trueisr.E();			      
-			      IMthreepi = true3pi.M(); 
+			      IMthreepi_MC = true3pi.M(); 
 			      //omegam_mc.threepiIM=true3pi.M();	
 			      //omegam_mc.isrE=trueisr.E();		     
 			      THREEPIGAM_MC.Fill();
       		}
       		else {
       			mctype = 5;  // three pi
-			      IMthreepi = true3pi.M(); 
+			      IMthreepi_MC = true3pi.M(); 
 			      Eisr=trueisr.E();
       			THREEPI_MC.Fill();
       		}
@@ -193,7 +191,7 @@ void MyClass::Main()
 			      }  
 			   }
 			   true3pi_eta=truepipl_eta+truepimi_eta+truepi0_eta;	
-			   IMthreepi = true3pi_eta.M(); 
+			   IMthreepi_MC = true3pi_eta.M(); 
 			   Eisr=trueisr_eta.E();		   
       		mctype=7;  // eta gamma
       		//threepiIM_MC=true3pi_eta.M(); 
@@ -302,6 +300,7 @@ void MyClass::Main()
       if (IfFiltered()) continue;
       if (promptnb != 3) continue; 
       
+      
       // define vaiables of best obervables
 		Double_t bestlagvalue=1000000000., bestpvalue=0., beamE=Beam.E(); //Beam.Print();
 		Int_t Bestphotocandindex[3]={0,0,0};
@@ -381,12 +380,12 @@ void MyClass::Main()
 		
 		// cut condition
 		if (chi2value < 20) {
-			cutype = 1;
+			cutype[0] = 1;
 		}
 		else {
-			cutype = 0;
+			cutype[0] = 0;
 		}
-		ALLCHAIN_MC_Pre.Fill();
+
 		ALLCHAIN_Pre.Fill();
 		
       
@@ -403,7 +402,6 @@ void MyClass::Main()
    BKGSUM1_MC.Write();
    BKGSUM2_MC.Write();
    ALLCHAIN_MC.Write();
-   ALLCHAIN_MC_Pre.Write();
    ALLCHAIN_Pre.Write();
 }
 
