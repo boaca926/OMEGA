@@ -341,11 +341,27 @@ public :
    TBranch        *b_mome_partsend;   //!
    TBranch        *b_beta_parts;   //!
    
-   Double_t speedc;
+   Int_t pstrnb;
+   Int_t Row;
+   Int_t Col;
+   Int_t row;
+   
    Double_t speedc;
 	Double_t massneupion;
    Double_t masschpion;
    
+   Double_t E_candidates[100];
+	Double_t X_candidates[100];
+	Double_t Y_candidates[100];
+	Double_t Z_candidates[100];
+	Double_t T_candidates[100];
+	Double_t Sig2E_candidates[100];
+	Double_t Sig2X_candidates[100];
+	Double_t Sig2Y_candidates[100];
+	Double_t Sig2Z_candidates[100];
+	Double_t Sig2T_candidates[100];
+   
+   Float_t minangle, maxangle, egammamin;
    
    TLorentzVector Beam;
 
@@ -360,6 +376,26 @@ public :
    virtual void     Show(Long64_t entry = -1);
    
    TLorentzVector GetLorentzVector(TVector3 vector, Double_t mass);
+   
+   TVectorD Getpiontrnb();
+   TVectorD FillInputvector(Int_t size, Int_t index1, Int_t index2, Int_t index3, Int_t indtr1, Int_t indtr2);
+   TVectorD FillSigma2vector(Int_t size, Int_t index1, Int_t index2, Int_t index3, Int_t indtr1, Int_t indtr2);
+   TVectorD gfunc(TVectorD etavector, Int_t rownb, TLorentzVector beam);
+   TVectorD Lambdavector(Int_t size, TMatrixD inveSmatrix, TMatrixD dgmatrix, TVectorD constr, TVectorD diffv);
+   TVectorD Fillsigma2vectorkinfit(Int_t size, TMatrixD matrix, Int_t matrixcol, Int_t matrixrow);
+   TVectorD Fillpullsvector(Int_t size, TVectorD sigma2vector_old, TVectorD sigma2vector_new, TVectorD inputvector_old, TVectorD inputvector_new);
+   TVectorD etakinfitfunc(TMatrixD Vmatrix, TMatrixD dgmatrixTrans, TVectorD lambdavector, TVectorD etatilde, Int_t rownb);
+   
+   TMatrixD CovMatrix(TVectorD vector, Int_t row, Int_t col);
+   TMatrixD Getafunc(TVectorD etavector, Int_t rownb, Int_t colnb);
+   TMatrixD Mtrans(TMatrixD ma);
+   TMatrixD MInvert(TMatrixD ma);
+   
+   Bool_t If2PionTracks(Int_t trnb, Int_t idx1, Int_t idx2);
+   Bool_t IfStreamed(Int_t pstrnb);
+   Bool_t IfFiltered();
+   
+   
 };
 
 #endif
@@ -382,7 +418,24 @@ MyClass::MyClass(TTree *tree) : fChain(0)
    // initializing vaiables
    speedc=29.9792458;
    massneupion=134.977;
-   masschpion=139.57;
+   masschpion=139.57; 
+   pstrnb=2;
+   Row=21, Col=21; row=7;
+   minangle=23, maxangle=157, egammamin=10.;
+   
+   for (Int_t i = 0; i < 100; i++) {
+		E_candidates[i] = 0.;
+		X_candidates[i] = 0.;
+		Y_candidates[i] = 0.;
+		Z_candidates[i] = 0.;
+		T_candidates[i] = 0.;
+		Sig2E_candidates[i] = 0.;
+		Sig2X_candidates[i] = 0.;
+		Sig2Y_candidates[i] = 0.;
+		Sig2Z_candidates[i] = 0.;
+		Sig2T_candidates[i] = 0.;	
+	}
+	
 }
 
 MyClass::~MyClass()

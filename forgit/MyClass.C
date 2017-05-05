@@ -12,8 +12,7 @@
 void MyClass::Main()
 {
 	Int_t mctype = 0;
-	Int_t cutype[NbCut] = {0, 0};
-	Tstring appliecuts[NbCut] = {"Chi2 cut", "cut2"};
+	Int_t cutype[2] = {0, 0};
 	Double_t IMthreepi_MC = 0., Eisr = 0.;
 	Double_t chi2value = 0., pvalue = 0.;
 
