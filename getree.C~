@@ -23,6 +23,7 @@ void getree()
 	TString BKGSUM2 = gettreename(7); //
 	TString MCSUM = gettreename(8);
 	TString ALLCHAIN = gettreename(9); //
+	TString EEG = gettreename(10); std::cout<<EEG<<endl;
 	// branche names
 	TString Smctype = getbraname(0);
 	TString SIMthreepi = getbraname(1); //std::cout<<getbraname(1)<<endl;
@@ -38,12 +39,19 @@ void getree()
 	TTree *TBKGSUM1_MC = new TTree("T"+BKGSUM1+"_MC","recreate");
 	TTree *TBKGSUM2_MC = new TTree("T"+BKGSUM2+"_MC","recreate");
 	TTree *TMCSUM_MC = new TTree("T"+MCSUM+"_MC","recreate");
+	TTree *TEEG_MC = new TTree("T"+EEG+"_MC","recreate");
 
 	TTree *TOMEGAPI_Pre = new TTree("T"+OMEGAPI+"_Pre","recreate");
+	TTree *TKPM_Pre = new TTree("T"+KPM+"_Pre","recreate");
+	TTree *TKSL_Pre = new TTree("T"+KSL+"_Pre","recreate");
+	TTree *TTHREEPI_Pre = new TTree("T"+THREEPI+"_Pre","recreate");
+	TTree *TTHREEPIGAM_Pre = new TTree("T"+THREEPIGAM+"_Pre","recreate");	
 	TTree *TETAGAM_Pre = new TTree("T"+ETAGAM+"_Pre","recreate"); 	
+	TTree *TBKGSUM1_Pre = new TTree("T"+BKGSUM1+"_Pre","recreate");
+	TTree *TBKGSUM2_Pre = new TTree("T"+BKGSUM2+"_Pre","recreate");
 	TTree *TMCSUM_Pre = new TTree("T"+MCSUM+"_Pre","recreate");
+	TTree *TEEG_Pre = new TTree("T"+EEG+"_Pre","recreate");
 	
-	TTree *TTHREEPIGAM_Pre = new TTree("T"+THREEPIGAM+"_Pre","recreate");
 	
 	// add trees into TList
 	TCollection* treelist = new TList;
@@ -56,10 +64,19 @@ void getree()
 	treelist->Add(TBKGSUM1_MC);
 	treelist->Add(TBKGSUM2_MC); 
 	treelist->Add(TMCSUM_MC);
+	treelist->Add(TEEG_MC);
 		
 	treelist->Add(TOMEGAPI_Pre);
+	treelist->Add(TKPM_Pre);
+	treelist->Add(TKSL_Pre);	
+	treelist->Add(TTHREEPI_Pre);
 	treelist->Add(TTHREEPIGAM_Pre);
 	treelist->Add(TETAGAM_Pre); 
+	treelist->Add(TBKGSUM1_Pre);
+	treelist->Add(TBKGSUM2_Pre);
+	treelist->Add(TMCSUM_Pre);
+	treelist->Add(TEEG_Pre);
+	
 	// scan the list and add branches	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -69,22 +86,27 @@ void getree()
 		tree_temp->Branch(SIMthreepi+"_MC",&threepiIM,SIMthreepi+"_MC/D");
 		tree_temp->Branch(SEisr+"_MC",&isrE,SEisr+"/D");
 		tree_temp->Branch(Schi2value,&chi2value,Schi2value+"/D");
+		tree_temp->Branch(Smctype,&mctype,Smctype+"/I");
 	}
 	
 	// define chain
 	TChain *allchainrho_mc = new TChain(ALLCHAIN+"_MC");
 	TChain *allchainksl_mc = new TChain(ALLCHAIN+"_MC");
+	TChain *allchaineeg_mc = new TChain(ALLCHAIN+"_MC");
 	
 	TChain *allchainrho_pre = new TChain(ALLCHAIN+"_Pre");
 	TChain *allchainksl_pre = new TChain(ALLCHAIN+"_Pre");
+	TChain *allchaineeg_pre = new TChain(ALLCHAIN+"_Pre");
 
 	// create chain list
 	TCollection* chainlist = new TList; 
 	chainlist->Add(allchainrho_mc);
 	chainlist->Add(allchainksl_mc);
+	chainlist->Add(allchaineeg_mc);
 	
 	chainlist->Add(allchainrho_pre);
 	chainlist->Add(allchainksl_pre);
+	chainlist->Add(allchaineeg_pre);
 
 	// mcrho samples, threepi-isr hadronic events
 	string line;
@@ -147,6 +169,35 @@ void getree()
       cout << "Unable to open filelist1" << endl;
       return 0;
    }
+   //
+   string line;
+   ifstream filelist2("./mceegoutpath");
+   if (filelist2.is_open()) {
+      while (!filelist2.eof()) {
+         if (getline(filelist2, line, '\n')){
+            if (line[0] != '!') {          	
+               allchaineeg_mc->Add(line.data());          
+               allchaineeg_pre->Add(line.data());                  
+               cout << "Adding file: " << line << " to the chain of files" << endl;       
+               // scan the list and add branches	
+					TObject* chainout=0;
+					TIter chainliter(chainlist);
+					while((chainout=chainliter.Next()) !=0) {
+						//chainout->Print();
+						TTree* chain_temp=dynamic_cast<TTree*>(chainout);
+						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM);
+						chain_temp->SetBranchAddress(SEisr,&isrE);
+						chain_temp->SetBranchAddress(Smctype,&mctype);
+						chain_temp->SetBranchAddress(Schi2value+"_cut",&cutype[0]);
+					}	
+            }
+         }
+      }
+      filelist2.close();
+   } else {
+      cout << "Unable to open filelist2" << endl;
+      return 0;
+   }
 
 	/// fill trees
 	/// generated MC events ///
@@ -162,6 +213,19 @@ void getree()
    	}	
 
    }
+   
+   // eeg
+   Int_t eegNb_MC=0;
+   for (Int_t irow=0;irow<allchaineeg_mc->GetEntries();irow++) {
+   	allchaineeg_mc->GetEntry(irow); 
+   	for (Int_t i=0;i<scale;i++) {
+   		//cout<<scale<<endl;
+   		eegNb_MC++; mcsumNb_MC++;
+   		TEEG_MC->Fill();
+   		TMCSUM_MC->Fill();
+   	}	
+   }
+   
    // all physics
    Int_t counter1=0;
    Int_t omegapiNb_MC=0, kpmNb_MC=0, kslNb_MC=0, threepiNb_MC=0, etagamNb_MC=0, bkgsum1Nb_MC=0, bkgsum2Nb_MC=0;
@@ -204,8 +268,7 @@ void getree()
 			TBKGSUM2_MC->Fill();
 		}
    }
-   
-   // eeg
+
    
    // data
    
@@ -227,9 +290,22 @@ void getree()
    	}	
 
    }
+   
+   // eeg
+   Int_t eegNb_Pre=0;
+   for (Int_t irow=0;irow<allchaineeg_pre->GetEntries();irow++) {
+   	allchaineeg_pre->GetEntry(irow); 
+   	if (!cutype[0] && CUTTAG[0]) continue;
+   	for (Int_t i=0;i<scale;i++) {
+   		eegNb_Pre++; mcsumNb_Pre++;
+   		TEEG_Pre->Fill();
+   		TMCSUM_Pre->Fill();
+   	}
+   }
+   
    // allphysics
    Int_t counter2=0;
-   Int_t omegapiNb_Pre=0, etagamNb_Pre=0;
+   Int_t omegapiNb_Pre=0, kpmNb_Pre=0, kslNb_Pre=0, threepiNb_Pre=0, etagamNb_Pre=0, bkgsum1Nb_Pre=0, bkgsum2Nb_Pre=0;
    for (Int_t irow=0;irow<allchainksl_pre->GetEntries();irow++) {
    	allchainksl_pre->GetEntry(irow); 
    	// CUT TYPE
@@ -240,14 +316,39 @@ void getree()
    		TOMEGAPI_Pre->Fill();
    		TMCSUM_Pre->Fill();
    	}
+   	else if (mctype == 2) {// kpm
+   		kpmNb_Pre++; mcsumNb_Pre++;
+   		TKPM_Pre->Fill();
+   		TMCSUM_Pre->Fill();
+   	}
+   	else if (mctype == 3) {/// ksl
+   		kslNb_Pre++; mcsumNb_Pre++;
+   		TKSL_Pre->Fill();
+   		TMCSUM_Pre->Fill();
+   	}
+   	else if (mctype == 5) {// threepi
+   		threepiNb_Pre++; mcsumNb_Pre++;
+   		TTHREEPI_Pre->Fill();
+   		TMCSUM_Pre->Fill();
+   	}
    	else if (mctype == 7) {/// eta gamma
    		etagamNb_Pre++; mcsumNb_Pre++; 
 			TETAGAM_Pre->Fill();
 			TMCSUM_Pre->Fill();
    	}
+   	
+   	if (mctype==6 || mctype==8 || mctype==9) {// bkgsum1
+			bkgsum1Nb_Pre++; mcsumNb_Pre++;
+			TBKGSUM1_Pre->Fill();
+			TMCSUM_Pre->Fill();
+		}
+		
+		if (mctype==2 || mctype==5 || mctype==6 || mctype==7 || mctype==8 || mctype==9) {
+			bkgsum2Nb_Pre++;
+			TBKGSUM2_Pre->Fill();
+		}
    }
-   
-   // eeg
+
    
    /// pre-selected Reconstr. events ///
    // signal
@@ -259,14 +360,15 @@ void getree()
    // data
 
 	printf("=================Generated=================\n");
-   printf("# OMEGAPI_MC = %d \n", omegapiNb_MC);
-   printf("# KPM_MC = %d \n", kpmNb_MC);
-   printf("# KSL_MC = %d \n", kslNb_MC);
-   printf("# ThreePiGam_MC = %d \n", omegamNb_MC);  
-   printf("# ThreePi_MC = %d \n", threepiNb_MC); 
-   printf("# ETAGam_MC = %d \n", etagamNb_MC);
-   printf("# BKGSUM1_MC = %d \n", bkgsum1Nb_MC);
-   printf("# BKGSUM2_MC = %d \n", bkgsum2Nb_MC);
+   printf("1. # OMEGAPI_MC = %d \n", omegapiNb_MC);
+   printf("2. # KPM_MC = %d \n", kpmNb_MC);
+   printf("3. # KSL_MC = %d \n", kslNb_MC);
+   printf("4. # ThreePiGam_MC = %d \n", omegamNb_MC);  
+   printf("5. # ThreePi_MC = %d \n", threepiNb_MC); 
+   printf("6. # ETAGam_MC = %d \n", etagamNb_MC);
+   printf("7. # BKGSUM1_MC = %d \n", bkgsum1Nb_MC);
+   printf("8. # BKGSUM2_MC = %d \n", bkgsum2Nb_MC);
+   printf("9. # EEG_MC = %d \n", eegNb_MC);
    printf("============================================\n");
    printf("# MCSUM_MC = %d \n", mcsumNb_MC);
    // cut check
@@ -289,14 +391,15 @@ void getree()
    	printf("-----------------------------------------------\n");
    }
    
-   printf("# OMEGAPI_Pre = %d \n", omegapiNb_Pre);
-   //printf("# KPM_MC = %d \n", kpmNb_MC);
-   //printf("# KSL_MC = %d \n", kslNb_MC);
-   printf("# ThreePiGam_Pre = %d \n", omegamNb_Pre);  
-   //printf("# ThreePi_MC = %d \n", threepiNb_MC); 
-   printf("# ETAGam_Pre = %d \n", etagamNb_Pre);
-   //printf("# BKGSUM1_MC = %d \n", bkgsum1Nb_MC);
-   //printf("# BKGSUM2_MC = %d \n", bkgsum2Nb_MC);
+   printf("1. # OMEGAPI_Pre = %d \n", omegapiNb_Pre);
+   printf("2. # KPM_Pre = %d \n", kpmNb_Pre);
+   printf("3. # KSL_Pre = %d \n", kslNb_Pre);
+   printf("4. # ThreePiGam_Pre = %d \n", omegamNb_Pre);  
+   printf("5. # ThreePi_Pre = %d \n", threepiNb_Pre); 
+   printf("6. # ETAGam_Pre = %d \n", etagamNb_Pre);
+   printf("7. # BKGSUM1_Pre = %d \n", bkgsum1Nb_Pre);
+   printf("8. # BKGSUM2_Pre = %d \n", bkgsum2Nb_Pre);
+   printf("9. # EEG_Pre = %d \n", eegNb_Pre);
    printf("============================================\n");
    printf("# MCSUM_Pre = %d \n", mcsumNb_Pre);
    
@@ -310,10 +413,19 @@ void getree()
 	TBKGSUM1_MC->Write();
 	TBKGSUM2_MC->Write();
 	TMCSUM_MC->Write();
+	TEEG_MC->Write();
 
 	TFile ftree("./TREE.root","recreate");
+	TOMEGAPI_Pre->Write();
 	TTHREEPIGAM_Pre->Write();
+	TKPM_Pre->Write();
+	TKSL_Pre->Write();
+	TTHREEPI_Pre->Write();
 	TETAGAM_Pre->Write();
+	TBKGSUM1_Pre->Write();
+	TBKGSUM2_Pre->Write();
+	TMCSUM_Pre->Write();
+	TEEG_Pre->Write();
 
 
 
