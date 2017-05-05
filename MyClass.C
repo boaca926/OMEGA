@@ -12,6 +12,7 @@
 void MyClass::Main()
 {
 	Int_t mctype = 0;
+	Int_t cutype = 0;
 	Double_t IMthreepi = 0., Eisr = 0.;
 	Double_t chi2value = 0., pvalue = 0.;
 
@@ -59,8 +60,6 @@ void MyClass::Main()
 	TString SEisr = getbraname(2); std::cout<<getbraname(2)<<endl;
 	TString Schi2value = getbraname(3); std::cout<<getbraname(3)<<endl;
 	
-	
-	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
 	while((treeout=treeliter.Next()) !=0) {
@@ -70,6 +69,7 @@ void MyClass::Main()
 		tree_temp->Branch(SIMthreepi,&IMthreepi,SIMthreepi+"/D");
 		tree_temp->Branch(SEisr,&Eisr,SEisr+"/D");
 		tree_temp->Branch(Schi2value,&chi2value,Schi2value+"/D");
+		tree_temp->Branch(Schi2value+"_cut",&cutype,Schi2value+"_cut/I");
 		//cout<<1<<endl;
 	}	
 
@@ -293,6 +293,7 @@ void MyClass::Main()
 		prompttracknb = piontrnb(0), trackindex1 = piontrnb(1), trackindex2 = piontrnb(2);
 		Bool_t if2PionTrack = If2PionTracks(prompttracknb, trackindex1, trackindex2);
 		
+		
 		ALLCHAIN_MC.Fill();
 		
 		/// pre selection
@@ -377,6 +378,14 @@ void MyClass::Main()
 			}
 		}// select 3 photon loop
 		
+		
+		// cut condition
+		if (chi2value < 20) {
+			cutype = 1;
+		}
+		else {
+			cutype = 0;
+		}
 		ALLCHAIN_MC_Pre.Fill();
 		ALLCHAIN_Pre.Fill();
 		

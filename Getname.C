@@ -1,4 +1,4 @@
-const int NbTree = 10, NbVar = 5;
+const int NbTree = 10, NbVar = 5, NbCut = 2;
 const double chi2cut = 20.;
 
 TString gettreename(Int_t index) {
