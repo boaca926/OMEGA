@@ -1,6 +1,0 @@
-alias updatefiles='cd /home/bo/Desktop/omega; git add MyClass.C MyClass.h Analys_new.C compile.C .bash_omega Gettree.C Getname.C getree.C mckslpath mcksloutpath mcrhopath mcrhoutpath Analys.C; git commit -m "updates"; git push'
-alias Check_ksl='cd /home/bo/Desktop/omega/mckslout; ls -1 | wc -l'
-alias Check_rpi='cd /home/bo/Desktop/omega/mcrpiout; ls -1 | wc -l'
-alias Merge='cd /home/bo/Desktop/omega; ./merge.sh; source merge.sh'
-
-alias kloeext='ssh -X -L 8000:kloeslow.lnf.infn.it:8000 -L 8080:kloeslow.lnf.infn.it:8080 -L 8081:dafne.lnf.infn.it:80 -L 8090:pcadesantis2.lnf.infn.it:80 -l bcao lxgw.lnf.infn.it'
