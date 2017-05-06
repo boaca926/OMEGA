@@ -2,7 +2,7 @@ const int NbTree = 11, NbVar = 5, NbCut = 1, NbMode = 4, scale = 6;
 const int NbHist = 100, bin = 100;
 const double xmin_IM = 0., xmax_IM = 100.;
 const double chi2cut = 20.;
-const int CUTTAG[NbCut] = {1}; 
+const int CUTTAG[NbCut] = {0}; // 0 disable cut
 const int colorid[NbTree] = {7, 46, 15, 4, 6, 3, 20, 20, 2, 5, 1};
 const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
 const TString cutname[NbCut] = {"Chi2Cut"};

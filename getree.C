@@ -454,7 +454,7 @@ void getree()
    printf("# MCSUM_Pre = %d, Data = %d \n", mcsumNb_Pre, dataNb_Pre);
    
    
-   TFile ftree("./TREE_Gen.root","recreate");
+   TFile ftree("./ROOT/TREE_Gen.root","recreate");
 	TTHREEPIGAM_MC->Write();
 	TOMEGAPI_MC->Write();
 	TKSL_MC->Write();
@@ -466,7 +466,7 @@ void getree()
 	TEEG_MC->Write();
 	TDATA->Write();	
 
-	TFile ftree("./TREE.root","recreate");
+	TFile ftree("./ROOT/TREE.root","recreate");
 	TOMEGAPI_Pre->Write();
 	TTHREEPIGAM_Pre->Write();
 	TKPM_Pre->Write();

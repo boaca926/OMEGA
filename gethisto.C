@@ -14,7 +14,7 @@ void gethisto() {
    gStyle->SetLineScalePS(2);
 	TGaxis::SetMaxDigits(3);
 	
-	TFile *f= new TFile("./TREE.root");
+	TFile *f= new TFile("./ROOT/TREE.root");
 	// define variables
 	Double_t threepiIM = 0., chi2value = 0;
 	// get trees names and branch names
@@ -36,6 +36,7 @@ void gethisto() {
 	TTree *TOMEGAPI = (TTree*)f->Get("T"+OMEGAPI+"_Pre");
 	TTree *TKPM = (TTree*)f->Get("T"+KPM+"_Pre");
 	TTree *TKSL = (TTree*)f->Get("T"+KSL+"_Pre");
+	TTree *TTHREEPI = (TTree*)f->Get("T"+THREEPI+"_Pre");
 	TTree *TTHREEPIGAM = (TTree*)f->Get("T"+THREEPIGAM+"_Pre");
 	// add to TList
 	TCollection* treelist = new TList;
@@ -43,6 +44,7 @@ void gethisto() {
 	treelist->Add(TKPM);
 	treelist->Add(TKSL);
 	treelist->Add(TTHREEPIGAM);
+	treelist->Add(TTHREEPI);	
 	// set branch address	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -72,12 +74,18 @@ void gethisto() {
    	TKSL->GetEntry(irow); 
    	HCHI2[2]->Fill(chi2value);
    }
-   for (Int_t irow=0;irow<TTHREEPIGAM->GetEntries();irow++) { // ksl
+   //
+   for (Int_t irow=0;irow<TTHREEPIGAM->GetEntries();irow++) { // threepi gamma
    	TTHREEPIGAM->GetEntry(irow); 
    	HCHI2[3]->Fill(chi2value);
    }
+   //
+   for (Int_t irow=0;irow<TTHREEPI->GetEntries();irow++) { // threepi 
+   	TTHREEPI->GetEntry(irow); 
+   	HCHI2[4]->Fill(chi2value);
+   }
    
-   TFile hf("./HISTOS.root","recreate");
+   TFile hf("./ROOT/HISTOS.root","recreate");
    for (Int_t i=0;i<NbTree;i++) {
 		HCHI2[i]->Write();
 	}
