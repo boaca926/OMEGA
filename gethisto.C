@@ -38,6 +38,12 @@ void gethisto() {
 	TTree *TKSL = (TTree*)f->Get("T"+KSL+"_Pre");
 	TTree *TTHREEPI = (TTree*)f->Get("T"+THREEPI+"_Pre");
 	TTree *TTHREEPIGAM = (TTree*)f->Get("T"+THREEPIGAM+"_Pre");
+	TTree *TETAGAM = (TTree*)f->Get("T"+ETAGAM+"_Pre");
+	TTree *TBKGSUM1 = (TTree*)f->Get("T"+BKGSUM1+"_Pre");
+	TTree *TBKGSUM2 = (TTree*)f->Get("T"+BKGSUM2+"_Pre");
+	TTree *TMCSUM = (TTree*)f->Get("T"+MCSUM+"_Pre");
+	TTree *TEEG = (TTree*)f->Get("T"+EEG+"_Pre");
+	TTree *TDATA = (TTree*)f->Get("T"+DATA+"_Pre");
 	// add to TList
 	TCollection* treelist = new TList;
 	treelist->Add(TOMEGAPI);
@@ -45,6 +51,12 @@ void gethisto() {
 	treelist->Add(TKSL);
 	treelist->Add(TTHREEPIGAM);
 	treelist->Add(TTHREEPI);	
+	treelist->Add(TETAGAM);	
+	treelist->Add(TBKGSUM1);	
+	treelist->Add(TBKGSUM2);
+	treelist->Add(TMCSUM);
+	treelist->Add(TEEG);
+	treelist->Add(TDATA);
 	// set branch address	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -84,6 +96,37 @@ void gethisto() {
    	TTHREEPI->GetEntry(irow); 
    	HCHI2[4]->Fill(chi2value);
    }
+   //
+   for (Int_t irow=0;irow<TETAGAM->GetEntries();irow++) { // threepi 
+   	TETAGAM->GetEntry(irow); 
+   	HCHI2[5]->Fill(chi2value);
+   }
+   //
+   for (Int_t irow=0;irow<TBKGSUM1->GetEntries();irow++) { // threepi 
+   	TBKGSUM1->GetEntry(irow); 
+   	HCHI2[6]->Fill(chi2value);
+   }
+   //
+   for (Int_t irow=0;irow<TBKGSUM2->GetEntries();irow++) { // threepi 
+   	TBKGSUM2->GetEntry(irow); 
+   	HCHI2[7]->Fill(chi2value);
+   }
+   //
+   for (Int_t irow=0;irow<TMCSUM->GetEntries();irow++) { // threepi 
+   	TMCSUM->GetEntry(irow); 
+   	HCHI2[8]->Fill(chi2value);
+   }
+   //
+   for (Int_t irow=0;irow<TEEG->GetEntries();irow++) { // threepi 
+   	TEEG->GetEntry(irow); 
+   	HCHI2[9]->Fill(chi2value);
+   }
+   //
+   for (Int_t irow=0;irow<TDATA->GetEntries();irow++) { // threepi 
+   	TDATA->GetEntry(irow); 
+   	HCHI2[10]->Fill(chi2value);
+   }
+   HCHI2[10]->SetMarkerStyle(2);
    
    TFile hf("./ROOT/HISTOS.root","recreate");
    for (Int_t i=0;i<NbTree;i++) {
