@@ -6,7 +6,7 @@ using namespace std;
 
 void getree() 
 {
-	
+	// initialize variables
 	Int_t mctype = 0;
 	Int_t cutype[NbCut] = {0};
 	Double_t threepiIM = 0.;
