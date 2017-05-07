@@ -330,7 +330,7 @@ void tree(double list[])
    	// CUT TYPE
 		CUTYPE=getcutype(chi2value, list); //cout<<CUTYPE<<endl;
    	//
-   	if (!CUTYPE > list[0] && CUTTAG) continue;
+   	if (!CUTYPE && CUTTAG) continue;
    	//cout<<CUTTAG[0]<<endl;
    	if (mctype == 4) {
    		omegamNb_Pre++; mcsumNb_Pre++;
@@ -345,7 +345,8 @@ void tree(double list[])
    for (Int_t irow=0;irow<allchaineeg_pre->GetEntries();irow++) {
    	allchaineeg_pre->GetEntry(irow); 
    	// CUT TYPE
-   	if (!CUTYPE > list[0] && CUTTAG) continue;
+   	CUTYPE=getcutype(chi2value, list);
+   	if (!CUTYPE && CUTTAG) continue;
    	//cout<<cutype[0]<<endl;
    	for (Int_t i=0;i<scale;i++) {
    		eegNb_Pre++; mcsumNb_Pre++;
@@ -359,7 +360,8 @@ void tree(double list[])
    for (Int_t irow=0;irow<allchaindata_pre->GetEntries();irow++) {
    	allchaindata_pre->GetEntry(irow);
    	// CUT TYPE
-   	if (!CUTYPE > list[0] && CUTTAG) continue;
+   	CUTYPE=getcutype(chi2value, list);
+   	if (!CUTYPE && CUTTAG) continue;
    	dataNb_Pre++; 
    	TDATA_Pre->Fill();	
    }
@@ -370,7 +372,8 @@ void tree(double list[])
    for (Int_t irow=0;irow<allchainksl_pre->GetEntries();irow++) {
    	allchainksl_pre->GetEntry(irow); 
    	// CUT TYPE
-   	if (!CUTYPE > list[0] && CUTTAG) continue; 	
+   	CUTYPE=getcutype(chi2value, list);
+   	if (!CUTYPE && CUTTAG) continue; 	
    	//cout<<CUTTAG[0]<<endl;	
    	if (mctype == 1) {/// omega pi
    		omegapiNb_Pre++; mcsumNb_Pre++;
