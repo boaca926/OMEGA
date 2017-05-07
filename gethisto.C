@@ -1,6 +1,22 @@
 #include "Getname.C"
 #include <iostream>
 #include <string>
+
+void drawline(Double_t a, Double_t b, Double_t c, Double_t d, Int_t color) {
+	TLine *l = new TLine(a,b,c,d);
+	l->SetLineColor(color);
+	l->SetLineWidth(2);
+	l->SetLineStyle(3); // 1=solid, 2=dash, 3=dash-dot, 4=dot-dot
+	l->Draw("Same");
+}
+
+void legtextsize(TLegend* l, Double_t size) {
+  for(int i=0 ; i<l->GetListOfPrimitives()->GetSize() ; i++) {
+    TLegendEntry *header = (TLegendEntry*)l->GetListOfPrimitives()->At(i);
+    header->SetTextSize(size);
+  }      
+}
+
 void format_h(TH1D* h, Int_t fillcolor, Int_t fillstyle, Int_t width) {
 	h->SetLineWidth(width);
 	h->SetFillStyle(fillstyle);

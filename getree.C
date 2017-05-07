@@ -4,11 +4,11 @@
 
 using namespace std;
 
-void getree() 
+void tree(double list[]) 
 {
 	// initialize variables
 	Int_t mctype = 0;
-	Int_t cutype[NbCut] = {0};
+	Int_t CUTYPE = 0;
 	Double_t threepiIM = 0.;
 	Double_t isrE = 0.;
 	Double_t chi2value = 0.;
@@ -23,7 +23,7 @@ void getree()
 	TString BKGSUM2 = gettreename(7); //
 	TString MCSUM = gettreename(8);
 	TString EEG = gettreename(9); //std::cout<<EEG<<endl;
-	TString DATA = gettreename(10); std::cout<<DATA<<endl;
+	TString DATA = gettreename(10); //std::cout<<DATA<<endl;
 	// branche names
 	TString Smctype = getbraname(0);
 	TString SIMthreepi = getbraname(1); //std::cout<<getbraname(1)<<endl;
@@ -125,7 +125,7 @@ void getree()
             if (line[0] != '!') {          	
                allchainrho_mc->Add(line.data()); 
                allchainrho_pre->Add(line.data());                            
-               cout << "Adding file: " << line << " to the chain of files" << endl;       
+               //cout << "Adding file: " << line << " to the chain of files" << endl;       
                // scan the list and add branches	
 					TObject* chainout=0;
 					TIter chainliter(chainlist);
@@ -136,7 +136,7 @@ void getree()
 						chain_temp->SetBranchAddress(SEisr,&isrE);
 						chain_temp->SetBranchAddress(Smctype,&mctype);
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
-						chain_temp->SetBranchAddress(Schi2value+"_cut",&cutype[0]);
+						//chain_temp->SetBranchAddress(Schi2value+"_cut",&cutype[0]);
 					}	
                
             }
@@ -156,7 +156,7 @@ void getree()
             if (line[0] != '!') {          	
                allchainksl_mc->Add(line.data());          
                allchainksl_pre->Add(line.data());                  
-               cout << "Adding file: " << line << " to the chain of files" << endl;       
+               //cout << "Adding file: " << line << " to the chain of files" << endl;       
                // scan the list and add branches	
 					TObject* chainout=0;
 					TIter chainliter(chainlist);
@@ -166,7 +166,8 @@ void getree()
 						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM);
 						chain_temp->SetBranchAddress(SEisr,&isrE);
 						chain_temp->SetBranchAddress(Smctype,&mctype);
-						chain_temp->SetBranchAddress(Schi2value+"_cut",&cutype[0]);
+						chain_temp->SetBranchAddress(Schi2value,&chi2value);
+						//chain_temp->SetBranchAddress(Schi2value+"_cut",&cutype[0]);
 					}	
             }
          }
@@ -185,7 +186,7 @@ void getree()
             if (line[0] != '!') {          	
                allchaineeg_mc->Add(line.data());          
                allchaineeg_pre->Add(line.data());                  
-               cout << "Adding file: " << line << " to the chain of files" << endl;       
+               //cout << "Adding file: " << line << " to the chain of files" << endl;       
                // scan the list and add branches	
 					TObject* chainout=0;
 					TIter chainliter(chainlist);
@@ -195,7 +196,8 @@ void getree()
 						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM);
 						chain_temp->SetBranchAddress(SEisr,&isrE);
 						chain_temp->SetBranchAddress(Smctype,&mctype);
-						chain_temp->SetBranchAddress(Schi2value+"_cut",&cutype[0]);
+						chain_temp->SetBranchAddress(Schi2value,&chi2value);
+						//chain_temp->SetBranchAddress(Schi2value+"_cut",&cutype[0]);
 					}	
             }
          }
@@ -214,7 +216,7 @@ void getree()
             if (line[0] != '!') {          	
                allchaindata->Add(line.data());          
                allchaindata_pre->Add(line.data());                  
-               cout << "Adding file: " << line << " to the chain of files" << endl;       
+               //cout << "Adding file: " << line << " to the chain of files" << endl;       
                // scan the list and add branches	
 					TObject* chainout=0;
 					TIter chainliter(chainlist);
@@ -224,7 +226,8 @@ void getree()
 						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM);
 						chain_temp->SetBranchAddress(SEisr,&isrE);
 						chain_temp->SetBranchAddress(Smctype,&mctype);
-						chain_temp->SetBranchAddress(Schi2value+"_cut",&cutype[0]);
+						chain_temp->SetBranchAddress(Schi2value,&chi2value);
+						//chain_temp->SetBranchAddress(Schi2value+"_cut",&cutype[0]);
 					}	
             }
          }
@@ -319,13 +322,15 @@ void getree()
    /// pre-selected MC events and data (with all cuts) ///
    // signal
    
-   Int_t mcsumNb_Pre=0;
-   Int_t omegamNb_Pre=0;
+   Double_t mcsumNb_Pre=0;
+   Double_t omegamNb_Pre=0;
    for (Int_t irow=0;irow<allchainrho_pre->GetEntries();irow++) {
    	allchainrho_pre->GetEntry(irow); //cout<<irow<<endl;
    	//cout<<CUTTAG<<endl;
    	// CUT TYPE
-   	if (!cutype[0] && CUTTAG[0]) continue;
+		CUTYPE=getcutype(chi2value, list); //cout<<CUTYPE<<endl;
+   	//
+   	if (!CUTYPE > list[0] && CUTTAG) continue;
    	//cout<<CUTTAG[0]<<endl;
    	if (mctype == 4) {
    		omegamNb_Pre++; mcsumNb_Pre++;
@@ -339,7 +344,8 @@ void getree()
    Int_t eegNb_Pre=0;
    for (Int_t irow=0;irow<allchaineeg_pre->GetEntries();irow++) {
    	allchaineeg_pre->GetEntry(irow); 
-   	if (!cutype[0] && CUTTAG[0]) continue;
+   	// CUT TYPE
+   	if (!CUTYPE > list[0] && CUTTAG) continue;
    	//cout<<cutype[0]<<endl;
    	for (Int_t i=0;i<scale;i++) {
    		eegNb_Pre++; mcsumNb_Pre++;
@@ -351,8 +357,9 @@ void getree()
    // data
    Int_t dataNb_Pre=0;
    for (Int_t irow=0;irow<allchaindata_pre->GetEntries();irow++) {
-   	allchaindata_pre->GetEntry(irow); 
-   	if (!cutype[0] && CUTTAG[0]) continue;
+   	allchaindata_pre->GetEntry(irow);
+   	// CUT TYPE
+   	if (!CUTYPE > list[0] && CUTTAG) continue;
    	dataNb_Pre++; 
    	TDATA_Pre->Fill();	
    }
@@ -363,7 +370,7 @@ void getree()
    for (Int_t irow=0;irow<allchainksl_pre->GetEntries();irow++) {
    	allchainksl_pre->GetEntry(irow); 
    	// CUT TYPE
-   	if (!cutype[0] && CUTTAG[0]) continue;   	
+   	if (!CUTYPE > list[0] && CUTTAG) continue; 	
    	//cout<<CUTTAG[0]<<endl;	
    	if (mctype == 1) {/// omega pi
    		omegapiNb_Pre++; mcsumNb_Pre++;
@@ -417,20 +424,7 @@ void getree()
    printf("============================================\n");
    printf("# MCSUM_MC = %d, DATA = %d \n", mcsumNb_MC, dataNb);
    // check cut
-   printf("===============cuts applied=================\n");
-   Int_t tagsum=0;
-   std::cout<<"Total "<< NbCut <<" cuts "<<"\n"<<endl;
-   for (Int_t i=0;i<NbCut;i++) {
-   	if (CUTTAG[i]) {
-   		tagsum++;
-   		std::cout<<i+1<<": "<<cutname[i]<<" is applied \n"<<endl;
-   	}	   	
-   	else {   		
-   		std::cout<<i+1<<": "<<cutname[i]<<" is NOT applied \n"<<endl;
-   	}
-   }   
-   std::cout<<"Total "<<tagsum<<" cuts applied \n"<<endl;
-   if (tagsum == 0) {
+   if (CUTTAG == 0) {
    	printf("================Pre-Selected============\n");
    	
    }
@@ -440,7 +434,7 @@ void getree()
    
    
    
-   
+   Double_t sb_Pre = omegamNb_Pre/mcsumNb_Pre;
    printf("1. # OMEGAPI_Pre = %d \n", omegapiNb_Pre);
    printf("2. # KPM_Pre = %d \n", kpmNb_Pre);
    printf("3. # KSL_Pre = %d \n", kslNb_Pre);
@@ -452,8 +446,9 @@ void getree()
    printf("9. # EEG_Pre = %d \n", eegNb_Pre);
    printf("============================================\n");
    printf("# MCSUM_Pre = %d, Data = %d \n", mcsumNb_Pre, dataNb_Pre);
-   
-   
+   printf("# S/B_Pre = %g \n", sb_Pre);
+
+   //cout<<1<<endl;
    TFile ftree("./ROOT/TREE_Gen.root","recreate");
 	TTHREEPIGAM_MC->Write();
 	TOMEGAPI_MC->Write();
@@ -478,31 +473,28 @@ void getree()
 	TMCSUM_Pre->Write();
 	TEEG_Pre->Write();
 	TDATA_Pre->Write();
+	//}	
 
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void getree () {
+	// check cuts
+	Int_t index=0;
+	for (Int_t i=0;i<NbCut;i++) {
+		if (Cutlist_std[i]!=Cutlist[i]) {
+			index++;
+			std::cout<<cutname[i]<<" is modified from "<<Cutlist_std[i]<<" to "<<Cutlist[i]<<endl;
+		}
+		else {
+			std::cout<<cutname[i]<<": "<<Cutlist_std[i]<<endl;
+		}
+	}
+	if (index>=2) {
+		std::cout<<"More than one cut values have been modified at the same time!. Modify ONE cut value at a time!!!"<<endl;
+	}
+	else {
+		std::cout<<"One cut value has been modified, acceptable choice."<<endl;
+	}
+	
+	tree(Cutlist);
 }

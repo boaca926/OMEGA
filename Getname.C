@@ -1,8 +1,11 @@
 const int NbTree = 11, NbVar = 5, NbCut = 1, NbMode = 4, scale = 6;
 const int NbHist = 100, bin = 100;
 const double xmin_IM = 0., xmax_IM = 100.;
-const double chi2cut = 20.;
-const int CUTTAG[NbCut] = {0}; // 0 disable cut
+const double Chi2cut_std = 20.;
+const double Chi2cut = 50.;
+const double Cutlist[NbCut] = {Chi2cut};
+const double Cutlist_std[NbCut] = {Chi2cut_std};
+const int CUTTAG = 0; // 0 disable cut
 const int colorid[NbTree] = {7, 46, 15, 4, 6, 3, 20, 20, 2, 5, 1};
 const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
 const TString cutname[NbCut] = {"Chi2Cut"};
@@ -52,25 +55,35 @@ void normlizehisto(TH1D* h, TH1D* hh) {
 	}
 }
 
-void drawline(Double_t a, Double_t b, Double_t c, Double_t d, Int_t color) {
-	TLine *l = new TLine(a,b,c,d);
-	l->SetLineColor(color);
-	l->SetLineWidth(2);
-	l->SetLineStyle(3); // 1=solid, 2=dash, 3=dash-dot, 4=dot-dot
-	l->Draw("Same");
-}
 
-void legtextsize(TLegend* l, Double_t size) {
-  for(int i=0 ; i<l->GetListOfPrimitives()->GetSize() ; i++) {
-    TLegendEntry *header = (TLegendEntry*)l->GetListOfPrimitives()->At(i);
-    header->SetTextSize(size);
-  }      
+
+Int_t getcutype(Double_t chi2value, Double_t cutlist[]) {
+	Int_t Type = 0;
+	Int_t type[1] = {0};
+	
+	if (chi2value < cutlist[0]) {
+		type[0] = 1;
+	}
+	else {
+		type[0] = 0;
+	}
+	
+	if (type[0]) {
+		Type = 1;
+	}
+	else {
+		Type = 0;
+	}
+	
+	return Type;
 }
 
 void Getname() {
 	TString a = gettreename(0);
 	//std::cout<<a<<endl; 
-	
+	//Int_t type_temp=0;
+	//type_temp=getcutype(Cutlist_std[]);
+	//cout<<type_temp<<endl;
 	
 }
 
