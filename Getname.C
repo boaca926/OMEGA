@@ -1,12 +1,20 @@
-const int NbTree = 11, NbVar = 5, NbCut = 1, NbMode = 4, scale = 6;
-const int NbHist = 100, bin = 100;
+const int NbTree = 11, NbVar = 7, NbCut = 1, NbMode = 4, scale = 6;
+const int NbHist = 100, bin_IM = 100, bin_TOF = 400;
 const double xmin_IM = 0., xmax_IM = 100.;
+const double xmin_TOF = -10., xmax_TOF = 10.;
 const double chi2cut = 20.;
 const double Cutlist_std[NbCut] = {chi2cut};
 const int CUTTAG[NbCut] = {1}; // 0 disable cut
 const int colorid[NbTree] = {7, 46, 15, 4, 6, 3, 20, 20, 2, 5, 1};
 const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
 const TString cutname[NbCut] = {"Chi2Cut"};
+const int modpos = 0;
+
+void format_h(TH1D* h, Int_t fillcolor, Int_t fillstyle, Int_t width) {
+	h->SetLineWidth(width);
+	h->SetFillStyle(fillstyle);
+	h->SetLineColor(fillcolor);
+}
 
 TString gettreename(Int_t index) {
 	TString myArr[NbTree] = {"OMEGAPI","KPM","KSL","THREEPIGAM", "THREEPI", "ETAGAM", "BKGSUM1", "BKGSUM2", "MCSUM", "EEG", "DATA"}; 
@@ -16,7 +24,7 @@ TString gettreename(Int_t index) {
 }
 
 TString getbraname(Int_t index) {
-	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue"}; 
+	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue","BestPiTime","BestETime"}; 
 	
 	TString st = myArr[index]; 
 	return st;
@@ -74,6 +82,27 @@ Int_t getcutype(Double_t chi2value, Double_t cutlist[]) {
 	
 	return Type;
 }
+
+/*void removefiles(const char *dirname= "/home/bo/Desktop/omega/ROOT") {
+	TSystemDirectory dir(dirname, dirname);
+	dir.Delete();
+	TList *files = dir.GetListOfFiles();
+	
+	if (files) {
+		TSystemFile *file;
+		TString fname;
+		TIter next(files);
+		while ((file=(TSystemFile*)next())) {
+			fname = file->GetName();
+			if (!file->IsDirectory()) {
+				cout<<fname.Data()<<endl;
+				
+			}
+		}
+		
+	}
+}*/
+
 
 
 void Getname() {

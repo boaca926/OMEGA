@@ -12,9 +12,9 @@
 void MyClass::Main()
 {
 	Int_t mctype = 0;
-	Int_t cutype[2] = {0, 0};
 	Double_t IMthreepi_MC = 0., Eisr = 0.;
 	Double_t chi2value = 0., pvalue = 0.;
+	Double_t bestPiTime = 0., bestETime = 0.;
 
 	// get names
 	TString OMEGAPI = gettreename(0); 
@@ -55,7 +55,9 @@ void MyClass::Main()
 	TString Smctype = getbraname(0);
 	TString SIMthreepi = getbraname(1); std::cout<<getbraname(1)<<endl;
 	TString SEisr = getbraname(2); std::cout<<getbraname(2)<<endl;
-	TString Schi2value = getbraname(3); std::cout<<getbraname(3)<<endl;
+	TString SChi2value = getbraname(3); std::cout<<getbraname(3)<<endl; 
+	TString SBestPiTime = getbraname(5); std::cout<<getbraname(5)<<endl;
+	TString SBestETime = getbraname(6); std::cout<<getbraname(6)<<endl;
 	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -65,9 +67,9 @@ void MyClass::Main()
 		tree_temp->Branch(Smctype,&mctype,Smctype+"/I");
 		tree_temp->Branch(SIMthreepi+"_MC",&IMthreepi_MC,SIMthreepi+"_MC/D");
 		tree_temp->Branch(SEisr,&Eisr,SEisr+"/D");
-		tree_temp->Branch(Schi2value,&chi2value,Schi2value+"/D");
-		tree_temp->Branch(Schi2value+"_cut",&cutype,Schi2value+"_cut/I");
-		//cout<<1<<endl;
+		tree_temp->Branch(SChi2value,&chi2value,SChi2value+"/D");
+		tree_temp->Branch(SBestPiTime,&bestPiTime,SBestPiTime+"/D");
+		tree_temp->Branch(SBestETime,&bestETime,SBestETime+"/D");
 	}	
 
 	///
@@ -376,14 +378,19 @@ void MyClass::Main()
 			}
 		}// select 3 photon loop
 		
+		// not fitted
+		TLorentzVector bestphoton1=Getphoton4vector(bestinputvector(0),bestinputvector(1),bestinputvector(2),bestinputvector(3));
+		TLorentzVector bestphoton2=Getphoton4vector(bestinputvector(5),bestinputvector(6),bestinputvector(7),bestinputvector(8));
+		TLorentzVector bestphoton3=Getphoton4vector(bestinputvector(10),bestinputvector(11),bestinputvector(12),bestinputvector(13));
+		TLorentzVector bestppl=Gettrack4vectorkinfit(bestinputvector(15), bestinputvector(16), bestinputvector(17));
+		TLorentzVector bestpmi=Gettrack4vectorkinfit(bestinputvector(18), bestinputvector(19), bestinputvector(20));
 		
-		// cut condition
-		if (chi2value < 20) {
-			cutype[0] = 1;
-		}
-		else {
-			cutype[0] = 0;
-		}
+		//time-of-fligt
+		TVector2 bestppltime(2.0,-6.0), bestpmitime(2.0,-6.0);
+		bestppltime.Set(timinginfo(trackindex1,bestppl)); // ppltime.Print();
+		bestpmitime.Set(timinginfo(trackindex2,bestpmi));
+		bestPiTime=bestppltime.X(), bestETime=bestppltime.Y();
+
 
 		ALLCHAIN_Pre.Fill();
 		
@@ -830,4 +837,68 @@ TVectorD MyClass::etakinfitfunc(TMatrixD Vmatrix, TMatrixD dgmatrixTrans, TVecto
 	TVectorD vector(rownb);
 	vector=etatilde-(Vmatrix*dgmatrixTrans)*lambdavector;
 	return vector;
+}
+
+TVector2 MyClass::timinginfo(Int_t index, TLorentzVector trackmom) {
+  //calculate the timing for electron and pion hypotheses for track with index index
+  //assumes there is track to cluster
+  //for each track need a pion and electron hypothesis
+  Double_t betae, betap;
+  Double_t  emass2=0.511*0.511;
+  Double_t ppimod=trackmom.P();
+  betae=ppimod/(sqrt(emass2+ppimod*ppimod));
+  betap=ppimod/trackmom.E();
+  Double_t te,tpi;
+ 
+  //length of tracks, for pion/e hypothesis
+  Double_t lenge, lengpi;
+  //adding the three track lenghts: LH to FH, FH to DC wall, DC wall to IP
+  lenge=len_seg[index][0][1]+len_seg[index][1][1]+len_seg[index][2][1];
+  //adding 3 small lenght pieces from LH to cluster in calorimeter together
+  Double_t callen;
+  callen=leng_parts[index][0]+leng_parts[index][1]+leng_parts[index][2];
+  //adding the three pieces to the track lenght
+  lenge=lenge+callen;
+  lengpi=len_seg[index][0][0]+len_seg[index][1][0]+len_seg[index][2][0];
+  lengpi=lengpi+callen;
+
+  te=(lenge)/(betae*speedc);
+  tpi=(lengpi)/(betap*speedc);
+
+  Double_t delte, deltp;
+  delte=te-tcl[best_clu[index]-1];
+  deltp=tpi-tcl[best_clu[index]-1];
+  TVector2 reti(deltp, delte);
+  return reti;
+
+}
+
+TLorentzVector MyClass::Getphoton4vector(Double_t E, Double_t x, Double_t y, Double_t z) {
+	TLorentzVector tvector(0.,0.,0.,0.);
+	Double_t px=0., py=0., pz=0.;
+	Double_t rsq=0., r=0.;
+	
+	rsq=TMath::Power(x,2)+TMath::Power(y,2)+TMath::Power(z,2);	
+	r=TMath::Sqrt(rsq);
+	px=E*x/r, py=E*y/r, pz=E*z/r;
+	
+	tvector.SetPxPyPzE(px,py,pz,E);
+	//printf("E=%lf,x=%lf,y=%lf,z=%lf,r=%lf\n",E,x,y,z,rsq);
+	
+	return tvector;
+}
+
+TLorentzVector MyClass::Gettrack4vectorkinfit(Double_t curv, Double_t cotan, Double_t phi) {
+	TLorentzVector tvector(0.,0.,0.,0.);
+	Double_t E=0., psq=0., ptran=0., px=0., py=0., pz=0.;
+	
+	ptran=1000.*1./TMath::Abs(curv);
+	px=ptran*TMath::Cos(phi); py=ptran*TMath::Sin(phi), pz=ptran*cotan;
+	psq=TMath::Power(ptran,2)+TMath::Power(pz,2);
+	E=TMath::Sqrt(masschpion*masschpion+psq);
+	//cout<<TMath::Abs(curv)<<endl;
+	
+	tvector.SetPxPyPzE(px,py,pz,E);
+	
+	return tvector;
 }

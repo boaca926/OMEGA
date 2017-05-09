@@ -24,17 +24,17 @@ void kinfitplot() {
 	TString DATA = gettreename(10);
 	
 	// get histos
-	TH1D *hChi2_OMEGAPI = (TH1D*)f->Get("hChi2Value"+OMEGAPI); 
-	TH1D *hChi2_KPM = (TH1D*)f->Get("hChi2Value"+KPM); 	
-	TH1D *hChi2_KSL = (TH1D*)f->Get("hChi2Value"+KSL); 
-	TH1D *hChi2_THREEPIGAM = (TH1D*)f->Get("hChi2Value"+THREEPIGAM); 
-	TH1D *hChi2_THREEPI = (TH1D*)f->Get("hChi2Value"+THREEPI);
-	TH1D *hChi2_ETAGAM = (TH1D*)f->Get("hChi2Value"+ETAGAM); 
-	TH1D *hChi2_BKGSUM1 = (TH1D*)f->Get("hChi2Value"+BKGSUM1); 
-	TH1D *hChi2_BKGSUM2 = (TH1D*)f->Get("hChi2Value"+BKGSUM2); 
-	TH1D *hChi2_MCSUM = (TH1D*)f->Get("hChi2Value"+MCSUM); 
-	TH1D *hChi2_EEG = (TH1D*)f->Get("hChi2Value"+EEG); 
-	TH1D *hChi2_DATA = (TH1D*)f->Get("hChi2Value"+DATA); 
+	TH1D *hChi2_OMEGAPI = (TH1D*)f->Get("hChi2Value_"+OMEGAPI); 
+	TH1D *hChi2_KPM = (TH1D*)f->Get("hChi2Value_"+KPM); 	
+	TH1D *hChi2_KSL = (TH1D*)f->Get("hChi2Value_"+KSL); 
+	TH1D *hChi2_THREEPIGAM = (TH1D*)f->Get("hChi2Value_"+THREEPIGAM); 
+	TH1D *hChi2_THREEPI = (TH1D*)f->Get("hChi2Value_"+THREEPI);
+	TH1D *hChi2_ETAGAM = (TH1D*)f->Get("hChi2Value_"+ETAGAM); 
+	TH1D *hChi2_BKGSUM1 = (TH1D*)f->Get("hChi2Value_"+BKGSUM1); 
+	TH1D *hChi2_BKGSUM2 = (TH1D*)f->Get("hChi2Value_"+BKGSUM2); 
+	TH1D *hChi2_MCSUM = (TH1D*)f->Get("hChi2Value_"+MCSUM); 
+	TH1D *hChi2_EEG = (TH1D*)f->Get("hChi2Value_"+EEG); 
+	TH1D *hChi2_DATA = (TH1D*)f->Get("hChi2Value_"+DATA); 
 	// add to TList
 	TCollection* histlist = new TList;
 	histlist->Add(hChi2_OMEGAPI);

@@ -18,6 +18,8 @@ Double_t tree(double list[], int index)
 	Double_t threepiIM = 0.;
 	Double_t isrE = 0.;
 	Double_t chi2value = 0.;
+	Double_t bestPiTime = 0.;
+	Double_t bestETime = 0.;
 	// tree names
 	TString OMEGAPI = gettreename(0); //
 	TString KPM = gettreename(1); //
@@ -34,7 +36,9 @@ Double_t tree(double list[], int index)
 	TString Smctype = getbraname(0);
 	TString SIMthreepi = getbraname(1); //std::cout<<getbraname(1)<<endl;
 	TString SEisr = getbraname(2); //std::cout<<getbraname(2)<<endl;
-	TString Schi2value = getbraname(3);
+	TString Schi2value = getbraname(3); 
+	TString SBestPiTime = getbraname(5); std::cout<<getbraname(5)<<endl;
+	TString SBestETime = getbraname(6); std::cout<<getbraname(6)<<endl;
 	
 	TTree *TOMEGAPI_MC = new TTree("T"+OMEGAPI+"_MC","recreate");
 	TTree *TKPM_MC = new TTree("T"+KPM+"_MC","recreate");
@@ -95,6 +99,8 @@ Double_t tree(double list[], int index)
 		tree_temp->Branch(SIMthreepi+"_MC",&threepiIM,SIMthreepi+"_MC/D");
 		tree_temp->Branch(SEisr+"_MC",&isrE,SEisr+"/D");
 		tree_temp->Branch(Schi2value,&chi2value,Schi2value+"/D");
+		tree_temp->Branch(SBestPiTime,&bestPiTime,SBestPiTime+"/D");
+		tree_temp->Branch(SBestETime,&bestETime,SBestETime+"/D");
 		tree_temp->Branch(Smctype,&mctype,Smctype+"/I");
 	}
 	
@@ -142,7 +148,8 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SEisr,&isrE);
 						chain_temp->SetBranchAddress(Smctype,&mctype);
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
-						//chain_temp->SetBranchAddress(Schi2value+"_cut",&cutype[0]);
+						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
+						chain_temp->SetBranchAddress(SBestETime,&bestETime);
 					}	
                
             }
@@ -173,7 +180,8 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SEisr,&isrE);
 						chain_temp->SetBranchAddress(Smctype,&mctype);
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
-						//chain_temp->SetBranchAddress(Schi2value+"_cut",&cutype[0]);
+						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
+						chain_temp->SetBranchAddress(SBestETime,&bestETime);
 					}	
             }
          }
@@ -203,7 +211,8 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SEisr,&isrE);
 						chain_temp->SetBranchAddress(Smctype,&mctype);
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
-						//chain_temp->SetBranchAddress(Schi2value+"_cut",&cutype[0]);
+						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
+						chain_temp->SetBranchAddress(SBestETime,&bestETime);
 					}	
             }
          }
@@ -233,7 +242,8 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SEisr,&isrE);
 						chain_temp->SetBranchAddress(Smctype,&mctype);
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
-						//chain_temp->SetBranchAddress(Schi2value+"_cut",&cutype[0]);
+						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
+						chain_temp->SetBranchAddress(SBestETime,&bestETime);
 					}	
             }
          }
@@ -418,97 +428,99 @@ Double_t tree(double list[], int index)
 			TBKGSUM2_Pre->Fill();
 		}
    }
-
-	/*printf("~~~~~~~~~~~~~~~~~~~~Mode %d~~~~~~~~~~~~~~~~\n", index);
-	printf("=================Generated=================\n");
-   printf("1. # OMEGAPI_MC = %d \n", omegapiNb_MC);
-   printf("2. # KPM_MC = %d \n", kpmNb_MC);
-   printf("3. # KSL_MC = %d \n", kslNb_MC);
-   printf("4. # ThreePiGam_MC = %d \n", omegamNb_MC);  
-   printf("5. # ThreePi_MC = %d \n", threepiNb_MC); 
-   printf("6. # ETAGam_MC = %d \n", etagamNb_MC);
-   printf("7. # BKGSUM1_MC = %d \n", bkgsum1Nb_MC);
-   printf("8. # BKGSUM2_MC = %d \n", bkgsum2Nb_MC);
-   printf("9. # EEG_MC = %d \n", eegNb_MC);
-   printf("============================================\n");
-   printf("# MCSUM_MC = %d, DATA = %d \n", mcsumNb_MC, dataNb);
-   // check cut
-   if (CUTTAG == 0) {
-   	printf("================Pre-Selected============\n");
-   	
-   }
-   else {
-   	printf("==================Cutted==================\n");	
-   }*/
    
    
    
    Double_t sb_Pre = omegamNb_Pre/(mcsumNb_Pre-omegamNb_Pre)*(dataNb_Pre-omegamNb_Pre);
-   /*printf("1. # OMEGAPI_Pre = %d \n", omegapiNb_Pre);
-   printf("2. # KPM_Pre = %d \n", kpmNb_Pre);
-   printf("3. # KSL_Pre = %d \n", kslNb_Pre);
-   printf("4. # ThreePiGam_Pre = %g \n", omegamNb_Pre);  
-   printf("5. # ThreePi_Pre = %d \n", threepiNb_Pre); 
-   printf("6. # ETAGam_Pre = %d \n", etagamNb_Pre);
-   printf("7. # BKGSUM1_Pre = %d \n", bkgsum1Nb_Pre);
-   printf("8. # BKGSUM2_Pre = %d \n", bkgsum2Nb_Pre);
-   printf("9. # EEG_Pre = %d \n", eegNb_Pre);
-   printf("============================================\n");
-   printf("# MCSUM_Pre = %g, Data = %d \n", mcsumNb_Pre, dataNb_Pre);
-   printf("# S/B_Pre = %g \n", sb_Pre);
-   printf("~~~~~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~~~~\n\n");*/
-   //printf("SB = %g, chi2cut = %g  \n",sb_Pre, list[0]);
+   printf("# expected signal events = %g, chi2cut = %g  \n",sb_Pre, list[index]);
 	
    //cout<<1<<endl;
-   TFile ftree("./ROOT/TREE_Gen.root","recreate");
-	TTHREEPIGAM_MC->Write();
-	TOMEGAPI_MC->Write();
-	TKSL_MC->Write();
-	TTHREEPI_MC->Write();
-	TETAGAM_MC->Write();
-	TBKGSUM1_MC->Write();
-	TBKGSUM2_MC->Write();
-	TMCSUM_MC->Write();
-	TEEG_MC->Write();
-	TDATA->Write();	
+   if (list[index]==Cutlist_std[index]) {
+   	printf("STANDARD CUTS ARE SPOTTED \n", index);
+		printf("=================Generated=================\n");
+   	printf("1. # OMEGAPI_MC = %d \n", omegapiNb_MC);
+   	printf("2. # KPM_MC = %d \n", kpmNb_MC);
+   	printf("3. # KSL_MC = %d \n", kslNb_MC);
+   	printf("4. # ThreePiGam_MC = %d \n", omegamNb_MC);  
+   	printf("5. # ThreePi_MC = %d \n", threepiNb_MC); 
+   	printf("6. # ETAGam_MC = %d \n", etagamNb_MC);
+   	printf("7. # BKGSUM1_MC = %d \n", bkgsum1Nb_MC);
+   	printf("8. # BKGSUM2_MC = %d \n", bkgsum2Nb_MC);
+   	printf("9. # EEG_MC = %d \n", eegNb_MC);
+   	printf("============================================\n");
+   	printf("# MCSUM_MC = %d, DATA = %d \n", mcsumNb_MC, dataNb);
+   	// check cut
+   	if (CUTTAG == 0) {
+   		printf("================Pre-Selected============\n");
+   	
+   	}
+   	else {
+   		printf("==================Cutted==================\n");	
+   	}
+   
+   	printf("1. # OMEGAPI_Pre = %d \n", omegapiNb_Pre);
+   	printf("2. # KPM_Pre = %d \n", kpmNb_Pre);
+   	printf("3. # KSL_Pre = %d \n", kslNb_Pre);
+   	printf("4. # ThreePiGam_Pre = %g \n", omegamNb_Pre);  
+   	printf("5. # ThreePi_Pre = %d \n", threepiNb_Pre); 
+   	printf("6. # ETAGam_Pre = %d \n", etagamNb_Pre);
+   	printf("7. # BKGSUM1_Pre = %d \n", bkgsum1Nb_Pre);
+   	printf("8. # BKGSUM2_Pre = %d \n", bkgsum2Nb_Pre);
+   	printf("9. # EEG_Pre = %d \n", eegNb_Pre);
+   	printf("============================================\n");
+   	printf("# MCSUM_Pre = %g, Data = %d \n", mcsumNb_Pre, dataNb_Pre);
+   	printf("# S/B_Pre = %g \n", sb_Pre);
+   	printf("~~~~~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~~~~\n\n");
+   
+   	TFile ftree("./ROOT/TREE_Gen.root","recreate");
+		TTHREEPIGAM_MC->Write();
+		TOMEGAPI_MC->Write();
+		TKSL_MC->Write();
+		TTHREEPI_MC->Write();
+		TETAGAM_MC->Write();
+		TBKGSUM1_MC->Write();
+		TBKGSUM2_MC->Write();
+		TMCSUM_MC->Write();
+		TEEG_MC->Write();
+		TDATA->Write();	
 
-	TFile ftree("./ROOT/TREE"+str_index+".root","recreate");
-	TOMEGAPI_Pre->Write();
-	TTHREEPIGAM_Pre->Write();
-	TKPM_Pre->Write();
-	TKSL_Pre->Write();
-	TTHREEPI_Pre->Write();
-	TETAGAM_Pre->Write();
-	TBKGSUM1_Pre->Write();
-	TBKGSUM2_Pre->Write();
-	TMCSUM_Pre->Write();
-	TEEG_Pre->Write();
-	TDATA_Pre->Write();
-	//}	
+		TFile ftree("./ROOT/TREE_"+cutname[index]+".root","recreate");
+		TOMEGAPI_Pre->Write();
+		TTHREEPIGAM_Pre->Write();
+		TKPM_Pre->Write();
+		TKSL_Pre->Write();
+		TTHREEPI_Pre->Write();
+		TETAGAM_Pre->Write();
+		TBKGSUM1_Pre->Write();
+		TBKGSUM2_Pre->Write();
+		TMCSUM_Pre->Write();
+		TEEG_Pre->Write();
+		TDATA_Pre->Write();
+	}	
 	
 	return sb_Pre;
 
 }
 
 void getree () {
-	// check cuts
-	Int_t index_mod=0;
-	// create modification list stores all cadidate values for cuts
-	// specify 
-	const int nbstep = 3, modpos = 0;
-	Double_t step = 2; 
-	Double_t lb = 28., upb = lb+step*nbstep; // define interval 
-	std::cout<<"Cut: "<<cutname[modpos]<<" changes ["<<lb<<","<<upb<<") with step "<<step<<endl;
+	// specify modification of cut values
+	const int nbstep = 1;
+	const double step = 2; 
+	const double lb = 20., upb = lb+step*nbstep;
+	// check modification list stores all cadidate values for cuts	
+	std::cout<<"Cut: "<<cutname[modpos]<<" varies within ["<<lb<<","<<upb<<") with a step "<<step<<endl;
+	std::cout<<"Total "<<nbstep<<" modifications will be made."<<endl;
 	//Double_t step = (upb - lb)/nbstep; // get step width
 	//std::cout<<"step = "<<step<<endl;
 	// create cut target list for modification and sepcify which cut value one wants to modified	
-	Double_t modlist[nbstep]; // length of modification list needs to be same as nbstep+1
+	Double_t modlist[nbstep]; // length of modification list needs to be same as nbstep
 	Double_t sblist[nbstep];
 	Double_t Cutlist[NbCut]; // create cutlist will store specific modified cut value
 	for (int i=0;i<NbCut;i++) {// initialize cutlist by copy cutlist_sta to it
 		Cutlist[i]=Cutlist_std[i];
 		//cout<<Cutlist[i]<<endl;
 	}
+	Int_t index_mod=0;
 	for (int i=0;i<nbstep;i++) {// initialize modification list
 		modlist[i]=0.;
 		sblist[i]=0.;
@@ -527,9 +539,9 @@ void getree () {
 				//cout<<Cutlist[i]<<endl;
 			}
 		}
-		sb_temp=tree(Cutlist,index_mod); 
+		sb_temp=tree(Cutlist,modpos); 
 		sblist[index_mod]=sb_temp;
-		cout<<"sb = "<<sblist[index_mod]<<", chi2cut = "<<modlist[index_mod]<<endl;
+		//cout<<"sb = "<<sblist[index_mod]<<", chi2cut = "<<modlist[index_mod]<<endl;
 		index_mod++;
 	}
 	Int_t index=0;
@@ -546,7 +558,7 @@ void getree () {
 		std::cout<<"More than one cut values have been modified at the same time!. Modify ONE cut value at a time!!!"<<endl;
 	}
 	else {
-		std::cout<<"One cut value has been modified, acceptable choice."<<endl;
+		std::cout<<"One cut value has been modified"<<endl;
 	}
 	//cout<<Cutlist[0]<<endl;
 	
@@ -559,7 +571,7 @@ void getree () {
 	gf->SetLineColor(2);
 	gf->Draw("CP");
 	
-	TFile hf("./ROOT/optimchi2gf.root","recreate");
+	TFile hf("./Plots/optimchi2gf.root","recreate");
    gf->Write();
 	
 }
