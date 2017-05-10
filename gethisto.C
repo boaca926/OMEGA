@@ -2,12 +2,30 @@
 #include <iostream>
 #include <string>
 
-void drawline(Double_t a, Double_t b, Double_t c, Double_t d, Int_t color) {
-	TLine *l = new TLine(a,b,c,d);
-	l->SetLineColor(color);
-	l->SetLineWidth(2);
-	l->SetLineStyle(3); // 1=solid, 2=dash, 3=dash-dot, 4=dot-dot
-	l->Draw("Same");
+Double_t getkvalue(Double_t x0, Double_t y0, Double_t x1, Double_t y1) {
+	Double_t k=0., yvalue=0.;
+	k=(y1-y0)/(x1-x0); 
+	
+	return k;
+}
+
+Double_t getbvalue(Double_t k, Double_t x, Double_t x0, Double_t y0){
+	Double_t y=0.;
+	y=k*(x-x0)+y0;
+	
+	return y;
+}
+
+Double_t getcrossx(Double_t k1, Double_t k2, Double_t b1, Double_t b2) {
+	Double_t x=0.;
+	x=(b2-b1)/(k1-k2);
+	return x;
+}
+
+Double_t getcrossy(Double_t k1, Double_t b1, Double_t xcross) {
+	Double_t y=0.;
+	y=k1*xcross+b1;
+	return y;
 }
 
 void legtextsize(TLegend* l, Double_t size) {

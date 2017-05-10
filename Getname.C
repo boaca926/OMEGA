@@ -1,14 +1,20 @@
-const int NbTree = 11, NbVar = 7, NbCut = 1, NbMode = 4, scale = 6;
+const int NbTree = 11, NbVar = 7, NbCut = 2, NbMode = 4, scale = 6;
 const int NbHist = 100, bin_IM = 100, bin_TOF = 400;
 const double xmin_IM = 0., xmax_IM = 100.;
 const double xmin_TOF = -10., xmax_TOF = 10.;
-const double chi2cut = 20.;
-const double Cutlist_std[NbCut] = {chi2cut};
+const double chi2cut = 20., tofcut1 = -0.7;
+const double Cutlist_std[NbCut] = {chi2cut, tofcut1};
 const int CUTTAG[NbCut] = {1}; // 0 disable cut
 const int colorid[NbTree] = {7, 46, 15, 4, 6, 3, 20, 20, 2, 5, 1};
 const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
-const TString cutname[NbCut] = {"Chi2Cut"};
+const TString cutname[NbCut] = {"Chi2Cut","tofcut1"};
 const int modpos = 0;
+
+void format_l(TLine* line, Int_t color, Int_t width) {
+	line->SetLineColor(color);
+	line->SetLineWidth(width);
+	line->SetLineStyle(3);
+}
 
 void format_h(TH1D* h, Int_t fillcolor, Int_t fillstyle, Int_t width) {
 	h->SetLineWidth(width);

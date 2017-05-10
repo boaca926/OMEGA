@@ -1,6 +1,7 @@
 #include "Getname.C"
 #include <iostream>
 #include <string>
+#include "gethisto.C"
 
 void kinfitplot() {
 	gStyle->SetOptTitle(0);
@@ -83,7 +84,7 @@ void kinfitplot() {
 	hChi2_BKGSUM1->Draw("Same");	
 	hChi2_EEG->Draw("Same");
 	hChi2_DATA->Draw("Samee1");
-	drawline(chi2cut,0.,chi2cut,ymax,1);
+	drawline(chi2cut,0.,chi2cut,ymax,2);
 	/*HCHI2_Norm[8]->Draw();
 	HCHI2_Norm[5]->Draw("Same");
 	HCHI2_Norm[6]->Draw("Same");

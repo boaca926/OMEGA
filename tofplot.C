@@ -1,6 +1,7 @@
 #include "Getname.C"
 #include <iostream>
 #include <string>
+#include "gethisto.C"
 
 void tofplot() {
 	gStyle->SetOptTitle(0);
@@ -60,32 +61,61 @@ void tofplot() {
 		format_h(H1D[i],colorid[i],0,1);
 		i++;
 	}
+	// determine standard cut
+	// linear form y1=k1*x1+b1, determine parameter k and b
+	// y2=k2*x2+b2=>if y1=y2=>k1*x+b1=k2*x+b2=>x=(b2-b1)/(k1-k2)
+	// line1_std
+	TLine *lh_std = new TLine(xmin_TOF,tofcut1,xmax_TOF,tofcut1); format_l(lh_std,4,2);
+	Double_t kh_std = getkvalue(xmin_TOF,tofcut1,xmax_TOF,tofcut1); printf("kh_std = %g \n",kh_std);
+	Double_t bh_std = getbvalue(kh_std,0.,xmin_TOF,tofcut1); printf("bh_std = %g \n",bh_std);
+	// line2_std
+	TLine *lv_std = new TLine(-1.8,xmax_TOF,2.2,xmin_TOF); format_l(lv_std,4,2);
+	Double_t kv_std = getkvalue(-1.8,xmax_TOF,2.2,xmin_TOF); printf("kv_std = %g \n",kv_std);
+	Double_t bv_std = getbvalue(kv_std,0.,-1.8,xmax_TOF); printf("bv_std = %g \n",bv_std);
+	// get cross point standard
+	Double_t lhlv_Xcross = getcrossx(kh_std,kv_std,bh_std,bv_std);
+	Double_t lhlv_Ycross = getcrossy(kh_std,bh_std,lhlv_Xcross);
+	printf("coss point: x=%g, y=%g\n",lhlv_Xcross,lhlv_Ycross);
+	TLine *lh_std_cross = new TLine(xmin_TOF,tofcut1,lhlv_Xcross,lhlv_Ycross); format_l(lh_std_cross,4,2);
+	TLine *lv_std_cross = new TLine(lhlv_Xcross,lhlv_Ycross,2.2,xmin_TOF); format_l(lv_std_cross,4,2);
 	
+	//
 	TCanvas *c = new TCanvas("c","ToF scattered",700,700);
 	c->Divide(2,2);
 	
 	c->cd(1);
 	hToF_EEG->Draw("COLZ");
 	gPad->SetLogz();
-	//drawline(100.,620.,450.,250.,1); 
-	//drawline(100.,590.,450.,220.,1);  
-	//drawline(0.65,700.,1.,450.,1); 
-	//drawline(0.85,700.,1.,200.,1);
+	hToF_EEG->GetXaxis()->SetTitle("#Deltat_{#pi^{#pm}}");
+	hToF_EEG->GetYaxis()->SetTitle("#Deltat_{e^{#pm}}");
 	
 	c->cd(2);
 	hToF_THREEPIGAM->Draw("COLZ");
-	gPad->SetLogz();
+	gPad->SetLogz(); 
+	hToF_THREEPIGAM->GetXaxis()->SetTitle("#Deltat_{#pi^{#pm}}");
+	hToF_THREEPIGAM->GetYaxis()->SetTitle("#Deltat_{e^{#pm}}");
 	
 	c->cd(3);
 	hToF_MCSUM->Draw("COLZ");
 	gPad->SetLogz();
+	lh_std_cross->Draw();
+	lv_std_cross->Draw("Same");
+	hToF_MCSUM->GetXaxis()->SetTitle("#Deltat_{#pi^{#pm}}");
+	hToF_MCSUM->GetYaxis()->SetTitle("#Deltat_{e^{#pm}}");
 	
 	c->cd(4);
 	hToF_DATA->Draw("COLZ");
 	gPad->SetLogz();
+	lh_std_cross->Draw();
+	lv_std_cross->Draw("Same"); 
+	hToF_DATA->GetXaxis()->SetTitle("#Deltat_{#pi^{#pm}}");
+	hToF_DATA->GetYaxis()->SetTitle("#Deltat_{e^{#pm}}");
 	
 	TCanvas *d = new TCanvas("d","ToF projection on Y",700,700);
 	d->cd(1);
+	Double_t ymax = H1D[10]->GetMaximum(); //cout<<ymax<<endl;
+	H1D[8]->GetYaxis()->SetRangeUser(1.,ymax*1.1);
+	H1D[8]->GetXaxis()->SetTitle("#Deltat_{e^{#pm}}");
 	H1D[10]->SetMarkerStyle(2);
 	H1D[8]->Draw();
 	H1D[5]->Draw("Same");
@@ -97,7 +127,28 @@ void tofplot() {
 	H1D[0]->Draw("Same");
 	H1D[9]->Draw("Same");
 	H1D[10]->Draw("SameP");
-	gPad->SetLogy();
+	TLine *l_cut = new TLine(tofcut1,0.,tofcut1,ymax*0.8); 
+	format_l(l_cut,4,1);
+	l_cut->Draw("Same");
+	//gPad->SetLogy();
+	
+	legd = new TLegend(0.52,0.5,0.93,0.90);
+	legd->SetFillStyle(0); 
+	legd->SetBorderSize(0);  
+	legd->SetNColumns(2);
+	legd->AddEntry(H1D[9],"Data","l");
+	legd->AddEntry(H1D[8],"ALLCHAIN","l");
+	legd->AddEntry(H1D[6],"MC rest","l");
+	legd->AddEntry(H1D[5],"#eta#gamma","l");
+	legd->AddEntry(H1D[4],"#pi^{+}#pi^{-}#pi^{0}","l");
+	legd->AddEntry(H1D[3],"#pi^{+}#pi^{-}#pi^{0}#gamma","l");
+	legd->AddEntry(H1D[2],"KSKL","l");
+	legd->AddEntry(H1D[1],"KPM","l");
+	legd->AddEntry(H1D[0],"#omega#pi^{0}","l"); 
+	legd->AddEntry(l_cut,"#Deltat_{e^{#pm}} cut","l");
+	legd->SetTextFont(132);
+	legd->Draw("Same");
+	legtextsize(legd, 0.02);
 	
 	TFile hf("./Plots/ToFPlots.root","recreate");
 	c->Write();
