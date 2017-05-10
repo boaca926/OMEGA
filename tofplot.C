@@ -69,15 +69,15 @@ void tofplot() {
 	Double_t kh_std = getkvalue(xmin_TOF,tofcut1,xmax_TOF,tofcut1); printf("kh_std = %g \n",kh_std);
 	Double_t bh_std = getbvalue(kh_std,0.,xmin_TOF,tofcut1); printf("bh_std = %g \n",bh_std);
 	// line2_std
-	//TLine *lv_std = new TLine(getxvalue(k, b, xmin_TOF),xmax_TOF,getxvalue(k, b, xmax_TOF),xmin_TOF); format_l(lv_std,4,2,3);
-	Double_t kv_std = k; printf("kv_std = %g \n",kv_std);
-	Double_t bv_std = tofcut2; printf("bv_std = %g \n",bv_std);
+	TLine *lv_std = new TLine(-1.8,xmax_TOF,2.2,xmin_TOF); format_l(lv_std,4,2,3);
+	Double_t kv_std = getkvalue(-1.8,xmax_TOF,2.2,xmin_TOF); printf("kv_std = %g \n",kv_std);
+	Double_t bv_std = getbvalue(kv_std,0.,-1.8,xmax_TOF); printf("bv_std = %g \n",bv_std);
 	// get cross point standard
 	Double_t lhlv_Xcross = getcrossx(kh_std,kv_std,bh_std,bv_std);
 	Double_t lhlv_Ycross = getcrossy(kh_std,bh_std,lhlv_Xcross);
 	printf("coss point: x=%g, y=%g\n",lhlv_Xcross,lhlv_Ycross);
 	TLine *lh_std_cross = new TLine(xmin_TOF,tofcut1,lhlv_Xcross,lhlv_Ycross); format_l(lh_std_cross,4,2,3);
-	TLine *lv_std_cross = new TLine(lhlv_Xcross,lhlv_Ycross,getxvalue(k, tofcut2, xmin_TOF),xmin_TOF); format_l(lv_std_cross,4,2,3);
+	TLine *lv_std_cross = new TLine(lhlv_Xcross,lhlv_Ycross,2.2,xmin_TOF); format_l(lv_std_cross,4,2,3);
 	
 	//
 	TCanvas *c = new TCanvas("c","ToF scattered",700,700);
@@ -100,51 +100,30 @@ void tofplot() {
 	gPad->SetLogz();
 	lh_std_cross->Draw();
 	lv_std_cross->Draw("Same");
-	
-	Int_t index=0, nbstep_temp=1, modpos1_temp=1, modpos2_temp=2;
-	if (modpos1_temp==1) {
-		double step_temp=cutstep_std[modpos1_temp]; 
-		double lb_temp=Cutlist_std[modpos1_temp]-step_temp*nbstep_temp;
-		Double_t upb_temp=Cutlist_std[modpos1_temp]+step_temp*nbstep_temp;
-		while (lb_temp<upb_temp+step_temp) {
-			Double_t lhlv_Xcross_mod = getcrossx(kh_std,kv_std,lb_temp,bv_std);
-			Double_t lhlv_Ycross_mod = getcrossy(kh_std,lb_temp,lhlv_Xcross_mod);
-			TLine *lh_std_cross_mod = new TLine(xmin_TOF,getyvalue(kh_std,lb_temp,xmin_TOF),lhlv_Xcross_mod,lhlv_Ycross_mod);			
-			if (lb_temp-Cutlist_std[modpos1_temp] > 0) {		 
-				format_l(lh_std_cross_mod,2,1,1);
-				TLine *lv_std_cross_mod = new TLine(lhlv_Xcross,lhlv_Ycross,lhlv_Xcross_mod,lhlv_Ycross_mod);
-				format_l(lv_std_cross_mod,4,2,3);
-				lv_std_cross_mod->Draw("Same");
-			}
-			else {
-				format_l(lh_std_cross_mod,1,1,1);
-			}
-			lh_std_cross_mod->Draw("Same");
-			lb_temp+=2*step_temp;
-			index++;
-		}
-	}
-	if (modpos2_temp==2) {
-		double step_temp=cutstep_std[modpos2_temp]; 
-		double lb_temp=Cutlist_std[modpos2_temp]-step_temp*nbstep_temp;
-		Double_t upb_temp=Cutlist_std[modpos2_temp]+step_temp*nbstep_temp;
-		while (lb_temp<upb_temp+step_temp) {
-			Double_t lhlv_Xcross_mod = getcrossx(kh_std,kv_std,bh_std,lb_temp);
-			Double_t lhlv_Ycross_mod = getcrossy(kh_std,bh_std,lhlv_Xcross_mod);
-			TLine *lv_std_cross_mod = new TLine(lhlv_Xcross_mod,lhlv_Ycross_mod,getxvalue(kv_std,lb_temp,xmin_TOF),xmin_TOF);
-			if (lb_temp-Cutlist_std[modpos2_temp] > 0) {		 
-				format_l(lv_std_cross_mod,2,1,1);
-				TLine *lh_std_cross_mod = new TLine(lhlv_Xcross,lhlv_Ycross,lhlv_Xcross_mod,lhlv_Ycross_mod);
-				format_l(lh_std_cross_mod,4,2,3);
-				lh_std_cross_mod->Draw("Same");
-			}
-			else {
-				format_l(lv_std_cross_mod,1,1,1);
-			}
+	Int_t index=0, nbstep_temp=1;
+	double step_temp=cutstep_std[1]; 
+	double lb_temp=Cutlist_std[1]-step_temp*nbstep_temp;
+	Double_t upb_temp=Cutlist_std[1]+step_temp*nbstep_temp;
+	while (lb_temp<upb_temp+step_temp) {
+		// modify cut parameters, varie b term with a fix k value
+		cout<<lb_temp<<endl;
+		Double_t lhlv_Xcross_mod = getcrossx(kh_std,kv_std,lb_temp,bv_std);
+		Double_t lhlv_Ycross_mod = getcrossy(kh_std,lb_temp,lhlv_Xcross_mod);
+		TLine *lh_std_cross_mod = new TLine(xmin_TOF,getyvalue(kh_std,lb_temp,xmin_TOF),lhlv_Xcross_mod,lhlv_Ycross_mod);
+		lh_std_cross_mod->Draw("Same");
+		// draw
+		if (lb_temp-Cutlist_std[1] > 0) {		 
+			format_l(lh_std_cross_mod,2,1,1);
+			TLine *lv_std_cross_mod = new TLine(lhlv_Xcross,lhlv_Ycross,lhlv_Xcross_mod,lhlv_Ycross_mod);
+			format_l(lv_std_cross_mod,4,2,3);
 			lv_std_cross_mod->Draw("Same");
-			lb_temp+=2*step_temp;
-			index++;
-		}		
+		}
+		else {
+			format_l(lh_std_cross_mod,1,1,1);
+		}
+		
+		lb_temp+=2*step_temp;
+		index++;
 	}
 	
 	hToF_MCSUM->GetXaxis()->SetTitle("#Deltat_{#pi^{#pm}}");
@@ -158,52 +137,7 @@ void tofplot() {
 	hToF_DATA->GetXaxis()->SetTitle("#Deltat_{#pi^{#pm}}");
 	hToF_DATA->GetYaxis()->SetTitle("#Deltat_{e^{#pm}}");
 	
-	if (modpos1_temp==1) {
-		double step_temp=cutstep_std[modpos1_temp]; 
-		double lb_temp=Cutlist_std[modpos1_temp]-step_temp*nbstep_temp;
-		Double_t upb_temp=Cutlist_std[modpos1_temp]+step_temp*nbstep_temp;
-		while (lb_temp<upb_temp+step_temp) {
-			Double_t lhlv_Xcross_mod = getcrossx(kh_std,kv_std,lb_temp,bv_std);
-			Double_t lhlv_Ycross_mod = getcrossy(kh_std,lb_temp,lhlv_Xcross_mod);
-			TLine *lh_std_cross_mod = new TLine(xmin_TOF,getyvalue(kh_std,lb_temp,xmin_TOF),lhlv_Xcross_mod,lhlv_Ycross_mod);			
-			if (lb_temp-Cutlist_std[modpos1_temp] > 0) {		 
-				format_l(lh_std_cross_mod,2,1,1);
-				TLine *lv_std_cross_mod = new TLine(lhlv_Xcross,lhlv_Ycross,lhlv_Xcross_mod,lhlv_Ycross_mod);
-				format_l(lv_std_cross_mod,4,2,3);
-				lv_std_cross_mod->Draw("Same");
-			}
-			else {
-				format_l(lh_std_cross_mod,1,1,1);
-			}
-			lh_std_cross_mod->Draw("Same");
-			lb_temp+=2*step_temp;
-			index++;
-		}
-	}
-	if (modpos2_temp==2) {
-		double step_temp=cutstep_std[modpos2_temp]; 
-		double lb_temp=Cutlist_std[modpos2_temp]-step_temp*nbstep_temp;
-		Double_t upb_temp=Cutlist_std[modpos2_temp]+step_temp*nbstep_temp;
-		while (lb_temp<upb_temp+step_temp) {
-			Double_t lhlv_Xcross_mod = getcrossx(kh_std,kv_std,bh_std,lb_temp);
-			Double_t lhlv_Ycross_mod = getcrossy(kh_std,bh_std,lhlv_Xcross_mod);
-			TLine *lv_std_cross_mod = new TLine(lhlv_Xcross_mod,lhlv_Ycross_mod,getxvalue(kv_std,lb_temp,xmin_TOF),xmin_TOF);
-			if (lb_temp-Cutlist_std[modpos2_temp] > 0) {		 
-				format_l(lv_std_cross_mod,2,1,1);
-				TLine *lh_std_cross_mod = new TLine(lhlv_Xcross,lhlv_Ycross,lhlv_Xcross_mod,lhlv_Ycross_mod);
-				format_l(lh_std_cross_mod,4,2,3);
-				lh_std_cross_mod->Draw("Same");
-			}
-			else {
-				format_l(lv_std_cross_mod,1,1,1);
-			}
-			lv_std_cross_mod->Draw("Same");
-			lb_temp+=2*step_temp;
-			index++;
-		}		
-	}
-	
-	TCanvas *d = new TCanvas("d","ToF projection on #Deltat_{e^{#pm}}",700,700);
+	TCanvas *d = new TCanvas("d","ToF projection on Y",700,700);
 	d->cd(1);
 	Double_t ymax = H1D[10]->GetMaximum(); //cout<<ymax<<endl;
 	H1D[8]->GetYaxis()->SetRangeUser(1.,ymax*1.1);
@@ -220,7 +154,7 @@ void tofplot() {
 	H1D[9]->Draw("Same");
 	H1D[10]->Draw("SameP");
 	TLine *l_cut = new TLine(tofcut1,0.,tofcut1,ymax*0.8); 
-	format_l(l_cut,4,2,3);
+	format_l(l_cut,4,1,3);
 	l_cut->Draw("Same");
 	//gPad->SetLogy();
 	

@@ -1,11 +1,10 @@
 const int NbTree = 11, NbVar = 7, NbCut = 3, NbMode = 4, scale = 6;
 const int NbHist = 100, bin_IM = 100, bin_TOF = 400;
 const double xmin_IM = 0., xmax_IM = 100.;
-const double xmin_TOF = -20., xmax_TOF = 20.;
-const double chi2cut = 20., tofcut1 = -0.7, tofcut2=-1.;
-const double k=-5.;
+const double xmin_TOF = -10., xmax_TOF = 10.;
+const double chi2cut = 20., tofcut1 = -0.7, tofcut2=1.;
 const double Cutlist_std[NbCut] = {chi2cut, tofcut1, tofcut2};
-const double cutstep_std[NbCut] ={2., 0.5, 5.0};
+const double cutstep_std[NbCut] ={2., 0.5, 0.1};
 const int CUTTAG = 1; // 0 disable cut
 const int colorid[NbTree] = {7, 46, 15, 4, 6, 3, 20, 20, 2, 5, 1};
 const TString cutname[NbCut] = {"Chi2Cut","tofcut1","tofcut2"};
@@ -14,7 +13,7 @@ const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
 // specify modification of cut values
 // modpos = 0: chi2cut
 // modpos = 1: tofcut1
-const int modpos = 2; // chi2 loop over 2-102, nbstep=25, chicut = 52
+const int modpos = 0; // chi2 loop over 2-102, nbstep=25, chicut = 52
 const int nbstep = 1; // nbstep=0 give standard cut value, number of cut modification = 2nstep+1
 const double step = cutstep_std[modpos]; 
 const double lb = Cutlist_std[modpos]-step*nbstep, upb = Cutlist_std[modpos]+step*nbstep;

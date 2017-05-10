@@ -16,13 +16,6 @@ Double_t getyvalue(Double_t k, Double_t b, Double_t x) {
 	return y;
 }
 
-Double_t getxvalue(Double_t k, Double_t b, Double_t y) {
-	Double_t x=0.;
-	x=(y-b)/k; 
-	
-	return x;
-}
-
 Double_t getkvalue(Double_t x0, Double_t y0, Double_t x1, Double_t y1) {
 	Double_t k=0., yvalue=0.;
 	k=(y1-y0)/(x1-x0); 
