@@ -1,10 +1,11 @@
 const int NbTree = 11, NbVar = 7, NbCut = 3, NbMode = 4, scale = 6;
 const int NbHist = 100, bin_IM = 100, bin_TOF = 400;
 const double xmin_IM = 0., xmax_IM = 100.;
-const double xmin_TOF = -10., xmax_TOF = 10.;
-const double chi2cut = 20., tofcut1 = -0.7, tofcut2=1.;
+const double xmin_TOF = -20., xmax_TOF = 20.;
+const double chi2cut = 20., tofcut1 = -0.7, tofcut2=-1.;
+const double k=-5.;
 const double Cutlist_std[NbCut] = {chi2cut, tofcut1, tofcut2};
-const double cutstep_std[NbCut] ={2., 0.5, 0.1};
+const double cutstep_std[NbCut] ={2., 0.5, 5.0};
 const int CUTTAG = 1; // 0 disable cut
 const int colorid[NbTree] = {7, 46, 15, 4, 6, 3, 20, 20, 2, 5, 1};
 const TString cutname[NbCut] = {"Chi2Cut","tofcut1","tofcut2"};

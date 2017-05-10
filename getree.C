@@ -568,6 +568,8 @@ void getree () {
 	}
 	//cout<<Cutlist[0]<<endl;
 	
+	TCanvas *c = new TCanvas("c","optimization of chi2 cut",700,700);
+	c->cd(1);
 	TGraph* gf= new TGraph(STEP+1,modlist,sblist);
 	gf->GetXaxis()->SetTitle("#chi^{2} cut");
 	gf->GetYaxis()->SetTitle("Number of expected e^{+}e^{-}->X->#pi^{+}#pi^{-}#pi^{0}#gamma event");
