@@ -148,9 +148,7 @@ void MyClass::Main()
 			   if (pi0nb == 1 && piplnb == 1 && piminb == 1 && isr1nb == 1 ) {// threepigam
 			   	mctype = 4;  
 			      Eisr=trueisr.E();			      
-			      IMthreepi_MC = true3pi.M(); 
-			      //omegam_mc.threepiIM=true3pi.M();	
-			      //omegam_mc.isrE=trueisr.E();		     
+			      IMthreepi_MC = true3pi.M(); 	     
 			      THREEPIGAM_MC.Fill();
       		}
       		else {

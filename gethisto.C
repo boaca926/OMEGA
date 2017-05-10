@@ -2,6 +2,20 @@
 #include <iostream>
 #include <string>
 
+
+void format_l(TLine* line, Int_t color, Int_t width, Int_t style) {
+	line->SetLineColor(color);
+	line->SetLineWidth(width);
+	line->SetLineStyle(style);
+}
+
+Double_t getyvalue(Double_t k, Double_t b, Double_t x) {
+	Double_t y=0.;
+	y=k*x+b; 
+	
+	return y;
+}
+
 Double_t getkvalue(Double_t x0, Double_t y0, Double_t x1, Double_t y1) {
 	Double_t k=0., yvalue=0.;
 	k=(y1-y0)/(x1-x0); 
@@ -10,11 +24,12 @@ Double_t getkvalue(Double_t x0, Double_t y0, Double_t x1, Double_t y1) {
 }
 
 Double_t getbvalue(Double_t k, Double_t x, Double_t x0, Double_t y0){
-	Double_t y=0.;
-	y=k*(x-x0)+y0;
+	Double_t b=0.;
+	b=k*(x-x0)+y0;
 	
-	return y;
+	return b;
 }
+
 
 Double_t getcrossx(Double_t k1, Double_t k2, Double_t b1, Double_t b2) {
 	Double_t x=0.;

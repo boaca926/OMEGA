@@ -65,19 +65,19 @@ void tofplot() {
 	// linear form y1=k1*x1+b1, determine parameter k and b
 	// y2=k2*x2+b2=>if y1=y2=>k1*x+b1=k2*x+b2=>x=(b2-b1)/(k1-k2)
 	// line1_std
-	TLine *lh_std = new TLine(xmin_TOF,tofcut1,xmax_TOF,tofcut1); format_l(lh_std,4,2);
+	TLine *lh_std = new TLine(xmin_TOF,tofcut1,xmax_TOF,tofcut1); format_l(lh_std,4,2,3);
 	Double_t kh_std = getkvalue(xmin_TOF,tofcut1,xmax_TOF,tofcut1); printf("kh_std = %g \n",kh_std);
 	Double_t bh_std = getbvalue(kh_std,0.,xmin_TOF,tofcut1); printf("bh_std = %g \n",bh_std);
 	// line2_std
-	TLine *lv_std = new TLine(-1.8,xmax_TOF,2.2,xmin_TOF); format_l(lv_std,4,2);
+	TLine *lv_std = new TLine(-1.8,xmax_TOF,2.2,xmin_TOF); format_l(lv_std,4,2,3);
 	Double_t kv_std = getkvalue(-1.8,xmax_TOF,2.2,xmin_TOF); printf("kv_std = %g \n",kv_std);
 	Double_t bv_std = getbvalue(kv_std,0.,-1.8,xmax_TOF); printf("bv_std = %g \n",bv_std);
 	// get cross point standard
 	Double_t lhlv_Xcross = getcrossx(kh_std,kv_std,bh_std,bv_std);
 	Double_t lhlv_Ycross = getcrossy(kh_std,bh_std,lhlv_Xcross);
 	printf("coss point: x=%g, y=%g\n",lhlv_Xcross,lhlv_Ycross);
-	TLine *lh_std_cross = new TLine(xmin_TOF,tofcut1,lhlv_Xcross,lhlv_Ycross); format_l(lh_std_cross,4,2);
-	TLine *lv_std_cross = new TLine(lhlv_Xcross,lhlv_Ycross,2.2,xmin_TOF); format_l(lv_std_cross,4,2);
+	TLine *lh_std_cross = new TLine(xmin_TOF,tofcut1,lhlv_Xcross,lhlv_Ycross); format_l(lh_std_cross,4,2,3);
+	TLine *lv_std_cross = new TLine(lhlv_Xcross,lhlv_Ycross,2.2,xmin_TOF); format_l(lv_std_cross,4,2,3);
 	
 	//
 	TCanvas *c = new TCanvas("c","ToF scattered",700,700);
@@ -100,6 +100,32 @@ void tofplot() {
 	gPad->SetLogz();
 	lh_std_cross->Draw();
 	lv_std_cross->Draw("Same");
+	Int_t index=0, nbstep_temp=1;
+	double step_temp=cutstep_std[1]; 
+	double lb_temp=Cutlist_std[1]-step_temp*nbstep_temp;
+	Double_t upb_temp=Cutlist_std[1]+step_temp*nbstep_temp;
+	while (lb_temp<upb_temp+step_temp) {
+		// modify cut parameters, varie b term with a fix k value
+		cout<<lb_temp<<endl;
+		Double_t lhlv_Xcross_mod = getcrossx(kh_std,kv_std,lb_temp,bv_std);
+		Double_t lhlv_Ycross_mod = getcrossy(kh_std,lb_temp,lhlv_Xcross_mod);
+		TLine *lh_std_cross_mod = new TLine(xmin_TOF,getyvalue(kh_std,lb_temp,xmin_TOF),lhlv_Xcross_mod,lhlv_Ycross_mod);
+		lh_std_cross_mod->Draw("Same");
+		// draw
+		if (lb_temp-Cutlist_std[1] > 0) {		 
+			format_l(lh_std_cross_mod,2,1,1);
+			TLine *lv_std_cross_mod = new TLine(lhlv_Xcross,lhlv_Ycross,lhlv_Xcross_mod,lhlv_Ycross_mod);
+			format_l(lv_std_cross_mod,4,2,3);
+			lv_std_cross_mod->Draw("Same");
+		}
+		else {
+			format_l(lh_std_cross_mod,1,1,1);
+		}
+		
+		lb_temp+=2*step_temp;
+		index++;
+	}
+	
 	hToF_MCSUM->GetXaxis()->SetTitle("#Deltat_{#pi^{#pm}}");
 	hToF_MCSUM->GetYaxis()->SetTitle("#Deltat_{e^{#pm}}");
 	
@@ -128,7 +154,7 @@ void tofplot() {
 	H1D[9]->Draw("Same");
 	H1D[10]->Draw("SameP");
 	TLine *l_cut = new TLine(tofcut1,0.,tofcut1,ymax*0.8); 
-	format_l(l_cut,4,1);
+	format_l(l_cut,4,1,3);
 	l_cut->Draw("Same");
 	//gPad->SetLogy();
 	

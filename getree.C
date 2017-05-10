@@ -6,7 +6,9 @@ using namespace std;
 
 Double_t tree(double list[], int index) 
 {
-	//cout<<index<<endl;
+	for (int i=0;i<NbCut;i++) {
+		std::cout<<cutname[i]<<": "<<list[i]<<endl;
+	}
 	TString str_index; 
 	str_index.Form("%d",index); 
 	// return str_index.Data);
@@ -37,8 +39,8 @@ Double_t tree(double list[], int index)
 	TString SIMthreepi = getbraname(1); //std::cout<<getbraname(1)<<endl;
 	TString SEisr = getbraname(2); //std::cout<<getbraname(2)<<endl;
 	TString Schi2value = getbraname(3); 
-	TString SBestPiTime = getbraname(5); std::cout<<getbraname(5)<<endl;
-	TString SBestETime = getbraname(6); std::cout<<getbraname(6)<<endl;
+	TString SBestPiTime = getbraname(5); //std::cout<<getbraname(5)<<endl;
+	TString SBestETime = getbraname(6); //std::cout<<getbraname(6)<<endl;
 	
 	TTree *TOMEGAPI_MC = new TTree("T"+OMEGAPI+"_MC","recreate");
 	TTree *TKPM_MC = new TTree("T"+KPM+"_MC","recreate");
@@ -503,46 +505,50 @@ Double_t tree(double list[], int index)
 }
 
 void getree () {
-	// specify modification of cut values
-	const int nbstep = 1;
-	const double step = 2; 
-	const double lb = 20., upb = lb+step*nbstep;
+	const int STEP=nbstep*2;
+	//cout<<modpos<<endl;
 	// check modification list stores all cadidate values for cuts	
-	std::cout<<"Cut: "<<cutname[modpos]<<" varies within ["<<lb<<","<<upb<<") with a step "<<step<<endl;
-	std::cout<<"Total "<<nbstep<<" modifications will be made."<<endl;
-	//Double_t step = (upb - lb)/nbstep; // get step width
-	//std::cout<<"step = "<<step<<endl;
+	std::cout<<"Cut: "<<cutname[modpos]<<" varies within ["<<lb<<","<<upb<<"] with a step "<<step<<endl;
+	std::cout<<"Total "<<STEP<<" modifications will be made."<<endl;
 	// create cut target list for modification and sepcify which cut value one wants to modified	
-	Double_t modlist[nbstep]; // length of modification list needs to be same as nbstep
-	Double_t sblist[nbstep];
+	Double_t modlist[STEP]; // length of modification list needs to be same as STEP
+	Double_t sblist[STEP];
 	Double_t Cutlist[NbCut]; // create cutlist will store specific modified cut value
 	for (int i=0;i<NbCut;i++) {// initialize cutlist by copy cutlist_sta to it
 		Cutlist[i]=Cutlist_std[i];
 		//cout<<Cutlist[i]<<endl;
 	}
 	Int_t index_mod=0;
-	for (int i=0;i<nbstep;i++) {// initialize modification list
+	for (int i=0;i<STEP;i++) {// initialize modification list
 		modlist[i]=0.;
 		sblist[i]=0.;
 	}
-	Double_t value_temp=index_mod*step;
-	
+	//Double_t value_temp=index_mod*step;
+	//cout<<upb-step<<endl;
 	Double_t sb_temp=0.;
-	while (value_temp<upb-step) {
-		value_temp=lb+index_mod*step; //cout<<index_mod*step<<endl;
-		modlist[index_mod] = value_temp; //cout<<modlist[index_mod]<<endl;
+	while (lb<upb+step) {
+		//cout<<lb<<endl;
+		//cout<<upb<<endl;
+		//value_temp=lb+index_mod*step; cout<<index_mod*step<<endl;
+		modlist[index_mod] = lb; //cout<<modlist[index_mod]<<endl;
 		// fill cutlist for each modified value at specific postion
 		for (int i=0;i<NbCut;i++) {// initialize cutlist by copy cutlist_sta to it
 			if (i==modpos) {
-				Cutlist[i]=modlist[index_mod];
+				Cutlist[i]=lb;
 				//std::cout<<cutname[modpos]<<" is modified from "<<Cutlist_std[modpos]<<" to "<<Cutlist[i]<<endl;
 				//cout<<Cutlist[i]<<endl;
 			}
+			else {
+				Cutlist[i]=Cutlist_std[i];
+			}
+			//cout<<Cutlist[i]<<endl;
 		}
 		sb_temp=tree(Cutlist,modpos); 
 		sblist[index_mod]=sb_temp;
 		//cout<<"sb = "<<sblist[index_mod]<<", chi2cut = "<<modlist[index_mod]<<endl;
-		index_mod++;
+		lb+=step;
+		index_mod++;		
+		
 	}
 	Int_t index=0;
 	for (Int_t i=0;i<NbCut;i++) {
@@ -562,7 +568,7 @@ void getree () {
 	}
 	//cout<<Cutlist[0]<<endl;
 	
-	TGraph* gf= new TGraph(nbstep,modlist,sblist);
+	TGraph* gf= new TGraph(STEP+1,modlist,sblist);
 	gf->GetXaxis()->SetTitle("#chi^{2} cut");
 	gf->GetYaxis()->SetTitle("Number of expected e^{+}e^{-}->X->#pi^{+}#pi^{-}#pi^{0}#gamma event");
 	gf->Draw("AC");
