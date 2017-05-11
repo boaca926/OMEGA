@@ -7,8 +7,9 @@ using namespace std;
 Double_t tree(double list[], int index) 
 {
 	for (int i=0;i<NbCut;i++) {
-		std::cout<<cutname[i]<<": "<<list[i]<<endl;
+		std::cout<<cutname[i]<<": "<<list[i]<<" // ";
 	}
+	
 	TString str_index; 
 	str_index.Form("%d",index); 
 	// return str_index.Data);
@@ -438,7 +439,7 @@ Double_t tree(double list[], int index)
 	//cout<<list[index]-Cutlist_std[index]<<endl;
    //cout<<Cutlist_std[index]<<endl;
    if (list[index]==Cutlist_std[index]) {
-   	printf("STANDARD CUTS ARE SPOTTED \n", index);
+   	printf("\nSTANDARD CUTS ARE SPOTTED \n", index);
 		printf("=================Generated=================\n");
    	printf("1. # OMEGAPI_MC = %d \n", omegapiNb_MC);
    	printf("2. # KPM_MC = %d \n", kpmNb_MC);
@@ -505,12 +506,17 @@ Double_t tree(double list[], int index)
 }
 
 void getree () {
+	gStyle->SetOptTitle(0);
+   gStyle->SetStatBorderSize(0);
+   gStyle->SetOptStat(0);
+   gStyle->SetLineScalePS(2);
+	
 	double lb = Cutlist_std[modpos]-step*nbstep, upb = Cutlist_std[modpos]+step*nbstep;
 	const int STEP=nbstep*2+1;
 	//cout<<modpos<<endl;
 	// check modification list stores all cadidate values for cuts	
 	std::cout<<"Cut: "<<cutname[modpos]<<" varies within ["<<lb<<","<<upb<<"] with a step "<<step<<endl;
-	std::cout<<"Total "<<STEP-1<<" modifications with respect to "<<Cutlist_std[modpos]<<" will be made."<<endl;
+	std::cout<<"Total "<<STEP-1<<" modifications with respect to "<<Cutlist_std[modpos]<<endl;
 	// create cut target list for modification and sepcify which cut value one wants to modified	
 	Double_t modlist[STEP]; // length of modification list needs to be same as STEP
 	Double_t sblist[STEP];
@@ -528,7 +534,7 @@ void getree () {
 	//cout<<upb-step<<endl;
 	Double_t sb_temp=0.;
 	for (int i=0;i<STEP;i++) {
-		cout<<i<<endl;
+		cout<<"\nMOD "<<i+1<<": ";
 		modlist[i] = lb; 
 		//cout<<lb<<endl;
 		/*for (int k=0;k<NbCut;k++) {// initialize cutlist by copy cutlist_sta to it
@@ -548,7 +554,7 @@ void getree () {
 		sblist[i]=sb_temp;
 		lb+=step; 
 	}
-	std::cout<<"---------"<<endl;
+	std::cout<<"\n---------"<<endl;
 	/*while (lb<upb+step) {
 		cout<<index_mod<<endl;
 		//cout<<upb<<endl;
@@ -593,17 +599,20 @@ void getree () {
 	
 	TCanvas *c = new TCanvas("c","optimization of chi2 cut",700,700);
 	c->cd(1);
+	TGaxis::SetMaxDigits(1);
 	TGraph* gf= new TGraph(STEP,modlist,sblist);
 	gf->GetXaxis()->SetTitle("#chi^{2} cut");
-	gf->GetYaxis()->SetTitle("Number of expected e^{+}e^{-}->#pi^{+}#pi^{-}#pi^{0}#gamma event");	
+	gf->GetYaxis()->SetTitle("Number of expected e^{+}e^{-}#rightarrow#pi^{+}#pi^{-}#pi^{0}#gamma event");	
 	gf->SetLineWidth(3); 
 	gf->SetMarkerStyle(21);
 	//gf->SetLineColor(2);
 	gf->Draw("AP");
 	//gf->Draw("CP");
 	//gf->Draw("P");
+	gf->GetXaxis()->SetNdivisions(505);
+	gf->GetYaxis()->SetNdivisions(505);
 	
-	TFile hf("./Plots/optimchi2gf.root","recreate");
-   gf->Write();
+	TFile hf("./Plots/optimchi2gf_"+cutname[modpos]+".root","recreate");
+   c->Write();
 	
 }

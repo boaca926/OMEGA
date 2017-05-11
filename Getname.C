@@ -14,8 +14,8 @@ const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
 // specify modification of cut values
 // modpos = 0: chi2cut
 // modpos = 1: tofcut1
-const int modpos = 1; // chi2 loop over 2-102, nbstep=25, chicut = 52
-const int nbstep = 20; // nbstep=0 give standard cut value, number of cut modification = 2nstep+1
+const int modpos = 0; // chi2 loop over 2-102, nbstep=25, chicut = 52
+const int nbstep = 1; // nbstep=0 give standard cut value, number of cut modification = 2nstep+1
 const double step = cutstep_std[modpos]; 
 
 
