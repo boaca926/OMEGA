@@ -346,7 +346,7 @@ Double_t tree(double list[], int index)
    	allchainrho_pre->GetEntry(irow); //cout<<irow<<endl;
    	//cout<<CUTTAG<<endl;
    	// CUT TYPE
-		CUTYPE=getcutype(chi2value, list); //cout<<CUTYPE<<endl;
+		CUTYPE=getcutype(chi2value,bestETime,bestPiTime,list); //cout<<CUTYPE<<endl;
    	//
    	if (!CUTYPE && CUTTAG) continue;
    	//cout<<CUTTAG[0]<<endl;
@@ -363,7 +363,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchaineeg_pre->GetEntries();irow++) {
    	allchaineeg_pre->GetEntry(irow); 
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value, list);
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,list);
    	if (!CUTYPE && CUTTAG) continue;
    	//cout<<cutype[0]<<endl;
    	for (Int_t i=0;i<scale;i++) {
@@ -378,7 +378,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchaindata_pre->GetEntries();irow++) {
    	allchaindata_pre->GetEntry(irow);
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value, list);
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,list);
    	if (!CUTYPE && CUTTAG) continue;
    	dataNb_Pre++; 
    	TDATA_Pre->Fill();	
@@ -390,7 +390,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchainksl_pre->GetEntries();irow++) {
    	allchainksl_pre->GetEntry(irow); 
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value, list);
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,list);
    	if (!CUTYPE && CUTTAG) continue; 	
    	//cout<<CUTTAG[0]<<endl;	
    	if (mctype == 1) {/// omega pi
@@ -434,9 +434,9 @@ Double_t tree(double list[], int index)
    
    
    Double_t sb_Pre = omegamNb_Pre/(mcsumNb_Pre-omegamNb_Pre)*(dataNb_Pre-omegamNb_Pre);
-   printf("# expected signal events = %g, chi2cut = %g  \n",sb_Pre, list[index]);
-	
-   //cout<<1<<endl;
+	//std::cout<<"# expected signal events = "<<sb_Pre<<", "+cutname[index]+"= "<<list[index]<<endl;
+	//cout<<list[index]-Cutlist_std[index]<<endl;
+   //cout<<Cutlist_std[index]<<endl;
    if (list[index]==Cutlist_std[index]) {
    	printf("STANDARD CUTS ARE SPOTTED \n", index);
 		printf("=================Generated=================\n");
@@ -505,11 +505,12 @@ Double_t tree(double list[], int index)
 }
 
 void getree () {
-	const int STEP=nbstep*2;
+	double lb = Cutlist_std[modpos]-step*nbstep, upb = Cutlist_std[modpos]+step*nbstep;
+	const int STEP=nbstep*2+1;
 	//cout<<modpos<<endl;
 	// check modification list stores all cadidate values for cuts	
 	std::cout<<"Cut: "<<cutname[modpos]<<" varies within ["<<lb<<","<<upb<<"] with a step "<<step<<endl;
-	std::cout<<"Total "<<STEP<<" modifications will be made."<<endl;
+	std::cout<<"Total "<<STEP-1<<" modifications with respect to "<<Cutlist_std[modpos]<<" will be made."<<endl;
 	// create cut target list for modification and sepcify which cut value one wants to modified	
 	Double_t modlist[STEP]; // length of modification list needs to be same as STEP
 	Double_t sblist[STEP];
@@ -526,8 +527,30 @@ void getree () {
 	//Double_t value_temp=index_mod*step;
 	//cout<<upb-step<<endl;
 	Double_t sb_temp=0.;
-	while (lb<upb+step) {
+	for (int i=0;i<STEP;i++) {
+		cout<<i<<endl;
+		modlist[i] = lb; 
 		//cout<<lb<<endl;
+		/*for (int k=0;k<NbCut;k++) {// initialize cutlist by copy cutlist_sta to it
+			if (k==modpos) {
+				Cutlist[k]=lb;
+				//std::cout<<cutname[modpos]<<" is modified from "<<Cutlist_std[modpos]<<" to "<<Cutlist[k]<<endl;
+				//cout<<Cutlist[i]<<endl;
+			}
+			else {
+				Cutlist[k]=Cutlist_std[k];
+			}
+			
+		}*/
+		Cutlist[modpos]=Cutlist_std[modpos]-step*(nbstep-i);
+		//cout<<Cutlist[modpos]-Cutlist_std[modpos]<<endl;
+		sb_temp=tree(Cutlist,modpos); 
+		sblist[i]=sb_temp;
+		lb+=step; 
+	}
+	std::cout<<"---------"<<endl;
+	/*while (lb<upb+step) {
+		cout<<index_mod<<endl;
 		//cout<<upb<<endl;
 		//value_temp=lb+index_mod*step; cout<<index_mod*step<<endl;
 		modlist[index_mod] = lb; //cout<<modlist[index_mod]<<endl;
@@ -543,13 +566,13 @@ void getree () {
 			}
 			//cout<<Cutlist[i]<<endl;
 		}
-		sb_temp=tree(Cutlist,modpos); 
-		sblist[index_mod]=sb_temp;
+		//sb_temp=tree(Cutlist,modpos); 
+		//sblist[index_mod]=sb_temp;
 		//cout<<"sb = "<<sblist[index_mod]<<", chi2cut = "<<modlist[index_mod]<<endl;
 		lb+=step;
 		index_mod++;		
 		
-	}
+	}*/
 	Int_t index=0;
 	for (Int_t i=0;i<NbCut;i++) {
 		if (Cutlist_std[i]!=Cutlist[i]) {
@@ -570,14 +593,15 @@ void getree () {
 	
 	TCanvas *c = new TCanvas("c","optimization of chi2 cut",700,700);
 	c->cd(1);
-	TGraph* gf= new TGraph(STEP+1,modlist,sblist);
+	TGraph* gf= new TGraph(STEP,modlist,sblist);
 	gf->GetXaxis()->SetTitle("#chi^{2} cut");
-	gf->GetYaxis()->SetTitle("Number of expected e^{+}e^{-}->X->#pi^{+}#pi^{-}#pi^{0}#gamma event");
-	gf->Draw("AC");
+	gf->GetYaxis()->SetTitle("Number of expected e^{+}e^{-}->#pi^{+}#pi^{-}#pi^{0}#gamma event");	
 	gf->SetLineWidth(3); 
 	gf->SetMarkerStyle(21);
-	gf->SetLineColor(2);
-	gf->Draw("CP");
+	//gf->SetLineColor(2);
+	gf->Draw("AP");
+	//gf->Draw("CP");
+	//gf->Draw("P");
 	
 	TFile hf("./Plots/optimchi2gf.root","recreate");
    gf->Write();

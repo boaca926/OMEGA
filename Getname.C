@@ -2,11 +2,11 @@ const int NbTree = 11, NbVar = 7, NbCut = 3, NbMode = 4, scale = 6;
 const int NbHist = 100, bin_IM = 100, bin_TOF = 400;
 const double xmin_IM = 0., xmax_IM = 100.;
 const double xmin_TOF = -10., xmax_TOF = 10.;
-const double chi2cut = 20., tofcut1 = -0.7, tofcut2=1;
+const double chi2cut = 30., tofcut1 = -0.4, tofcut2=1;
 const double k=-5.;
 const double Cutlist_std[NbCut] = {chi2cut, tofcut1, tofcut2};
 const double cutstep_std[NbCut] ={2., 0.1, 1.0};
-const int CUTTAG = 0; // 0 disable cut
+const int CUTTAG = 1; // 0 disable cut
 const int colorid[NbTree] = {7, 46, 15, 4, 6, 3, 20, 20, 2, 5, 1};
 const TString cutname[NbCut] = {"Chi2Cut","tofcut1","tofcut2"};
 const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
@@ -14,10 +14,10 @@ const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
 // specify modification of cut values
 // modpos = 0: chi2cut
 // modpos = 1: tofcut1
-const int modpos = 2; // chi2 loop over 2-102, nbstep=25, chicut = 52
-const int nbstep = 1; // nbstep=0 give standard cut value, number of cut modification = 2nstep+1
+const int modpos = 1; // chi2 loop over 2-102, nbstep=25, chicut = 52
+const int nbstep = 20; // nbstep=0 give standard cut value, number of cut modification = 2nstep+1
 const double step = cutstep_std[modpos]; 
-const double lb = Cutlist_std[modpos]-step*nbstep, upb = Cutlist_std[modpos]+step*nbstep;
+
 
 
 void format_h(TH1D* h, Int_t fillcolor, Int_t fillstyle, Int_t width) {
@@ -71,19 +71,33 @@ void normlizehisto(TH1D* h, TH1D* hh) {
 	}
 }
 
-Int_t getcutype(Double_t chi2value, Double_t cutlist[]) {
-	//cout<<cutlist[0]<<endl;
+Int_t getcutype(Double_t chi2value, Double_t bestETime, Double_t bestPiTime, Double_t cutlist[]) {
+	//cout<<bestETime<<endl;
 	Int_t Type = 0;
-	Int_t type[1] = {0};
-	
+	Int_t type[NbCut] = {0,0,0};
+	// chi2 cut
 	if (chi2value < cutlist[0]) {
 		type[0] = 1;
 	}
 	else {
 		type[0] = 0;
 	}
-	
-	if (type[0]) {
+	// tof cut1
+	if (bestETime < cutlist[1]) {
+		type[1] = 1;
+	}
+	else {
+		type[1] = 0;
+	}
+	// tof cut2
+	if (bestETime < cutlist[2]) {
+		type[2] = 1;
+	}
+	else {
+		type[2] = 0;
+	}
+	// all cuts
+	if (type[0] && type[1] ) {
 		Type = 1;
 	}
 	else {
