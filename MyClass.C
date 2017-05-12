@@ -15,6 +15,7 @@ void MyClass::Main()
 	Double_t IMthreepi_MC = 0., Eisr = 0.;
 	Double_t chi2value = 0., pvalue = 0.;
 	Double_t bestPiTime = 0., bestETime = 0.;
+	Double_t deltaE = 0., tracksum = 0.;
 
 	// get names
 	TString OMEGAPI = gettreename(0); 
@@ -58,6 +59,8 @@ void MyClass::Main()
 	TString SChi2value = getbraname(3); std::cout<<getbraname(3)<<endl; 
 	TString SBestPiTime = getbraname(5); std::cout<<getbraname(5)<<endl;
 	TString SBestETime = getbraname(6); std::cout<<getbraname(6)<<endl;
+	TString SDeltaE = getbraname(7); std::cout<<getbraname(7)<<endl;
+	TString STracksum = getbraname(8); std::cout<<getbraname(8)<<endl;
 	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -70,6 +73,8 @@ void MyClass::Main()
 		tree_temp->Branch(SChi2value,&chi2value,SChi2value+"/D");
 		tree_temp->Branch(SBestPiTime,&bestPiTime,SBestPiTime+"/D");
 		tree_temp->Branch(SBestETime,&bestETime,SBestETime+"/D");
+		tree_temp->Branch(SDeltaE,&deltaE,SDeltaE+"/D");
+		tree_temp->Branch(STracksum,&tracksum,STracksum+"/D");
 	}	
 
 	///
@@ -383,11 +388,26 @@ void MyClass::Main()
 		TLorentzVector bestppl=Gettrack4vectorkinfit(bestinputvector(15), bestinputvector(16), bestinputvector(17));
 		TLorentzVector bestpmi=Gettrack4vectorkinfit(bestinputvector(18), bestinputvector(19), bestinputvector(20));
 		
+		// fitted
+		TLorentzVector bestphoton1kinfit=Getphoton4vector(bestinputvectorkinfit(0),bestinputvectorkinfit(1),bestinputvectorkinfit(2),bestinputvectorkinfit(3));
+		TLorentzVector bestphoton2kinfit=Getphoton4vector(bestinputvectorkinfit(5),bestinputvectorkinfit(6),bestinputvectorkinfit(7),bestinputvectorkinfit(8));
+		TLorentzVector bestphoton3kinfit=Getphoton4vector(bestinputvectorkinfit(10),bestinputvectorkinfit(11),bestinputvectorkinfit(12),bestinputvectorkinfit(13));
+		TLorentzVector bestpplkinfit=Gettrack4vectorkinfit(bestinputvectorkinfit(15), bestinputvectorkinfit(16), bestinputvectorkinfit(17));
+		TLorentzVector bestpmikinfit=Gettrack4vectorkinfit(bestinputvectorkinfit(18), bestinputvectorkinfit(19), bestinputvectorkinfit(20));
+		
 		//time-of-fligt
 		TVector2 bestppltime(2.0,-6.0), bestpmitime(2.0,-6.0);
 		bestppltime.Set(timinginfo(trackindex1,bestppl)); // ppltime.Print();
 		bestpmitime.Set(timinginfo(trackindex2,bestpmi));
 		bestPiTime=bestppltime.X(), bestETime=bestppltime.Y();
+		
+		//deltaE and tracksum
+		tracksum = (bestpplkinfit.Vect()).Mag()+(bestpmikinfit.Vect()).Mag();
+		
+		Double_t pionMsqr=TMath::Power(masschpion,2);
+		Double_t pplmomsqr=TMath::Power((bestpplkinfit.Vect()).Mag(),2);
+		Double_t pmimomsqr=TMath::Power((bestpmikinfit.Vect()).Mag(),2);
+		deltaE = (bestpplkinfit.Vect()+bestpmikinfit.Vect()-Beam.Vect()).Mag()-(Beam.E()-TMath::Sqrt(pionMsqr+pplmomsqr)-TMath::Sqrt(pionMsqr+pmimomsqr));
 
 
 		ALLCHAIN_Pre.Fill();

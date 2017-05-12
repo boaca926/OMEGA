@@ -3,6 +3,9 @@
 cd /home/bo/Desktop/omega/ROOT
 rm -f *
 cd ..
+cd /home/bo/Desktop/omega/Plots
+rm -f *
+cd ..
 rm rungetree.C
 runscript=rungetree.C
 echo "void rungetree() {" >> $runscript

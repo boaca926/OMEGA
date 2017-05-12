@@ -23,6 +23,7 @@ Double_t tree(double list[], int index)
 	Double_t chi2value = 0.;
 	Double_t bestPiTime = 0.;
 	Double_t bestETime = 0.;
+	Double_t deltaE = 0.;
 	// tree names
 	TString OMEGAPI = gettreename(0); //
 	TString KPM = gettreename(1); //
@@ -42,6 +43,8 @@ Double_t tree(double list[], int index)
 	TString Schi2value = getbraname(3); 
 	TString SBestPiTime = getbraname(5); //std::cout<<getbraname(5)<<endl;
 	TString SBestETime = getbraname(6); //std::cout<<getbraname(6)<<endl;
+	TString SDeltaE = getbraname(7); std::cout<<getbraname(7)<<endl;
+	
 	
 	TTree *TOMEGAPI_MC = new TTree("T"+OMEGAPI+"_MC","recreate");
 	TTree *TKPM_MC = new TTree("T"+KPM+"_MC","recreate");
@@ -104,6 +107,7 @@ Double_t tree(double list[], int index)
 		tree_temp->Branch(Schi2value,&chi2value,Schi2value+"/D");
 		tree_temp->Branch(SBestPiTime,&bestPiTime,SBestPiTime+"/D");
 		tree_temp->Branch(SBestETime,&bestETime,SBestETime+"/D");
+		tree_temp->Branch(SDeltaE,&deltaE,SDeltaE+"/D");
 		tree_temp->Branch(Smctype,&mctype,Smctype+"/I");
 	}
 	
@@ -153,6 +157,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
+						chain_temp->SetBranchAddress(SDeltaE,&deltaE);
 					}	
                
             }
@@ -185,6 +190,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
+						chain_temp->SetBranchAddress(SDeltaE,&deltaE);
 					}	
             }
          }
@@ -216,6 +222,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
+						chain_temp->SetBranchAddress(SDeltaE,&deltaE);
 					}	
             }
          }
@@ -247,6 +254,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
+						chain_temp->SetBranchAddress(SDeltaE,&deltaE);
 					}	
             }
          }
@@ -433,9 +441,13 @@ Double_t tree(double list[], int index)
    }
    
    
-   
-   Double_t sb_Pre = omegamNb_Pre/(mcsumNb_Pre-omegamNb_Pre)*(dataNb_Pre-omegamNb_Pre);
-	//std::cout<<"# expected signal events = "<<sb_Pre<<", "+cutname[index]+"= "<<list[index]<<endl;
+   Double_t SBLIST [3] = {0.,0.,0.};
+   Double_t sb_Pre = omegamNb_Pre/(mcsumNb_Pre-omegamNb_Pre);
+   SBLIST[0] = (omegamNb_Pre/mcsumNb_Pre)*dataNb_Pre;
+   //count<<mcsumNb_Pre<<endl;
+   //cout<<dataNb<<endl;
+   //cout<<TMath::Sqrt(mcsumNb_Pre)<<endl;
+	std::cout<<"# score function = "<<SBLIST[0]<<", "+cutname[index]+"= "<<list[index]<<endl;
 	//cout<<list[index]-Cutlist_std[index]<<endl;
    //cout<<Cutlist_std[index]<<endl;
    if (list[index]==Cutlist_std[index]) {
@@ -486,8 +498,13 @@ Double_t tree(double list[], int index)
 		TMCSUM_MC->Write();
 		TEEG_MC->Write();
 		TDATA->Write();	
-
-		TFile ftree("./ROOT/TREE_"+cutname[index]+".root","recreate");
+		
+		if (!CUTTAG){
+			TFile ftree("./ROOT/TREE_Pre.root","recreate");
+		}
+		else {
+			TFile ftree("./ROOT/TREE_"+cutname[index]+".root","recreate");
+		}	
 		TOMEGAPI_Pre->Write();
 		TTHREEPIGAM_Pre->Write();
 		TKPM_Pre->Write();
@@ -501,7 +518,7 @@ Double_t tree(double list[], int index)
 		TDATA_Pre->Write();
 	}	
 	
-	return sb_Pre;
+	return SBLIST[];
 
 }
 
@@ -510,13 +527,16 @@ void getree () {
    gStyle->SetStatBorderSize(0);
    gStyle->SetOptStat(0);
    gStyle->SetLineScalePS(2);
+   TGaxis::SetMaxDigits(3);
 	
 	double lb = Cutlist_std[modpos]-step*nbstep, upb = Cutlist_std[modpos]+step*nbstep;
 	const int STEP=nbstep*2+1;
 	//cout<<modpos<<endl;
 	// check modification list stores all cadidate values for cuts	
-	std::cout<<"Cut: "<<cutname[modpos]<<" varies within ["<<lb<<","<<upb<<"] with a step "<<step<<endl;
-	std::cout<<"Total "<<STEP-1<<" modifications with respect to "<<Cutlist_std[modpos]<<endl;
+	if (CUTTAG){
+		std::cout<<"Cut: "<<cutname[modpos]<<" varies within ["<<lb<<","<<upb<<"] with a step "<<step<<endl;
+		std::cout<<"Total "<<STEP-1<<" modifications with respect to "<<Cutlist_std[modpos]<<endl;
+	}
 	// create cut target list for modification and sepcify which cut value one wants to modified	
 	Double_t modlist[STEP]; // length of modification list needs to be same as STEP
 	Double_t sblist[STEP];
@@ -532,9 +552,9 @@ void getree () {
 	}
 	//Double_t value_temp=index_mod*step;
 	//cout<<upb-step<<endl;
-	Double_t sb_temp=0.;
+	Double_t sb_temp = 0.;
 	for (int i=0;i<STEP;i++) {
-		cout<<"\nMOD "<<i+1<<": ";
+		cout<<"\nMOD "<<i+1<<" // ";
 		modlist[i] = lb; 
 		//cout<<lb<<endl;
 		/*for (int k=0;k<NbCut;k++) {// initialize cutlist by copy cutlist_sta to it
@@ -550,7 +570,7 @@ void getree () {
 		}*/
 		Cutlist[modpos]=Cutlist_std[modpos]-step*(nbstep-i);
 		//cout<<Cutlist[modpos]-Cutlist_std[modpos]<<endl;
-		sb_temp=tree(Cutlist,modpos); 
+		sb_temp=tree(Cutlist,modpos)[0]; 
 		sblist[i]=sb_temp;
 		lb+=step; 
 	}
@@ -599,20 +619,22 @@ void getree () {
 	
 	TCanvas *c = new TCanvas("c","optimization of chi2 cut",700,700);
 	c->cd(1);
-	TGaxis::SetMaxDigits(1);
 	TGraph* gf= new TGraph(STEP,modlist,sblist);
-	gf->GetXaxis()->SetTitle("#chi^{2} cut");
-	gf->GetYaxis()->SetTitle("Number of expected e^{+}e^{-}#rightarrow#pi^{+}#pi^{-}#pi^{0}#gamma event");	
+	gf->GetYaxis()->SetTitleOffset(1.2);
+	gf->GetXaxis()->SetTitle(xname[modpos]);
+	gf->GetYaxis()->SetTitle("Number of e^{+}e^{-}#rightarrow#pi^{+}#pi^{-}#pi^{0}#gamma events");	
 	gf->SetLineWidth(3); 
 	gf->SetMarkerStyle(21);
 	//gf->SetLineColor(2);
 	gf->Draw("AP");
 	//gf->Draw("CP");
 	//gf->Draw("P");
-	gf->GetXaxis()->SetNdivisions(505);
-	gf->GetYaxis()->SetNdivisions(505);
+	//gf->GetXaxis()->SetNdivisions(505);
+	//gf->GetYaxis()->SetNdivisions(505);
 	
-	TFile hf("./Plots/optimchi2gf_"+cutname[modpos]+".root","recreate");
-   c->Write();
+	if (CUTTAG){
+		TFile hf("./Plots/optimcuts_"+cutname[modpos]+".root","recreate");
+   	c->Write();
+   }
 	
 }

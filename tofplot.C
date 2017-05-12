@@ -76,32 +76,21 @@ void tofplot() {
 	Double_t lhlv_Xcross = getcrossx(kh_std,kv_std,bh_std,bv_std);
 	Double_t lhlv_Ycross = getcrossy(kh_std,bh_std,lhlv_Xcross);
 	printf("coss point: x=%g, y=%g\n",lhlv_Xcross,lhlv_Ycross);
-	TLine *lh_std_cross = new TLine(xmin_TOF,tofcut1,lhlv_Xcross,lhlv_Ycross); format_l(lh_std_cross,4,2,3);
-	TLine *lv_std_cross = new TLine(lhlv_Xcross,lhlv_Ycross,getxvalue(k, tofcut2, xmin_TOF),xmin_TOF); format_l(lv_std_cross,4,2,3);
+	TLine *lh_std_cross = new TLine(xmin_TOF,tofcut1,lhlv_Xcross,lhlv_Ycross); format_l(lh_std_cross,4,1,1);
+	TLine *lv_std_cross = new TLine(lhlv_Xcross,lhlv_Ycross,getxvalue(k, tofcut2, xmin_TOF),xmin_TOF); format_l(lv_std_cross,4,1,1);
 	
 	//
+	Int_t index=0, nbstep_temp=1, modpos1_temp=1, modpos2_temp=2;
 	TCanvas *c = new TCanvas("c","ToF scattered",700,700);
 	c->Divide(2,2);
-	
+
 	c->cd(1);
 	hToF_EEG->Draw("COLZ");
 	gPad->SetLogz();
-	hToF_EEG->GetXaxis()->SetTitle("#Deltat_{#pi^{#pm}}");
-	hToF_EEG->GetYaxis()->SetTitle("#Deltat_{e^{#pm}}");
 	
-	c->cd(2);
-	hToF_THREEPIGAM->Draw("COLZ");
-	gPad->SetLogz(); 
-	hToF_THREEPIGAM->GetXaxis()->SetTitle("#Deltat_{#pi^{#pm}}");
-	hToF_THREEPIGAM->GetYaxis()->SetTitle("#Deltat_{e^{#pm}}");
-	
-	c->cd(3);
-	hToF_MCSUM->Draw("COLZ");
-	gPad->SetLogz();
 	lh_std_cross->Draw();
 	lv_std_cross->Draw("Same");
 	
-	Int_t index=0, nbstep_temp=1, modpos1_temp=1, modpos2_temp=2;
 	if (modpos1_temp==1) {
 		double step_temp=cutstep_std[modpos1_temp]; 
 		double lb_temp=Cutlist_std[modpos1_temp]-step_temp*nbstep_temp;
@@ -113,7 +102,7 @@ void tofplot() {
 			if (lb_temp-Cutlist_std[modpos1_temp] > 0) {		 
 				format_l(lh_std_cross_mod,2,1,1);
 				TLine *lv_std_cross_mod = new TLine(lhlv_Xcross,lhlv_Ycross,lhlv_Xcross_mod,lhlv_Ycross_mod);
-				format_l(lv_std_cross_mod,4,2,3);
+				format_l(lv_std_cross_mod,4,1,1);
 				lv_std_cross_mod->Draw("Same");
 			}
 			else {
@@ -135,7 +124,120 @@ void tofplot() {
 			if (lb_temp-Cutlist_std[modpos2_temp] > 0) {		 
 				format_l(lv_std_cross_mod,2,1,1);
 				TLine *lh_std_cross_mod = new TLine(lhlv_Xcross,lhlv_Ycross,lhlv_Xcross_mod,lhlv_Ycross_mod);
-				format_l(lh_std_cross_mod,4,2,3);
+				format_l(lh_std_cross_mod,4,1,1);
+				lh_std_cross_mod->Draw("Same");
+			}
+			else {
+				format_l(lv_std_cross_mod,1,1,1);
+			}
+			lv_std_cross_mod->Draw("Same");
+			lb_temp+=2*step_temp;
+			index++;
+		}		
+	}
+	
+	hToF_EEG->GetXaxis()->SetTitle("#Deltat_{#pi^{#pm}}");
+	hToF_EEG->GetYaxis()->SetTitle("#Deltat_{e^{#pm}}");
+	
+
+	
+	c->cd(2);
+	hToF_THREEPIGAM->Draw("COLZ");
+	gPad->SetLogz(); 
+	lh_std_cross->Draw();
+	lv_std_cross->Draw("Same");
+	
+	if (modpos1_temp==1) {
+		double step_temp=cutstep_std[modpos1_temp]; 
+		double lb_temp=Cutlist_std[modpos1_temp]-step_temp*nbstep_temp;
+		Double_t upb_temp=Cutlist_std[modpos1_temp]+step_temp*nbstep_temp;
+		while (lb_temp<upb_temp+step_temp) {
+			Double_t lhlv_Xcross_mod = getcrossx(kh_std,kv_std,lb_temp,bv_std);
+			Double_t lhlv_Ycross_mod = getcrossy(kh_std,lb_temp,lhlv_Xcross_mod);
+			TLine *lh_std_cross_mod = new TLine(xmin_TOF,getyvalue(kh_std,lb_temp,xmin_TOF),lhlv_Xcross_mod,lhlv_Ycross_mod);			
+			if (lb_temp-Cutlist_std[modpos1_temp] > 0) {		 
+				format_l(lh_std_cross_mod,2,1,1);
+				TLine *lv_std_cross_mod = new TLine(lhlv_Xcross,lhlv_Ycross,lhlv_Xcross_mod,lhlv_Ycross_mod);
+				format_l(lv_std_cross_mod,4,1,1);
+				lv_std_cross_mod->Draw("Same");
+			}
+			else {
+				format_l(lh_std_cross_mod,1,1,1);
+			}
+			lh_std_cross_mod->Draw("Same");
+			lb_temp+=2*step_temp;
+			index++;
+		}
+	}
+	if (modpos2_temp==2) {
+		double step_temp=cutstep_std[modpos2_temp]; 
+		double lb_temp=Cutlist_std[modpos2_temp]-step_temp*nbstep_temp;
+		Double_t upb_temp=Cutlist_std[modpos2_temp]+step_temp*nbstep_temp;
+		while (lb_temp<upb_temp+step_temp) {
+			Double_t lhlv_Xcross_mod = getcrossx(kh_std,kv_std,bh_std,lb_temp);
+			Double_t lhlv_Ycross_mod = getcrossy(kh_std,bh_std,lhlv_Xcross_mod);
+			TLine *lv_std_cross_mod = new TLine(lhlv_Xcross_mod,lhlv_Ycross_mod,getxvalue(kv_std,lb_temp,xmin_TOF),xmin_TOF);
+			if (lb_temp-Cutlist_std[modpos2_temp] > 0) {		 
+				format_l(lv_std_cross_mod,2,1,1);
+				TLine *lh_std_cross_mod = new TLine(lhlv_Xcross,lhlv_Ycross,lhlv_Xcross_mod,lhlv_Ycross_mod);
+				format_l(lh_std_cross_mod,4,1,1);
+				lh_std_cross_mod->Draw("Same");
+			}
+			else {
+				format_l(lv_std_cross_mod,1,1,1);
+			}
+			lv_std_cross_mod->Draw("Same");
+			lb_temp+=2*step_temp;
+			index++;
+		}		
+	}
+	
+	
+	hToF_THREEPIGAM->GetXaxis()->SetTitle("#Deltat_{#pi^{#pm}}");
+	hToF_THREEPIGAM->GetYaxis()->SetTitle("#Deltat_{e^{#pm}}");
+	
+	
+	
+	c->cd(3);
+	hToF_MCSUM->Draw("COLZ");
+	gPad->SetLogz();
+	lh_std_cross->Draw();
+	lv_std_cross->Draw("Same");
+	
+	if (modpos1_temp==1) {
+		double step_temp=cutstep_std[modpos1_temp]; 
+		double lb_temp=Cutlist_std[modpos1_temp]-step_temp*nbstep_temp;
+		Double_t upb_temp=Cutlist_std[modpos1_temp]+step_temp*nbstep_temp;
+		while (lb_temp<upb_temp+step_temp) {
+			Double_t lhlv_Xcross_mod = getcrossx(kh_std,kv_std,lb_temp,bv_std);
+			Double_t lhlv_Ycross_mod = getcrossy(kh_std,lb_temp,lhlv_Xcross_mod);
+			TLine *lh_std_cross_mod = new TLine(xmin_TOF,getyvalue(kh_std,lb_temp,xmin_TOF),lhlv_Xcross_mod,lhlv_Ycross_mod);			
+			if (lb_temp-Cutlist_std[modpos1_temp] > 0) {		 
+				format_l(lh_std_cross_mod,2,1,1);
+				TLine *lv_std_cross_mod = new TLine(lhlv_Xcross,lhlv_Ycross,lhlv_Xcross_mod,lhlv_Ycross_mod);
+				format_l(lv_std_cross_mod,4,1,1);
+				lv_std_cross_mod->Draw("Same");
+			}
+			else {
+				format_l(lh_std_cross_mod,1,1,1);
+			}
+			lh_std_cross_mod->Draw("Same");
+			lb_temp+=2*step_temp;
+			index++;
+		}
+	}
+	if (modpos2_temp==2) {
+		double step_temp=cutstep_std[modpos2_temp]; 
+		double lb_temp=Cutlist_std[modpos2_temp]-step_temp*nbstep_temp;
+		Double_t upb_temp=Cutlist_std[modpos2_temp]+step_temp*nbstep_temp;
+		while (lb_temp<upb_temp+step_temp) {
+			Double_t lhlv_Xcross_mod = getcrossx(kh_std,kv_std,bh_std,lb_temp);
+			Double_t lhlv_Ycross_mod = getcrossy(kh_std,bh_std,lhlv_Xcross_mod);
+			TLine *lv_std_cross_mod = new TLine(lhlv_Xcross_mod,lhlv_Ycross_mod,getxvalue(kv_std,lb_temp,xmin_TOF),xmin_TOF);
+			if (lb_temp-Cutlist_std[modpos2_temp] > 0) {		 
+				format_l(lv_std_cross_mod,2,1,1);
+				TLine *lh_std_cross_mod = new TLine(lhlv_Xcross,lhlv_Ycross,lhlv_Xcross_mod,lhlv_Ycross_mod);
+				format_l(lh_std_cross_mod,4,1,1);
 				lh_std_cross_mod->Draw("Same");
 			}
 			else {
@@ -169,7 +271,7 @@ void tofplot() {
 			if (lb_temp-Cutlist_std[modpos1_temp] > 0) {		 
 				format_l(lh_std_cross_mod,2,1,1);
 				TLine *lv_std_cross_mod = new TLine(lhlv_Xcross,lhlv_Ycross,lhlv_Xcross_mod,lhlv_Ycross_mod);
-				format_l(lv_std_cross_mod,4,2,3);
+				format_l(lv_std_cross_mod,4,1,1);
 				lv_std_cross_mod->Draw("Same");
 			}
 			else {
@@ -191,7 +293,7 @@ void tofplot() {
 			if (lb_temp-Cutlist_std[modpos2_temp] > 0) {		 
 				format_l(lv_std_cross_mod,2,1,1);
 				TLine *lh_std_cross_mod = new TLine(lhlv_Xcross,lhlv_Ycross,lhlv_Xcross_mod,lhlv_Ycross_mod);
-				format_l(lh_std_cross_mod,4,2,3);
+				format_l(lh_std_cross_mod,4,1,1);
 				lh_std_cross_mod->Draw("Same");
 			}
 			else {
@@ -219,28 +321,33 @@ void tofplot() {
 	H1D[0]->Draw("Same");
 	H1D[9]->Draw("Same");
 	H1D[10]->Draw("SameP");
-	TLine *l_cut = new TLine(tofcut1,0.,tofcut1,ymax*0.8); 
-	format_l(l_cut,4,2,3);
+	TLine *l_cut = new TLine(tofcut1,0.,tofcut1,ymax*0.8); format_l(l_cut,4,2,1);
+	TLine *lplus_cut = new TLine(tofcut1+cutstep_std[1],0.,tofcut1+cutstep_std[1],ymax*0.8); format_l(lplus_cut,2,1,1);
+	TLine *lminus_cut = new TLine(tofcut1-cutstep_std[1],0.,tofcut1-cutstep_std[1],ymax*0.8); format_l(lminus_cut,1,1,1);
+	
 	l_cut->Draw("Same");
+	//lplus_cut->Draw("Same");
+	//lminus_cut->Draw("Same");
 	//gPad->SetLogy();
 	
-	legd = new TLegend(0.52,0.5,0.93,0.90);
+	legd = new TLegend(0.54,0.44,0.88,0.85);
 	legd->SetFillStyle(0); 
 	legd->SetBorderSize(0);  
-	legd->SetNColumns(2);
-	legd->AddEntry(H1D[9],"Data","l");
-	legd->AddEntry(H1D[8],"ALLCHAIN","l");
-	legd->AddEntry(H1D[6],"MC rest","l");
-	legd->AddEntry(H1D[5],"#eta#gamma","l");
-	legd->AddEntry(H1D[4],"#pi^{+}#pi^{-}#pi^{0}","l");
+	legd->SetNColumns(2);			
+	legd->AddEntry(H1D[0],"#omega#pi^{0}","l"); 	
 	legd->AddEntry(H1D[3],"#pi^{+}#pi^{-}#pi^{0}#gamma","l");
+	legd->AddEntry(H1D[4],"#pi^{+}#pi^{-}#pi^{0}","l");
+	legd->AddEntry(H1D[5],"#eta#gamma","l");
 	legd->AddEntry(H1D[2],"KSKL","l");
 	legd->AddEntry(H1D[1],"KPM","l");
-	legd->AddEntry(H1D[0],"#omega#pi^{0}","l"); 
+	legd->AddEntry(H1D[9],"e^{+}e^{-}#gamma","l");
+	legd->AddEntry(H1D[6],"MC rest","l");
+	legd->AddEntry(H1D[10],"Data","l");
+	legd->AddEntry(H1D[8],"ALLCHAIN","l");
 	legd->AddEntry(l_cut,"#Deltat_{e^{#pm}} cut","l");
 	legd->SetTextFont(132);
 	legd->Draw("Same");
-	legtextsize(legd, 0.02);
+	legtextsize(legd, 0.03);
 	
 	TFile hf("./Plots/ToFPlots.root","recreate");
 	c->Write();

@@ -71,7 +71,7 @@ void kinfitplot() {
 	Double_t widthc1=getbinwidth(hChi2_OMEGAPI);
 	hChi2_MCSUM->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f",widthc1));
 	hChi2_MCSUM->GetXaxis()->SetTitle("#chi^{2}");
-	hChi2_MCSUM->GetXaxis()->SetRangeUser(0.,50.);
+	hChi2_MCSUM->GetXaxis()->SetRangeUser(0.,70.);
 	hChi2_MCSUM->GetYaxis()->SetRangeUser(0.,ymax*1.2);
 	hChi2_MCSUM->GetYaxis()->SetTitleOffset(1.4);
 	hChi2_MCSUM->Draw(); 
@@ -84,7 +84,9 @@ void kinfitplot() {
 	hChi2_BKGSUM1->Draw("Same");	
 	hChi2_EEG->Draw("Same");
 	hChi2_DATA->Draw("Samee1");
-	drawline(chi2cut,0.,chi2cut,ymax,2);
+	TLine *l_cut = new TLine(chi2cut,0.,chi2cut,ymax); 
+	format_l(l_cut,4,2,1);
+	l_cut->Draw("Same");
 	/*HCHI2_Norm[8]->Draw();
 	HCHI2_Norm[5]->Draw("Same");
 	HCHI2_Norm[6]->Draw("Same");
@@ -96,21 +98,22 @@ void kinfitplot() {
 	HCHI2_Norm[9]->Draw("Same");
 	HCHI2_Norm[10]->Draw("SameP");*/
 	
-	legc1 = new TLegend(0.55,0.4,0.85,0.85);
+	legc1 = new TLegend(0.54,0.4,0.88,0.85);
 	legc1->SetFillStyle(0); 
 	legc1->SetBorderSize(0);  
 	legc1->SetNColumns(2);
-	legc1->AddEntry(hChi2_THREEPIGAM,"#pi^{+}#pi^{-}#pi^{0}#gamma","l");
+	
 	legc1->AddEntry(hChi2_OMEGAPI,"#omega#pi^{0}","l");
-	/*legc1->AddEntry(h3PiKSL,"KSKL","l");
-	legc1->AddEntry(h3PiKMP,"KPM","l");
-	legc1->AddEntry(h3PiThreepi,"#pi^{+}#pi^{-}#pi^{0}","l");
-	legc1->AddEntry(h3PiIMEtagam,"#eta#gamma","l");
-	legc1->AddEntry(h3PiEgg,"e^{+}e^{-}","l");
-	legc1->AddEntry(h3PiIMPPg,"#pi^{+}#pi^{-}#gamma","l");
-	legc1->AddEntry(h3PiIMBGRest,"MC rest","l");
-	legc1->AddEntry(h3PiIMExp,"Data","l");	
-	legc1->AddEntry(h3PiIMMcSum,"ALLCHAIN","l");*/
+	legc1->AddEntry(hChi2_KSL,"KSKL","l");
+	legc1->AddEntry(hChi2_KPM,"KPM","l");
+	legc1->AddEntry(hChi2_THREEPIGAM,"#pi^{+}#pi^{-}#pi^{0}#gamma","l");
+	legc1->AddEntry(hChi2_THREEPI,"#pi^{+}#pi^{-}#pi^{0}","l");
+	legc1->AddEntry(hChi2_THREEPIGAM,"#eta#gamma","l");
+	legc1->AddEntry(hChi2_EEG,"e^{+}e^{-}#gamma","l");
+	legc1->AddEntry(hChi2_BKGSUM1,"MC rest","l");
+	legc1->AddEntry(hChi2_DATA,"Data","l");	
+	legc1->AddEntry(hChi2_MCSUM,"ALLCHAIN","l");
+	legc1->AddEntry(l_cut,"#chi^{2} cut","l");
 	legc1->SetTextFont(132);
 	legc1->Draw("Same");
 	legtextsize(legc1, 0.03);

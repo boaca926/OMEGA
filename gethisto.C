@@ -73,6 +73,7 @@ void legtextsize(TLegend* l, Double_t size) {
   }      
 }
 
+
 void gethisto() {
    gStyle->SetOptTitle(0);
    gStyle->SetStatBorderSize(0);
@@ -80,12 +81,18 @@ void gethisto() {
    gStyle->SetLineScalePS(2);
 	TGaxis::SetMaxDigits(3);
 	
-	TFile *f= new TFile("./ROOT/TREE_"+cutname[modpos]+".root");
+	if (!CUTTAG){
+		TFile *f= new TFile("./ROOT/TREE_Pre.root");
+	}
+	else {
+		TFile *f= new TFile("./ROOT/TREE_"+cutname[modpos]+".root");
+	}	
 	// define variables
 	Double_t threepiIM = 0.;
 	Double_t  chi2value = 0;
 	Double_t bestPiTime = 0.;
 	Double_t bestETime = 0.;
+	Double_t deltaE = 0.;
 	// get trees names and branch names
 	TString OMEGAPI = gettreename(0); 
 	TString KPM = gettreename(1);
@@ -103,6 +110,7 @@ void gethisto() {
 	TString Schi2value = getbraname(3);
 	TString SBestPiTime = getbraname(5);
 	TString SBestETime = getbraname(6);
+	TString SDeltaE = getbraname(7);
 	// get trees
 	TTree *TOMEGAPI = (TTree*)f->Get("T"+OMEGAPI+"_Pre");
 	TTree *TKPM = (TTree*)f->Get("T"+KPM+"_Pre");
@@ -137,26 +145,32 @@ void gethisto() {
 		tree_temp->SetBranchAddress(Schi2value,&chi2value);
 		tree_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 		tree_temp->SetBranchAddress(SBestETime,&bestETime);
+		tree_temp->SetBranchAddress(SDeltaE,&deltaE);
 	}
 	// create a list of histo
 	TH1D *HCHI2[NbTree];
+	TH1D *HDeltaE[NbTree];
 	TH2D *HTOF[NbTree];
+	
 	for (Int_t i=0;i<NbTree;i++) {
 		HCHI2[i] = new TH1D("hChi2Value_"+gettreename(i),"Chi2 values",bin_IM,xmin_IM,xmax_IM); format_h(HCHI2[i],colorid[i],0,1);
-		HTOF[i] = new TH2D("hToF_"+gettreename(i),"ToF",bin_TOF,xmin_TOF,xmax_TOF,bin_TOF,xmin_TOF,xmax_TOF);
-	}
+		HTOF[i] = new TH2D("hToF_"+gettreename(i),"TOF",bin_TOF,xmin_TOF,xmax_TOF,bin_TOF,xmin_TOF,xmax_TOF);
+		HDeltaE[i] = new TH1D("hDeltaE_"+gettreename(i),"DeltaE",bin_DeltaE,xmin_DeltaE,xmax_DeltaE);
+}
 	
 	//
 	for (Int_t irow=0;irow<TOMEGAPI->GetEntries();irow++) { // omega pi
    	TOMEGAPI->GetEntry(irow); 
    	HCHI2[0]->Fill(chi2value);
    	HTOF[0]->Fill(bestPiTime,bestETime);
+   	HDeltaE[0]->Fill(deltaE);
    } 
    // 
    for (Int_t irow=0;irow<TKPM->GetEntries();irow++) { // kpm
    	TKPM->GetEntry(irow); 
    	HCHI2[1]->Fill(chi2value);
    	HTOF[1]->Fill(bestPiTime,bestETime);
+   	HDeltaE[1]->Fill(deltaE);
    }
    // 
    for (Int_t irow=0;irow<TKSL->GetEntries();irow++) { // ksl
@@ -169,48 +183,56 @@ void gethisto() {
    	TTHREEPIGAM->GetEntry(irow); 
    	HCHI2[3]->Fill(chi2value);
    	HTOF[3]->Fill(bestPiTime,bestETime);
+   	HDeltaE[3]->Fill(deltaE);
    }
    //
    for (Int_t irow=0;irow<TTHREEPI->GetEntries();irow++) { // threepi 
    	TTHREEPI->GetEntry(irow); 
    	HCHI2[4]->Fill(chi2value);
    	HTOF[4]->Fill(bestPiTime,bestETime);
+   	HDeltaE[4]->Fill(deltaE);
    }
    //
    for (Int_t irow=0;irow<TETAGAM->GetEntries();irow++) { // threepi 
    	TETAGAM->GetEntry(irow); 
    	HCHI2[5]->Fill(chi2value);
    	HTOF[5]->Fill(bestPiTime,bestETime);
+   	HDeltaE[5]->Fill(deltaE);
    }
    //
    for (Int_t irow=0;irow<TBKGSUM1->GetEntries();irow++) { // threepi 
    	TBKGSUM1->GetEntry(irow); 
    	HCHI2[6]->Fill(chi2value);
    	HTOF[6]->Fill(bestPiTime,bestETime);
+   	HDeltaE[6]->Fill(deltaE);
    }
    //
    for (Int_t irow=0;irow<TBKGSUM2->GetEntries();irow++) { // threepi 
    	TBKGSUM2->GetEntry(irow); 
    	HCHI2[7]->Fill(chi2value);
    	HTOF[7]->Fill(bestPiTime,bestETime);
+   	HDeltaE[7]->Fill(deltaE);
    }
    //
    for (Int_t irow=0;irow<TMCSUM->GetEntries();irow++) { // threepi 
    	TMCSUM->GetEntry(irow); 
    	HCHI2[8]->Fill(chi2value);
    	HTOF[8]->Fill(bestPiTime,bestETime);
+   	HDeltaE[8]->Fill(deltaE);
    }
    //
    for (Int_t irow=0;irow<TEEG->GetEntries();irow++) { // threepi 
    	TEEG->GetEntry(irow); 
    	HCHI2[9]->Fill(chi2value);
    	HTOF[9]->Fill(bestPiTime,bestETime);
+   	HDeltaE[9]->Fill(deltaE);
    }
    //
    for (Int_t irow=0;irow<TDATA->GetEntries();irow++) { // threepi 
    	TDATA->GetEntry(irow); 
    	HCHI2[10]->Fill(chi2value);
    	HTOF[10]->Fill(bestPiTime,bestETime);
+   	HDeltaE[10]->Fill(deltaE);
    }
    HCHI2[10]->SetMarkerStyle(2);
    
@@ -218,6 +240,7 @@ void gethisto() {
    for (Int_t i=0;i<NbTree;i++) {
 		HCHI2[i]->Write();
 		HTOF[i]->Write();
+		HDeltaE[i]->Write();
 	}
 
 }
