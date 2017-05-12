@@ -67,12 +67,17 @@ void scatt1plot() {
 	
 	TCanvas *c = new TCanvas("c","track momenta sum vs delta E",700,700);
 	c->Divide(3,1);
-	
+	TLine *l_cut = new TLine(xmin_Tracksum,deltaEcut,xmax_Tracksum,deltaEcut); format_l(l_cut,4,1,1);
+	TLine *l1_cut = new TLine(xmin_Tracksum,deltaEcut+cutstep_std[3],xmax_Tracksum,deltaEcut+cutstep_std[3]); format_l(l1_cut,2,1,1);
+	TLine *l2_cut = new TLine(xmin_Tracksum,deltaEcut-cutstep_std[3],xmax_Tracksum,deltaEcut-cutstep_std[3]); format_l(l2_cut,1,1,1);
 	c->cd(1);
 	HScatter1_THREEPIGAM->GetXaxis()->SetTitle("#left|#bar{p}_{#pi^{+}}#right|+#left|#bar{p}_{#pi^{-}}#right|");
 	HScatter1_THREEPIGAM->GetYaxis()->SetTitle("#deltaE");
 	HScatter1_THREEPIGAM->GetYaxis()->SetTitleOffset(1.4);
 	HScatter1_THREEPIGAM->Draw("COLZ");
+	l_cut->Draw("Same");
+	l1_cut->Draw("Same");
+	l2_cut->Draw("Same");
 	gPad->SetLogz();
 	
 	c->cd(2);
@@ -80,6 +85,9 @@ void scatt1plot() {
 	HScatter1_MCSUM->GetYaxis()->SetTitle("#deltaE");
 	HScatter1_MCSUM->GetYaxis()->SetTitleOffset(1.4);
 	HScatter1_MCSUM->Draw("COLZ");
+	l_cut->Draw("Same");
+	l1_cut->Draw("Same");
+	l2_cut->Draw("Same");
 	gPad->SetLogz();
 	
 	c->cd(3);
@@ -87,6 +95,9 @@ void scatt1plot() {
 	HScatter1_DATA->GetYaxis()->SetTitle("#deltaE");
 	HScatter1_DATA->GetYaxis()->SetTitleOffset(1.4);
 	HScatter1_DATA->Draw("COLZ");
+	l_cut->Draw("Same");
+	l1_cut->Draw("Same");
+	l2_cut->Draw("Same");
 	gPad->SetLogz();
 	
 	TCanvas *d = new TCanvas("d","track momenta sum vs delta E 1D projection",700,700);

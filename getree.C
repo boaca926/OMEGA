@@ -44,8 +44,8 @@ Double_t tree(double list[], int index)
 	TString Schi2value = getbraname(3); 
 	TString SBestPiTime = getbraname(5); //std::cout<<getbraname(5)<<endl;
 	TString SBestETime = getbraname(6); //std::cout<<getbraname(6)<<endl;
-	TString SDeltaE = getbraname(7); std::cout<<getbraname(7)<<endl;
-	TString STracksum = getbraname(8); std::cout<<getbraname(8)<<endl;
+	TString SDeltaE = getbraname(7); //std::cout<<getbraname(7)<<endl;
+	TString STracksum = getbraname(8); //std::cout<<getbraname(8)<<endl;
 	
 	TTree *TOMEGAPI_MC = new TTree("T"+OMEGAPI+"_MC","recreate");
 	TTree *TKPM_MC = new TTree("T"+KPM+"_MC","recreate");
@@ -361,7 +361,7 @@ Double_t tree(double list[], int index)
    	allchainrho_pre->GetEntry(irow); //cout<<irow<<endl;
    	//cout<<CUTTAG<<endl;
    	// CUT TYPE
-		CUTYPE=getcutype(chi2value,bestETime,bestPiTime,list); //cout<<CUTYPE<<endl;
+		CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,list); //cout<<CUTYPE<<endl;
    	//
    	if (!CUTYPE && CUTTAG) continue;
    	//cout<<CUTTAG[0]<<endl;
@@ -378,7 +378,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchaineeg_pre->GetEntries();irow++) {
    	allchaineeg_pre->GetEntry(irow); 
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,list);
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,list); 
    	if (!CUTYPE && CUTTAG) continue;
    	//cout<<cutype[0]<<endl;
    	for (Int_t i=0;i<scale;i++) {
@@ -393,7 +393,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchaindata_pre->GetEntries();irow++) {
    	allchaindata_pre->GetEntry(irow);
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,list);
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,list); 
    	if (!CUTYPE && CUTTAG) continue;
    	dataNb_Pre++; 
    	TDATA_Pre->Fill();	
@@ -405,7 +405,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchainksl_pre->GetEntries();irow++) {
    	allchainksl_pre->GetEntry(irow); 
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,list);
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,list); 
    	if (!CUTYPE && CUTTAG) continue; 	
    	//cout<<CUTTAG[0]<<endl;	
    	if (mctype == 1) {/// omega pi
