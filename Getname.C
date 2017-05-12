@@ -1,7 +1,7 @@
 const int NbTree = 11, NbVar = 9, NbCut = 3, NbMode = 4, scale = 6;
-const int NbHist = 100, bin_IM = 100, bin_TOF = 400, bin_DeltaE = 700;
-const double xmin_IM = 0., xmax_IM = 100., xmax_DeltaE = 0.;
-const double xmin_TOF = -10., xmax_TOF = 10., xmin_DeltaE = -700.;
+const int NbHist = 100, bin_IM = 100, bin_TOF = 400, bin_DeltaE = 900, bin_Tracksum = 900;
+const double xmin_IM = 0., xmax_IM = 100., xmax_DeltaE = 200., xmin_Tracksum = 100.;
+const double xmin_TOF = -10., xmax_TOF = 10., xmin_DeltaE = -700., xmax_Tracksum = 1000.;
 const double chi2cut = 32., tofcut1 = -0.5, tofcut2=4;
 const double k=-5.;
 const double Cutlist_std[NbCut] = {chi2cut, tofcut1, tofcut2};
@@ -16,7 +16,7 @@ const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
 // modpos = 0: chi2cut
 // modpos = 1: tofcut1
 const int modpos = 0; // chi2 loop over 2-102, nbstep=25, chicut = 52
-const int nbstep = 1; // nbstep=0 give standard cut value, number of cut modification = 2nstep+1
+const int nbstep = 0; // nbstep=0 give standard cut value, number of cut modification = 2nstep+1
 const double step = cutstep_std[modpos]; 
 
 
@@ -101,8 +101,8 @@ Int_t getcutype(Double_t chi2value, Double_t bestETime, Double_t bestPiTime, Dou
 		type[2] = 0;
 	}
 	// all cuts
-	//if (type[0] && type[1] && type[2]) {
-	if (type[modpos]) {
+	if (type[0] && type[1] && type[2]) {
+	//if (type[modpos]) {
 		Type = 1;
 	}
 	else {

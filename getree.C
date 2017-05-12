@@ -24,6 +24,7 @@ Double_t tree(double list[], int index)
 	Double_t bestPiTime = 0.;
 	Double_t bestETime = 0.;
 	Double_t deltaE = 0.;
+	Double_t tracksum = 0.;
 	// tree names
 	TString OMEGAPI = gettreename(0); //
 	TString KPM = gettreename(1); //
@@ -44,7 +45,7 @@ Double_t tree(double list[], int index)
 	TString SBestPiTime = getbraname(5); //std::cout<<getbraname(5)<<endl;
 	TString SBestETime = getbraname(6); //std::cout<<getbraname(6)<<endl;
 	TString SDeltaE = getbraname(7); std::cout<<getbraname(7)<<endl;
-	
+	TString STracksum = getbraname(8); std::cout<<getbraname(8)<<endl;
 	
 	TTree *TOMEGAPI_MC = new TTree("T"+OMEGAPI+"_MC","recreate");
 	TTree *TKPM_MC = new TTree("T"+KPM+"_MC","recreate");
@@ -109,6 +110,7 @@ Double_t tree(double list[], int index)
 		tree_temp->Branch(SBestETime,&bestETime,SBestETime+"/D");
 		tree_temp->Branch(SDeltaE,&deltaE,SDeltaE+"/D");
 		tree_temp->Branch(Smctype,&mctype,Smctype+"/I");
+		tree_temp->Branch(STracksum,&tracksum,STracksum+"/D");
 	}
 	
 	// define chain
@@ -158,6 +160,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
 						chain_temp->SetBranchAddress(SDeltaE,&deltaE);
+						chain_temp->SetBranchAddress(STracksum,&tracksum);
 					}	
                
             }
@@ -191,6 +194,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
 						chain_temp->SetBranchAddress(SDeltaE,&deltaE);
+						chain_temp->SetBranchAddress(STracksum,&tracksum);
 					}	
             }
          }
@@ -223,6 +227,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
 						chain_temp->SetBranchAddress(SDeltaE,&deltaE);
+						chain_temp->SetBranchAddress(STracksum,&tracksum);
 					}	
             }
          }
@@ -255,6 +260,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
 						chain_temp->SetBranchAddress(SDeltaE,&deltaE);
+						chain_temp->SetBranchAddress(STracksum,&tracksum);
 					}	
             }
          }
