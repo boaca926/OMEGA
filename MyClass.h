@@ -349,6 +349,7 @@ public :
    Double_t speedc;
 	Double_t massneupion;
    Double_t masschpion;
+   Double_t pi;
    
    Double_t E_candidates[100];
 	Double_t X_candidates[100];
@@ -387,6 +388,7 @@ public :
    TVectorD Fillsigma2vectorkinfit(Int_t size, TMatrixD matrix, Int_t matrixcol, Int_t matrixrow);
    TVectorD Fillpullsvector(Int_t size, TVectorD sigma2vector_old, TVectorD sigma2vector_new, TVectorD inputvector_old, TVectorD inputvector_new);
    TVectorD etakinfitfunc(TMatrixD Vmatrix, TMatrixD dgmatrixTrans, TVectorD lambdavector, TVectorD etatilde, Int_t rownb);
+   TVectorD Fillpermutvector(Int_t size, TVectorD input, Int_t index1, Int_t index2, Int_t index3);
    
    TVector2 timinginfo(Int_t index, TLorentzVector trackmom);
    
@@ -394,6 +396,8 @@ public :
    TMatrixD Getafunc(TVectorD etavector, Int_t rownb, Int_t colnb);
    TMatrixD Mtrans(TMatrixD ma);
    TMatrixD MInvert(TMatrixD ma);
+   
+   Double_t Chi2Eisrtest(TVectorD inputvector, TVectorD sigma2vector, Double_t isrenergy);
    
    Bool_t If2PionTracks(Int_t trnb, Int_t idx1, Int_t idx2);
    Bool_t IfStreamed(Int_t pstrnb);
@@ -426,6 +430,7 @@ MyClass::MyClass(TTree *tree) : fChain(0)
    pstrnb=2;
    Row=21, Col=21; row=7;
    minangle=23, maxangle=157, egammamin=10.;
+   pi=TMath::Pi();
    
    for (Int_t i = 0; i < 100; i++) {
 		E_candidates[i] = 0.;

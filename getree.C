@@ -6,8 +6,9 @@ using namespace std;
 
 Double_t tree(double list[], int index) 
 {
+	
 	for (int i=0;i<NbCut;i++) {
-		std::cout<<cutname[i]<<": "<<list[i]<<" // ";
+		std::cout<<cutname[i]<<": "<<list[i]<<endl;
 	}
 	
 	TString str_index; 
@@ -18,13 +19,21 @@ Double_t tree(double list[], int index)
 	// initialize variables
 	Int_t mctype = 0;
 	Int_t CUTYPE = 0;
-	Double_t threepiIM = 0.;
-	Double_t isrE = 0.;
+	Double_t threepiIM_MC = 0.;
+	Double_t isrE_MC = 0.;
 	Double_t chi2value = 0.;
 	Double_t bestPiTime = 0.;
 	Double_t bestETime = 0.;
 	Double_t deltaE = 0.;
 	Double_t tracksum = 0.;
+	Double_t threepiIM = 0.;
+	Double_t IMdiff = 0.;
+	Double_t threepiIM_impv = 0.;
+	Double_t Emaxprompt = 0.;
+	Double_t bestpiphoton1Ekinfit = 0.;
+	Double_t bestpiphoton2Ekinfit = 0.;
+	Double_t isrE = 0.;
+	Double_t isrE_impv  = 0.;
 	// tree names
 	TString OMEGAPI = gettreename(0); //
 	TString KPM = gettreename(1); //
@@ -46,6 +55,14 @@ Double_t tree(double list[], int index)
 	TString SBestETime = getbraname(6); //std::cout<<getbraname(6)<<endl;
 	TString SDeltaE = getbraname(7); //std::cout<<getbraname(7)<<endl;
 	TString STracksum = getbraname(8); //std::cout<<getbraname(8)<<endl;
+	TString SThreepiIM = getbraname(9); //std::cout<<getbraname(9)<<endl; 
+	TString SIMdiff = getbraname(10);
+	TString SThreepiIM_impv = getbraname(11);
+	TString SEmaxprompt = getbraname(12);
+	TString SBestpiphoton1Ekinfit = getbraname(13);
+	TString SBestpiphoton2Ekinfit = getbraname(14);
+	TString SISRE = getbraname(15);
+	TString SISRE_impv = getbraname(16);
 	
 	TTree *TOMEGAPI_MC = new TTree("T"+OMEGAPI+"_MC","recreate");
 	TTree *TKPM_MC = new TTree("T"+KPM+"_MC","recreate");
@@ -103,14 +120,22 @@ Double_t tree(double list[], int index)
 	while((treeout=treeliter.Next()) !=0) {
 		//treeout->Print();
 		TTree* tree_temp=dynamic_cast<TTree*>(treeout);
-		tree_temp->Branch(SIMthreepi+"_MC",&threepiIM,SIMthreepi+"_MC/D");
-		tree_temp->Branch(SEisr+"_MC",&isrE,SEisr+"/D");
+		tree_temp->Branch(SIMthreepi+"_MC",&threepiIM_MC,SIMthreepi+"_MC/D");
+		tree_temp->Branch(SEisr+"_MC",&isrE_MC,SEisr+"/D");
 		tree_temp->Branch(Schi2value,&chi2value,Schi2value+"/D");
 		tree_temp->Branch(SBestPiTime,&bestPiTime,SBestPiTime+"/D");
 		tree_temp->Branch(SBestETime,&bestETime,SBestETime+"/D");
 		tree_temp->Branch(SDeltaE,&deltaE,SDeltaE+"/D");
 		tree_temp->Branch(Smctype,&mctype,Smctype+"/I");
 		tree_temp->Branch(STracksum,&tracksum,STracksum+"/D");
+		tree_temp->Branch(SThreepiIM,&threepiIM,SThreepiIM+"/D");
+		tree_temp->Branch(SThreepiIM_impv,&threepiIM_impv,SThreepiIM_impv+"/D");
+		tree_temp->Branch(SIMdiff,&IMdiff,SIMdiff+"/D");
+		tree_temp->Branch(SEmaxprompt,&Emaxprompt,SEmaxprompt+"/D");
+		tree_temp->Branch(SBestpiphoton1Ekinfit,&bestpiphoton1Ekinfit,SBestpiphoton1Ekinfit+"/D");
+		tree_temp->Branch(SBestpiphoton2Ekinfit,&bestpiphoton2Ekinfit,SBestpiphoton2Ekinfit+"/D");
+		tree_temp->Branch(SISRE,&isrE,SISRE+"/D");
+		tree_temp->Branch(SISRE_impv,&isrE_impv,SISRE_impv+"/D");
 	}
 	
 	// define chain
@@ -153,14 +178,20 @@ Double_t tree(double list[], int index)
 					while((chainout=chainliter.Next()) !=0) {
 						//chainout->Print();
 						TTree* chain_temp=dynamic_cast<TTree*>(chainout);
-						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM);
-						chain_temp->SetBranchAddress(SEisr,&isrE);
+						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM_MC);
+						chain_temp->SetBranchAddress(SEisr+"_MC",&isrE_MC);
 						chain_temp->SetBranchAddress(Smctype,&mctype);
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
 						chain_temp->SetBranchAddress(SDeltaE,&deltaE);
 						chain_temp->SetBranchAddress(STracksum,&tracksum);
+						chain_temp->SetBranchAddress(SThreepiIM,&threepiIM);
+						chain_temp->SetBranchAddress(SThreepiIM_impv,&threepiIM_impv);
+						chain_temp->SetBranchAddress(SIMdiff,&IMdiff);
+						chain_temp->SetBranchAddress(SEmaxprompt,&Emaxprompt);
+						chain_temp->SetBranchAddress(SISRE,&isrE);
+						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 					}	
                
             }
@@ -187,14 +218,20 @@ Double_t tree(double list[], int index)
 					while((chainout=chainliter.Next()) !=0) {
 						//chainout->Print();
 						TTree* chain_temp=dynamic_cast<TTree*>(chainout);
-						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM);
-						chain_temp->SetBranchAddress(SEisr,&isrE);
+						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM_MC);
+						chain_temp->SetBranchAddress(SEisr+"_MC",&isrE_MC);
 						chain_temp->SetBranchAddress(Smctype,&mctype);
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
 						chain_temp->SetBranchAddress(SDeltaE,&deltaE);
 						chain_temp->SetBranchAddress(STracksum,&tracksum);
+						chain_temp->SetBranchAddress(SThreepiIM,&threepiIM);
+						chain_temp->SetBranchAddress(SThreepiIM_impv,&threepiIM_impv);
+						chain_temp->SetBranchAddress(SIMdiff,&IMdiff);
+						chain_temp->SetBranchAddress(SEmaxprompt,&Emaxprompt);
+						chain_temp->SetBranchAddress(SISRE,&isrE);
+						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 					}	
             }
          }
@@ -220,14 +257,20 @@ Double_t tree(double list[], int index)
 					while((chainout=chainliter.Next()) !=0) {
 						//chainout->Print();
 						TTree* chain_temp=dynamic_cast<TTree*>(chainout);
-						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM);
-						chain_temp->SetBranchAddress(SEisr,&isrE);
+						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM_MC);
+						chain_temp->SetBranchAddress(SEisr+"_MC",&isrE_MC);
 						chain_temp->SetBranchAddress(Smctype,&mctype);
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
 						chain_temp->SetBranchAddress(SDeltaE,&deltaE);
 						chain_temp->SetBranchAddress(STracksum,&tracksum);
+						chain_temp->SetBranchAddress(SThreepiIM,&threepiIM);
+						chain_temp->SetBranchAddress(SThreepiIM_impv,&threepiIM_impv);
+						chain_temp->SetBranchAddress(SIMdiff,&IMdiff);
+						chain_temp->SetBranchAddress(SEmaxprompt,&Emaxprompt);
+						chain_temp->SetBranchAddress(SISRE,&isrE);
+						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 					}	
             }
          }
@@ -253,14 +296,20 @@ Double_t tree(double list[], int index)
 					while((chainout=chainliter.Next()) !=0) {
 						//chainout->Print();
 						TTree* chain_temp=dynamic_cast<TTree*>(chainout);
-						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM);
-						chain_temp->SetBranchAddress(SEisr,&isrE);
+						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM_MC);
+						chain_temp->SetBranchAddress(SEisr+"_MC",&isrE_MC);
 						chain_temp->SetBranchAddress(Smctype,&mctype);
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
 						chain_temp->SetBranchAddress(SDeltaE,&deltaE);
 						chain_temp->SetBranchAddress(STracksum,&tracksum);
+						chain_temp->SetBranchAddress(SThreepiIM,&threepiIM);
+						chain_temp->SetBranchAddress(SThreepiIM_impv,&threepiIM_impv);
+						chain_temp->SetBranchAddress(SIMdiff,&IMdiff);
+						chain_temp->SetBranchAddress(SEmaxprompt,&Emaxprompt);
+						chain_temp->SetBranchAddress(SISRE,&isrE);
+						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 					}	
             }
          }

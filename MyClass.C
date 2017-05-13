@@ -12,11 +12,13 @@
 void MyClass::Main()
 {
 	Int_t mctype = 0;
-	Double_t IMthreepi_MC = 0., Eisr = 0.;
+	Double_t IMthreepi_MC = 0., Eisr_MC = 0.;
 	Double_t chi2value = 0., pvalue = 0.;
 	Double_t bestPiTime = 0., bestETime = 0.;
 	Double_t deltaE = 0., tracksum = 0.;
-
+	Double_t threepiIM = 0., threepiIM_impv = 0., IMdiff = 0.;
+	Double_t isrE = 0., isrE_impv = 0.;
+	Double_t Emaxprompt = 0., bestpiphoton1Ekinfit = 0., bestpiphoton2Ekinfit = 0.;
 	// get names
 	TString OMEGAPI = gettreename(0); 
 	TString KPM = gettreename(1); //std::cout<<gettreename(1)<<endl
@@ -60,7 +62,15 @@ void MyClass::Main()
 	TString SBestPiTime = getbraname(5); std::cout<<getbraname(5)<<endl;
 	TString SBestETime = getbraname(6); std::cout<<getbraname(6)<<endl;
 	TString SDeltaE = getbraname(7); std::cout<<getbraname(7)<<endl;
-	TString STracksum = getbraname(8); std::cout<<getbraname(8)<<endl;
+	TString STracksum = getbraname(8); std::cout<<getbraname(8)<<endl; 
+	TString SThreepiIM = getbraname(9); std::cout<<getbraname(9)<<endl;
+	TString SIMdiff = getbraname(10); std::cout<<getbraname(10)<<endl;
+	TString SThreepiIM_impv = getbraname(11); std::cout<<getbraname(11)<<endl;
+	TString SEmaxprompt = getbraname(12); std::cout<<getbraname(12)<<endl;
+	TString SBestpiphoton1Ekinfit = getbraname(13); std::cout<<getbraname(13)<<endl;
+	TString SBestpiphoton2Ekinfit = getbraname(14); std::cout<<getbraname(14)<<endl;
+	TString SISRE = getbraname(15); getbraname(15); std::cout<<getbraname(15)<<endl;
+	TString SISRE_impv = getbraname(16); getbraname(16); std::cout<<getbraname(16)<<endl;
 	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -69,12 +79,20 @@ void MyClass::Main()
 		TTree* tree_temp=dynamic_cast<TTree*>(treeout);
 		tree_temp->Branch(Smctype,&mctype,Smctype+"/I");
 		tree_temp->Branch(SIMthreepi+"_MC",&IMthreepi_MC,SIMthreepi+"_MC/D");
-		tree_temp->Branch(SEisr,&Eisr,SEisr+"/D");
+		tree_temp->Branch(SEisr+"_MC",&Eisr_MC,SEisr+"/D");
 		tree_temp->Branch(SChi2value,&chi2value,SChi2value+"/D");
 		tree_temp->Branch(SBestPiTime,&bestPiTime,SBestPiTime+"/D");
 		tree_temp->Branch(SBestETime,&bestETime,SBestETime+"/D");
 		tree_temp->Branch(SDeltaE,&deltaE,SDeltaE+"/D");
 		tree_temp->Branch(STracksum,&tracksum,STracksum+"/D");
+		tree_temp->Branch(SThreepiIM,&threepiIM,SThreepiIM+"/D");
+		tree_temp->Branch(SThreepiIM_impv,&threepiIM_impv,SThreepiIM_impv+"/D");
+		tree_temp->Branch(SIMdiff,&IMdiff,SIMdiff+"/D");
+		tree_temp->Branch(SEmaxprompt,&Emaxprompt,SIMdiff+"/D");
+		tree_temp->Branch(SBestpiphoton1Ekinfit,&bestpiphoton1Ekinfit,SBestpiphoton1Ekinfit+"/D");
+		tree_temp->Branch(SBestpiphoton2Ekinfit,&bestpiphoton2Ekinfit,SBestpiphoton2Ekinfit+"/D");
+		tree_temp->Branch(SISRE,&isrE,SISRE+"/D");
+		tree_temp->Branch(SISRE_impv,&isrE_impv,SISRE_impv+"/D");
 	}	
 
 	///
@@ -101,19 +119,19 @@ void MyClass::Main()
       if (phid == 0) { // omega pi
       	mctype = 1; 
       	IMthreepi_MC = 0.;
-      	Eisr = 0.;
+      	Eisr_MC = 0.;
       	OMEGAMPI_MC.Fill();
       }
       else if (phid == 1) {// kpm
       	mctype = 2;  //cout<<mctype<<endl;
       	IMthreepi_MC = 0.; 
-      	Eisr = 0.;
+      	Eisr_MC = 0.;
       	KPM_MC.Fill();
       }
       else if (phid == 2) {// ksl
       	mctype = 3; 
       	IMthreepi_MC = 0.; 
-      	Eisr = 0.;
+      	Eisr_MC = 0.;
       	KSL_MC.Fill();
       }
       else if (phid==3) {
@@ -152,14 +170,14 @@ void MyClass::Main()
       		true3pi=truepipl+truepimi+truepi0;
 			   if (pi0nb == 1 && piplnb == 1 && piminb == 1 && isr1nb == 1 ) {// threepigam
 			   	mctype = 4;  
-			      Eisr=trueisr.E();			      
+			      Eisr_MC=trueisr.E();			      
 			      IMthreepi_MC = true3pi.M(); 	     
 			      THREEPIGAM_MC.Fill();
       		}
       		else {
       			mctype = 5;  // three pi
 			      IMthreepi_MC = true3pi.M(); 
-			      Eisr=trueisr.E();
+			      Eisr_MC=trueisr.E();
       			THREEPI_MC.Fill();
       		}
       	}
@@ -196,7 +214,7 @@ void MyClass::Main()
 			   }
 			   true3pi_eta=truepipl_eta+truepimi_eta+truepi0_eta;	
 			   IMthreepi_MC = true3pi_eta.M(); 
-			   Eisr=trueisr_eta.E();		   
+			   Eisr_MC=trueisr_eta.E();		   
       		mctype=7;  // eta gamma
       		//threepiIM_MC=true3pi_eta.M(); 
       		ETAGAM_MC.Fill();
@@ -395,6 +413,41 @@ void MyClass::Main()
 		TLorentzVector bestpplkinfit=Gettrack4vectorkinfit(bestinputvectorkinfit(15), bestinputvectorkinfit(16), bestinputvectorkinfit(17));
 		TLorentzVector bestpmikinfit=Gettrack4vectorkinfit(bestinputvectorkinfit(18), bestinputvectorkinfit(19), bestinputvectorkinfit(20));
 		
+		// Emax prompt photon
+		TLorentzVector bestpiphoton1kinfit, bestpiphoton2kinfit;
+		TLorentzVector Emaxprompt4mom;
+		Double_t Emaxprompt_temp = 0.;
+		if (bestphoton1kinfit.E() >= bestphoton2kinfit.E()) {
+		  Emaxprompt_temp=bestphoton1kinfit.E();
+		  bestpiphoton1kinfit = bestphoton2kinfit;
+		  if (Emaxprompt_temp >= bestphoton3kinfit.E()) {
+		  		Emaxprompt = Emaxprompt_temp;	
+		  		Emaxprompt4mom = bestphoton1;
+		  		bestpiphoton2kinfit = bestphoton3kinfit;		  		
+		  }
+		  else {
+		  		Emaxprompt4mom = bestphoton3;
+		  		Emaxprompt = bestphoton3kinfit.E();
+		  		bestpiphoton2kinfit = bestphoton1kinfit;
+		  }
+		}  
+		else {
+		  Emaxprompt_temp=bestphoton2kinfit.E();
+		  bestpiphoton1kinfit = bestphoton1kinfit;
+		  if (Emaxprompt_temp >= bestphoton3kinfit.E()) {
+		  		Emaxprompt = Emaxprompt_temp;	
+		  		Emaxprompt4mom = bestphoton2;
+		  		bestpiphoton2kinfit = bestphoton3kinfit;	
+		  }
+		  else {
+		  		Emaxprompt = bestphoton3kinfit.E();
+		  		Emaxprompt4mom = bestphoton3;
+		  		bestpiphoton2kinfit = bestphoton2kinfit;
+		  }
+		}
+		bestpiphoton1Ekinfit=bestpiphoton1kinfit.E();
+		bestpiphoton2Ekinfit=bestpiphoton2kinfit.E();
+		
 		//time-of-fligt
 		TVector2 bestppltime(2.0,-6.0), bestpmitime(2.0,-6.0);
 		bestppltime.Set(timinginfo(trackindex1,bestppl)); // ppltime.Print();
@@ -408,7 +461,133 @@ void MyClass::Main()
 		Double_t pplmomsqr=TMath::Power((bestpplkinfit.Vect()).Mag(),2);
 		Double_t pmimomsqr=TMath::Power((bestpmikinfit.Vect()).Mag(),2);
 		deltaE = (bestpplkinfit.Vect()+bestpmikinfit.Vect()-Beam.Vect()).Mag()-(Beam.E()-TMath::Sqrt(pionMsqr+pplmomsqr)-TMath::Sqrt(pionMsqr+pmimomsqr));
-
+		
+		/// permutation
+      Int_t permunb=0, permunbmin=0;
+   	Double_t chi2Eisromega_temp=0., chi2Eisreta_temp=0., chi2mgg_temp=0.;
+   	Double_t chi2test_temp=0., chi2testmin=1000000000., chi2testmin1=1000000000.;
+   	Double_t boostangle=0., anglediff=0.;
+   	TVectorD inputvectormin(Row), inputvectorminkinfit(Row), sigma2vectormin(Row);
+   	TVectorD inputvectormin1(Row), inputvectorminkinfit1(Row);
+   	TVectorD inputvector_permu(Row), sigma2vector_permu(Row);
+   	TVectorD inputvectorkinfit_permu(Row), sigma2vectorkinfit_permu(Row);
+   	TLorentzVector pionphoton1_temp(0.,0.,0.,0.), pionphoton2_temp(0.,0.,0.,0.), isrphoton_temp(0.,0.,0.,0.);
+   	TLorentzVector pionphoton1boost_temp(0.,0.,0.,0.), pionphoton2boost_temp(0.,0.,0.,0.), isrphotonboost_temp(0.,0.,0.,0.);
+   	TLorentzVector pionphoton1min(0.,0.,0.,0.), pionphoton2min(0.,0.,0.,0.), isrphotonmin(0.,0.,0.,0.), threepiboost(0.,0.,0.,0.), bestpplboost(0.,0.,0.,0.), bestpmiboost(0.,0.,0.,0.);
+   	
+   	for (Int_t j=0;j<2;j++) {// begin permu. loop
+			//printf("j=%d, photon2 index=%d\n",j,Photocandindex[j]);
+			for (Int_t k=j+1;k<3;k++) {
+				//printf("(j=%d, k=%d)\n",j,k);
+				for (Int_t i=0;i<3;i++) {
+					if (i!=j && i!=k) {
+						permunb++;
+						Double_t sigma12=bestVkinfit(5*j,5*k); //cout<<sigma12<<endl;
+						// not fitted
+						inputvector_permu=Fillpermutvector(Row,bestinputvector,i,j,k); //inputvector_permu.Print();
+						sigma2vector_permu=Fillpermutvector(Row,bestsigma2vector,i,j,k);
+						
+						// fitted
+						inputvectorkinfit_permu=Fillpermutvector(Row,bestinputvectorkinfit,i,j,k);
+						sigma2vectorkinfit_permu=Fillpermutvector(Row,bestsigma2vectorkinfit,i,j,k);
+						//chi2 test on invariant mass of two photons, fill pion photons 4 vectors						
+						pionphoton1_temp=Getphoton4vector(inputvector_permu(5),inputvector_permu(6),inputvector_permu(7),inputvector_permu(8)); //cout<<pionphoton1_temp.E()<<endl;
+						pionphoton2_temp=Getphoton4vector(inputvector_permu(10),inputvector_permu(11),inputvector_permu(12),inputvector_permu(13));
+						isrphoton_temp=Getphoton4vector(inputvector_permu(0),inputvector_permu(1),inputvector_permu(2),inputvector_permu(3));
+						//
+						pionphoton1boost_temp=pionphoton1_temp;
+						pionphoton1boost_temp.Boost(Boost3vector);
+						//
+						pionphoton2boost_temp=pionphoton2_temp;
+						pionphoton2boost_temp.Boost(Boost3vector);
+						//
+						isrphotonboost_temp=isrphoton_temp;
+						isrphotonboost_temp.Boost(Boost3vector);
+						//
+						bestpplboost=bestpplkinfit;
+						bestpplboost.Boost(Boost3vector);
+						//
+						bestpmiboost=bestpmikinfit;
+						bestpmiboost.Boost(Boost3vector);
+						
+						threepiboost=pionphoton1boost_temp+pionphoton2boost_temp+bestpplboost+bestpmiboost;
+						boostangle=threepiboost.Angle(isrphotonboost_temp.Vect())*180./pi;
+						anglediff=boostangle-180.;
+	
+						//cout<<boostangle<<endl;
+						//pionphoton1boost_temp.Print();
+						Double_t openangle=pionphoton1_temp.Angle(pionphoton2_temp.Vect());
+						Double_t cosangle=TMath::Cos(openangle);
+						//Double_t mgg_temp=TMath::Sqrt(2*pionphoton1_temp.E()*pionphoton2_temp.E()*(1-cosangle));
+						Double_t mgg_temp=(pionphoton1_temp+pionphoton2_temp).M();
+						//Double_t mgg=(pionphoton1_temp+pionphoton2_temp).M(); //hIMtest->Fill(mgg_temp);
+						//cout<<mgg<<endl;
+						//
+						Double_t errormggsq=TMath::Power(mgg_temp/2,2)*(sigma2vector_permu(5)/TMath::Power(inputvector_permu(5),2)+sigma2vector_permu(10)/TMath::Power(inputvector_permu(10),2));
+						Double_t msq=TMath::Power(mgg_temp,2);
+						//Double_t errormggsq=TMath::Power(msq,2)*(sigma2vector_permu(5)/TMath::Power(inputvector_permu(5),2)+sigma2vector_permu(10)/TMath::Power(inputvector_permu(10),2));
+						//
+						Double_t chi2Eisreta_temp=Chi2Eisrtest(inputvector_permu,sigma2vector_permu,363.);
+						Double_t chi2Eisromega_temp=Chi2Eisrtest(inputvector_permu,sigma2vector_permu,209.);
+						Double_t chi2diff=chi2Eisromega_temp-chi2Eisreta_temp;						
+						//
+						Double_t mggdiff=mgg_temp-massneupion;
+						//Double_t mggdiff=TMath::Power(mgg_temp,2)-TMath::Power(massneupion,2);
+						//
+						TLorentzVector threepions_temp=pionphoton1_temp+pionphoton2_temp+bestppl+bestpmi;
+						Double_t beta_temp=(threepions_temp.Vect()).Mag()/threepions_temp.E();
+						Double_t betadiff=beta_temp-0.264;
+						//Double_t chi2mgg_temp=TMath::Power(mggdiff,2);
+						Double_t chi2mgg_temp=TMath::Power(mggdiff,2)/errormggsq;
+   					//Double_t chi2mgg_temp=TMath::Power(mggdiff,2)/errormggsq+chi2Eisromega_temp;
+   					//Double_t chi2mgg_temp=TMath::Power(mggdiff,2)/errormggsq+TMath::Power(anglediff,2)/180.;
+   					//if (chi2diff < 0.) chi2mgg_temp=chi2Eisromega_temp;
+   					//else chi2mgg_temp=chi2Eisreta_temp;
+   					//
+   					Double_t chi2mgg_temp1=TMath::Power(mggdiff,2)/errormggsq+chi2Eisreta_temp;
+   					//cout<<chi2mgg_temp<<endl;
+   					//inputvector_permu.Print();
+   					//cout<<pionphoton1_temp.E()<<endl;
+   					//cout<<pionphoton2_temp.E()<<endl;
+   					if (chi2mgg_temp < chi2testmin) {
+							chi2testmin=chi2mgg_temp; 
+							permunbmin=permunb;
+							inputvectormin=inputvector_permu;
+							inputvectorminkinfit=inputvectorkinfit_permu;
+							sigma2vectormin=sigma2vectorkinfit_permu;
+							pionphoton1min=pionphoton1_temp; //pionphoton1min.Print();
+							pionphoton2min=pionphoton2_temp; //pionphoton2min.Print();
+							isrphotonmin=isrphoton_temp; //isrphotonmin.Print();
+						}// end selection
+						// improve eta selection
+						if (chi2mgg_temp1 < chi2testmin1) {
+						   chi2testmin1=chi2mgg_temp1; 
+							permunbmin=permunb;
+							inputvectormin1=inputvector_permu;
+							inputvectorminkinfit1=inputvectorkinfit_permu; //cout<<inputvectorminkinfit1(0)<<endl;
+						}
+					}	 								
+				}
+			}		
+		}// end permu. loop
+		
+		// fitted
+		TLorentzVector ISRphotonkinfit=Getphoton4vector(inputvectorminkinfit(0),inputvectorminkinfit(1),inputvectorminkinfit(2),inputvectorminkinfit(3));
+		TLorentzVector pionphoton1kinfit=Getphoton4vector(inputvectorminkinfit(5),inputvectorminkinfit(6),inputvectorminkinfit(7),inputvectorminkinfit(8));
+		TLorentzVector pionphoton2kinfit=Getphoton4vector(inputvectorminkinfit(10),inputvectorminkinfit(11),inputvectorminkinfit(12),inputvectorminkinfit(13));
+		TLorentzVector threepionskinfit=pionphoton1kinfit+pionphoton2kinfit+bestpplkinfit+bestpmikinfit;
+		threepiIM=threepionskinfit.M();
+		IMdiff = threepiIM-IMthreepi_MC;
+		isrE = ISRphotonkinfit.E();
+		
+		/// improved eta IM selection
+		// fitted		
+		TLorentzVector ISRphotonkinfit1=Getphoton4vector(inputvectorminkinfit1(0),inputvectorminkinfit1(1),inputvectorminkinfit1(2),inputvectorminkinfit1(3));
+		TLorentzVector pionphoton1kinfit1=Getphoton4vector(inputvectorminkinfit1(5),inputvectorminkinfit1(6),inputvectorminkinfit1(7),inputvectorminkinfit1(8));
+		TLorentzVector pionphoton2kinfit1=Getphoton4vector(inputvectorminkinfit1(10),inputvectorminkinfit1(11),inputvectorminkinfit1(12),inputvectorminkinfit1(13));
+		TLorentzVector threepionskinfit1=pionphoton1kinfit1+pionphoton2kinfit1+bestpplkinfit+bestpmikinfit;
+		threepiIM_impv=threepionskinfit1.M();
+		isrE_impv = ISRphotonkinfit1.E();
 
 		ALLCHAIN_Pre.Fill();
 		
@@ -919,4 +1098,39 @@ TLorentzVector MyClass::Gettrack4vectorkinfit(Double_t curv, Double_t cotan, Dou
 	tvector.SetPxPyPzE(px,py,pz,E);
 	
 	return tvector;
+}
+
+TVectorD MyClass::Fillpermutvector(Int_t size, TVectorD input, Int_t index1, Int_t index2, Int_t index3) {
+	TVectorD vector(size);
+	TVectorD testvector(size);
+	
+	for (Int_t i=0;i<21;i++) {
+		testvector(i)=i;
+	}
+	//input.Print();
+	//index1=1, index2=0, index3=2; 
+	//printf("%d,%d,%d \n",5*index1,5*index2,5*index3);
+	//cout<<testvector(index1)<<endl;
+	vector(0)=input(5*index1), vector(1)=input(5*index1+1), vector(2)=input(5*index1+2), vector(3)=input(5*index1+3), vector(4)=input(5*index1+4);
+	vector(5)=input(5*index2), vector(6)=input(5*index2+1), vector(7)=input(5*index2+2), vector(8)=input(5*index2+3), vector(9)=input(5*index2+4);
+	vector(10)=input(5*index3), vector(11)=input(5*index3+1), vector(12)=input(5*index3+2), vector(13)=input(5*index3+3), vector(14)=input(5*index3+4);
+	
+	vector(15)=input(15), vector(16)=input(16), vector(17)=input(17), vector(18)=input(18), vector(19)=input(19), vector(20)=input(20);
+	
+	//testvector.Print();
+	//input.Print();
+	//vector.Print();
+	//printf("=========================\n");
+	
+	return vector;
+}
+
+Double_t MyClass::Chi2Eisrtest(TVectorD inputvector, TVectorD sigma2vector, Double_t isrenergy) {
+	Double_t chi2isrE=0., isrEdiff=0., isrEdiff1=0.;
+	
+	isrEdiff=inputvector(0)-isrenergy;//362
+	chi2isrE=TMath::Power(isrEdiff,2)/sigma2vector(0);
+	
+	return chi2isrE;
+
 }

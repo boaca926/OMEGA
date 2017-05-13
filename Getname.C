@@ -1,12 +1,12 @@
-const int NbTree = 11, NbVar = 9, NbCut = 4, NbMode = 4, scale = 6;
-const int NbHist = 100, bin_IM = 100, bin_TOF = 400, bin_DeltaE = 1000, bin_Tracksum = 1000;
-const double xmin_IM = 0., xmin_TOF = -10., xmax_DeltaE = 200., xmin_Tracksum = 0.;
-const double xmax_IM = 100., xmax_TOF = 10., xmin_DeltaE = -800., xmax_Tracksum = 1000.;
-const double chi2cut = 32., tofcut1 = -0.5, tofcut2=4., deltaEcut=-210.;
+const int NbTree = 11, NbVar = 17, NbCut = 4, NbMode = 4, scale = 6;
+const int NbHist = 100, bin_Chi2 = 100, bin_TOF = 400, bin_DeltaE = 1000, bin_Tracksum = 1000, bin_IM = 110;
+const double xmin_Chi2 = 0., xmin_TOF = -10., xmax_DeltaE = 200., xmin_Tracksum = 0., xmin_IM = 0.;
+const double xmax_Chi2 = 100., xmax_TOF = 10., xmin_DeltaE = -800., xmax_Tracksum = 1000., xmax_IM = 1100;
+const double chi2cut = 32., tofcut1 = -0.5, tofcut2=4., deltaEcut=-215.;
 const double k=-5.;
 const double Cutlist_std[NbCut] = {chi2cut, tofcut1, tofcut2, deltaEcut};
-const double cutstep_std[NbCut] ={2., 0.2, 1., 3.};
-const int CUTTAG = 0; // 0 disable cut
+const double cutstep_std[NbCut] ={2., 0.2, 1., 4.};
+const int CUTTAG = 1; // 0 disable cut
 const int colorid[NbTree] = {7, 46, 15, 4, 6, 3, 20, 20, 2, 5, 1};
 const TString cutname[NbCut] = {"Chi2Cut","tofcut1","tofcut2","DeltaEcut"};
 const TString xname[NbCut] = {"#chi^{2} cut","#Deltat_{e^{#pm}} cut","#Delta_{#pi^{#pm}} cut", "#deltaE cut"};
@@ -17,7 +17,7 @@ const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
 // modpos = 1: tofcut1
 // modpos = 2: tofcut2
 // modpos = 3: deltaEcut
-const int modpos = 3; // chi2 loop over 2-102, nbstep=25, chicut = 52
+const int modpos = 0; // chi2 loop over 2-102, nbstep=25, chicut = 52
 const int nbstep = 0; // nbstep=0 give standard cut value, number of cut modification = 2nstep+1
 const double step = cutstep_std[modpos]; 
 
@@ -37,7 +37,7 @@ TString gettreename(Int_t index) {
 }
 
 TString getbraname(Int_t index) {
-	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue","BestPiTime","BestETime","DeltaE","tracksum"}; 
+	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue","BestPiTime","BestETime","DeltaE","tracksum","ThreepiIM","IMdiff","ThreepiIM_impv","Emaxprompt","bestpiphoton1Ekinfit","bestpiphoton2Ekinfit","ISRE","ISR_impv"}; 
 	
 	TString st = myArr[index]; 
 	return st;
