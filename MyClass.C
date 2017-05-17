@@ -18,7 +18,7 @@ void MyClass::Main()
 	Double_t deltaE = 0., tracksum = 0.;
 	Double_t threepiIM = 0., threepiIM_impv = 0., IMdiff = 0.;
 	Double_t isrE = 0., isrE_impv = 0.;
-	Double_t Emaxprompt = 0., bestpiphoton1Ekinfit = 0., bestpiphoton2Ekinfit = 0.;
+	Double_t Emaxprompt = 0., bestpiphoton1Ekinfit = 0., bestpiphoton2Ekinfit = 0., pionphotonEsum = 0.;
 	// get names
 	TString OMEGAPI = gettreename(0); 
 	TString KPM = gettreename(1); //std::cout<<gettreename(1)<<endl
@@ -70,7 +70,8 @@ void MyClass::Main()
 	TString SBestpiphoton1Ekinfit = getbraname(13); std::cout<<getbraname(13)<<endl;
 	TString SBestpiphoton2Ekinfit = getbraname(14); std::cout<<getbraname(14)<<endl;
 	TString SISRE = getbraname(15); getbraname(15); std::cout<<getbraname(15)<<endl;
-	TString SISRE_impv = getbraname(16); getbraname(16); std::cout<<getbraname(16)<<endl;
+	TString SISRE_impv = getbraname(16); getbraname(16); std::cout<<getbraname(16)<<endl; 
+	TString SPionphotonEsum = getbraname(17); getbraname(17); std::cout<<getbraname(17)<<endl;
 	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -93,6 +94,7 @@ void MyClass::Main()
 		tree_temp->Branch(SBestpiphoton2Ekinfit,&bestpiphoton2Ekinfit,SBestpiphoton2Ekinfit+"/D");
 		tree_temp->Branch(SISRE,&isrE,SISRE+"/D");
 		tree_temp->Branch(SISRE_impv,&isrE_impv,SISRE_impv+"/D");
+		tree_temp->Branch(SPionphotonEsum,&pionphotonEsum,SPionphotonEsum+"/D");
 	}	
 
 	///
@@ -579,6 +581,7 @@ void MyClass::Main()
 		threepiIM=threepionskinfit.M();
 		IMdiff = threepiIM-IMthreepi_MC;
 		isrE = ISRphotonkinfit.E();
+		pionphotonEsum = (pionphoton1kinfit.Vect()).Mag()+(pionphoton2kinfit.Vect()).Mag();
 		
 		/// improved eta IM selection
 		// fitted		
@@ -588,7 +591,7 @@ void MyClass::Main()
 		TLorentzVector threepionskinfit1=pionphoton1kinfit1+pionphoton2kinfit1+bestpplkinfit+bestpmikinfit;
 		threepiIM_impv=threepionskinfit1.M();
 		isrE_impv = ISRphotonkinfit1.E();
-
+		
 		ALLCHAIN_Pre.Fill();
 		
       

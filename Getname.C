@@ -1,7 +1,7 @@
-const int NbTree = 11, NbVar = 17, NbCut = 4, NbMode = 4, scale = 6;
-const int NbHist = 100, bin_Chi2 = 100, bin_TOF = 400, bin_DeltaE = 1000, bin_Tracksum = 1000, bin_IM = 110;
-const double xmin_Chi2 = 0., xmin_TOF = -10., xmax_DeltaE = 200., xmin_Tracksum = 0., xmin_IM = 0.;
-const double xmax_Chi2 = 100., xmax_TOF = 10., xmin_DeltaE = -800., xmax_Tracksum = 1000., xmax_IM = 1100;
+const int NbTree = 11, NbVar = 18, NbCut = 4, NbMode = 4, scale = 6;
+const int NbHist = 100, bin_Chi2 = 100, bin_TOF = 400, bin_DeltaE = 1000, bin_Tracksum = 500, bin_IM = 110, bin_pionPsum = 400;
+const double xmin_Chi2 = 0., xmin_TOF = -10., xmin_DeltaE = -800., xmin_Tracksum = 100., xmin_IM = 0., xmin_pionPsum = 120.;
+const double xmax_Chi2 = 100., xmax_TOF = 10., xmax_DeltaE = 200., xmax_Tracksum = 600., xmax_IM = 1100., xmax_pionPsum = 520.;
 const double chi2cut = 32., tofcut1 = -0.5, tofcut2=4., deltaEcut=-215.;
 const double k=-5.;
 const double Cutlist_std[NbCut] = {chi2cut, tofcut1, tofcut2, deltaEcut};
@@ -37,7 +37,7 @@ TString gettreename(Int_t index) {
 }
 
 TString getbraname(Int_t index) {
-	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue","BestPiTime","BestETime","DeltaE","tracksum","ThreepiIM","IMdiff","ThreepiIM_impv","Emaxprompt","bestpiphoton1Ekinfit","bestpiphoton2Ekinfit","ISRE","ISR_impv"}; 
+	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue","BestPiTime","BestETime","DeltaE","tracksum","ThreepiIM","IMdiff","ThreepiIM_impv","Emaxprompt","bestpiphoton1Ekinfit","bestpiphoton2Ekinfit","ISRE","ISR_impv","pionphotonEsum"}; 
 	
 	TString st = myArr[index]; 
 	return st;

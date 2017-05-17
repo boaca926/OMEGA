@@ -34,6 +34,7 @@ Double_t tree(double list[], int index)
 	Double_t bestpiphoton2Ekinfit = 0.;
 	Double_t isrE = 0.;
 	Double_t isrE_impv  = 0.;
+	Double_t pionphotonEsum = 0.;
 	// tree names
 	TString OMEGAPI = gettreename(0); //
 	TString KPM = gettreename(1); //
@@ -63,6 +64,7 @@ Double_t tree(double list[], int index)
 	TString SBestpiphoton2Ekinfit = getbraname(14);
 	TString SISRE = getbraname(15);
 	TString SISRE_impv = getbraname(16);
+	TString SPionphotonEsum = getbraname(17);
 	
 	TTree *TOMEGAPI_MC = new TTree("T"+OMEGAPI+"_MC","recreate");
 	TTree *TKPM_MC = new TTree("T"+KPM+"_MC","recreate");
@@ -136,6 +138,7 @@ Double_t tree(double list[], int index)
 		tree_temp->Branch(SBestpiphoton2Ekinfit,&bestpiphoton2Ekinfit,SBestpiphoton2Ekinfit+"/D");
 		tree_temp->Branch(SISRE,&isrE,SISRE+"/D");
 		tree_temp->Branch(SISRE_impv,&isrE_impv,SISRE_impv+"/D");
+		tree_temp->Branch(SPionphotonEsum,&pionphotonEsum,SPionphotonEsum+"/D");
 	}
 	
 	// define chain
@@ -192,6 +195,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SEmaxprompt,&Emaxprompt);
 						chain_temp->SetBranchAddress(SISRE,&isrE);
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
+						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
 					}	
                
             }
@@ -232,6 +236,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SEmaxprompt,&Emaxprompt);
 						chain_temp->SetBranchAddress(SISRE,&isrE);
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
+						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
 					}	
             }
          }
@@ -271,6 +276,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SEmaxprompt,&Emaxprompt);
 						chain_temp->SetBranchAddress(SISRE,&isrE);
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
+						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
 					}	
             }
          }
@@ -310,6 +316,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SEmaxprompt,&Emaxprompt);
 						chain_temp->SetBranchAddress(SISRE,&isrE);
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
+						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
 					}	
             }
          }
