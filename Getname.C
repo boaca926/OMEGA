@@ -1,15 +1,15 @@
-const int NbTree = 11, NbVar = 18, NbCut = 4, NbMode = 4, scale = 6;
-const int NbHist = 100, bin_Chi2 = 100, bin_TOF = 400, bin_DeltaE = 1000, bin_Tracksum = 500, bin_IM = 110, bin_pionPsum = 400;
-const double xmin_Chi2 = 0., xmin_TOF = -10., xmin_DeltaE = -800., xmin_Tracksum = 100., xmin_IM = 0., xmin_pionPsum = 120.;
-const double xmax_Chi2 = 100., xmax_TOF = 10., xmax_DeltaE = 200., xmax_Tracksum = 600., xmax_IM = 1100., xmax_pionPsum = 520.;
-const double chi2cut = 32., tofcut1 = -0.5, tofcut2=4., deltaEcut=-215.;
+const int NbTree = 11, NbVar = 19, NbCut = 5, NbMode = 4, scale = 6;
+const int NbHist = 100, bin = 1000, bin_Chi2 = 100, bin_TOF = 400, bin_DeltaE = 1000, bin_Tracksum = 500, bin_IM = 110, bin_pionPsum = 400;
+const double xmin = 0., xmin_Chi2 = 0., xmin_TOF = -10., xmin_DeltaE = -800., xmin_Tracksum = 100., xmin_IM = 0., xmin_pionPsum = 120.;
+const double xmax = 1000., xmax_Chi2 = 100., xmax_TOF = 10., xmax_DeltaE = 200., xmax_Tracksum = 600., xmax_IM = 1100., xmax_pionPsum = 520.;
+const double chi2cut = 32., tofcut1 = -0.5, tofcut2=4., deltaEcut=-215., Emaxcut=340.;
 const double k=-5.;
-const double Cutlist_std[NbCut] = {chi2cut, tofcut1, tofcut2, deltaEcut};
-const double cutstep_std[NbCut] ={2., 0.2, 1., 4.};
+const double Cutlist_std[NbCut] = {chi2cut, tofcut1, tofcut2, deltaEcut, Emaxcut};
+const double cutstep_std[NbCut] ={2., 0.2, 1., 4., 1.};
 const int CUTTAG = 1; // 0 disable cut
 const int colorid[NbTree] = {7, 46, 15, 4, 6, 3, 20, 20, 2, 5, 1};
-const TString cutname[NbCut] = {"Chi2Cut","tofcut1","tofcut2","DeltaEcut"};
-const TString xname[NbCut] = {"#chi^{2} cut","#Deltat_{e^{#pm}} cut","#Delta_{#pi^{#pm}} cut", "#deltaE cut"};
+const TString cutname[NbCut] = {"Chi2Cut","tofcut1","tofcut2","DeltaEcut","Emaxcut"};
+const TString xname[NbCut] = {"#chi^{2} cut","#Deltat_{e^{#pm}} cut","#Delta_{#pi^{#pm}} cut", "#deltaE cut", "Emax cut"};
 const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
 
 // specify modification of cut values
@@ -17,7 +17,7 @@ const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
 // modpos = 1: tofcut1
 // modpos = 2: tofcut2
 // modpos = 3: deltaEcut
-const int modpos = 0; // chi2 loop over 2-102, nbstep=25, chicut = 52
+const int modpos = 4; // chi2 loop over 2-102, nbstep=25, chicut = 52
 const int nbstep = 0; // nbstep=0 give standard cut value, number of cut modification = 2nstep+1
 const double step = cutstep_std[modpos]; 
 
@@ -37,7 +37,7 @@ TString gettreename(Int_t index) {
 }
 
 TString getbraname(Int_t index) {
-	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue","BestPiTime","BestETime","DeltaE","tracksum","ThreepiIM","IMdiff","ThreepiIM_impv","Emaxprompt","bestpiphoton1Ekinfit","bestpiphoton2Ekinfit","ISRE","ISR_impv","pionphotonEsum"}; 
+	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue","BestPiTime","BestETime","DeltaE","tracksum","ThreepiIM","IMdiff","ThreepiIM_impv","Emaxprompt","bestpiphoton1Ekinfit","bestpiphoton2Ekinfit","ISRE","ISR_impv","pionphotonEsum","ThreepiIM_nofit"}; 
 	
 	TString st = myArr[index]; 
 	return st;
@@ -74,7 +74,7 @@ void normlizehisto(TH1D* h, TH1D* hh) {
 	}
 }
 
-Int_t getcutype(Double_t chi2value, Double_t bestETime, Double_t bestPiTime, Double_t deltaE, Double_t cutlist[]) {
+Int_t getcutype(Double_t chi2value, Double_t bestETime, Double_t bestPiTime, Double_t deltaE, Double_t Emax, Double_t cutlist[]) {
 	//cout<<bestETime<<endl;
 	Int_t Type = 0;
 	Int_t type[NbCut];
@@ -109,8 +109,15 @@ Int_t getcutype(Double_t chi2value, Double_t bestETime, Double_t bestPiTime, Dou
 	else {
 		type[3] = 0;
 	}
+	// Emax
+	if (Emax < cutlist[4]) {
+		type[4] = 1;
+	}
+	else {
+		type[4] = 0;
+	}
 	// all cuts
-	if (type[0] && type[1] && type[2] && type[3]) {
+	if (type[0] && type[1] && type[2] && type[3] && type[4]) {
 	//if (type[modpos]) {
 		Type = 1;
 	}

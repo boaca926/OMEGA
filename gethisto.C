@@ -176,7 +176,7 @@ void gethisto() {
 	TH2D *HScatter2[NbTree];
 	
 	for (Int_t i=0;i<NbTree;i++) {
-		HEMAX[i] = new TH1D("HEMAX_"+gettreename(i),"Maximum energy of prompt photon",bin_IM,xmin_IM,xmax_IM); format_h(HEMAX[i],colorid[i],0,1);
+		HEMAX[i] = new TH1D("HEMAX_"+gettreename(i),"Maximum energy of prompt photon",bin,xmin,xmax); format_h(HEMAX[i],colorid[i],0,1);
 		HIM[i] = new TH1D("hIM_"+gettreename(i),"Invariant mass",bin_IM,xmin_IM,xmax_IM); format_h(HIM[i],colorid[i],0,1);
 		HCHI2[i] = new TH1D("hChi2Value_"+gettreename(i),"Chi2 values",bin_Chi2,xmin_Chi2,xmax_Chi2); format_h(HCHI2[i],colorid[i],0,1);
 		HTOF[i] = new TH2D("hToF_"+gettreename(i),"TOF",bin_TOF,xmin_TOF,xmax_TOF,bin_TOF,xmin_TOF,xmax_TOF);
@@ -196,6 +196,7 @@ void gethisto() {
    	HScatter1[0]->Fill(tracksum,deltaE);
    	HScatter2[0]->Fill(pionphotonEsum,tracksum);
    	HIM[0]->Fill(threepiIM);
+   	HEMAX[0]->Fill(Emaxprompt);
    } 
    // 
    for (Int_t irow=0;irow<TKPM->GetEntries();irow++) { // kpm
@@ -206,6 +207,7 @@ void gethisto() {
    	HScatter1[1]->Fill(tracksum,deltaE);
    	HScatter2[1]->Fill(pionphotonEsum,tracksum);
    	HIM[1]->Fill(threepiIM);
+   	HEMAX[1]->Fill(Emaxprompt);
    }
    // 
    for (Int_t irow=0;irow<TKSL->GetEntries();irow++) { // ksl
@@ -215,6 +217,7 @@ void gethisto() {
    	HScatter1[2]->Fill(tracksum,deltaE);
    	HScatter2[2]->Fill(pionphotonEsum,tracksum);
    	HIM[2]->Fill(threepiIM);
+   	HEMAX[2]->Fill(Emaxprompt);
    }
    //
    for (Int_t irow=0;irow<TTHREEPIGAM->GetEntries();irow++) { // threepi gamma
@@ -225,6 +228,7 @@ void gethisto() {
    	HScatter1[3]->Fill(tracksum,deltaE);
    	HScatter2[3]->Fill(pionphotonEsum,tracksum);
    	HIM[3]->Fill(threepiIM);
+   	HEMAX[3]->Fill(Emaxprompt);
    }
    //
    for (Int_t irow=0;irow<TTHREEPI->GetEntries();irow++) { // threepi 
@@ -235,6 +239,7 @@ void gethisto() {
    	HScatter1[4]->Fill(tracksum,deltaE);
    	HScatter2[4]->Fill(pionphotonEsum,tracksum);
    	HIM[4]->Fill(threepiIM);
+   	HEMAX[4]->Fill(Emaxprompt);
    }
    //
    for (Int_t irow=0;irow<TETAGAM->GetEntries();irow++) { // threepi 
@@ -245,6 +250,7 @@ void gethisto() {
    	HScatter1[5]->Fill(tracksum,deltaE);
    	HScatter2[5]->Fill(pionphotonEsum,tracksum);
    	HIM[5]->Fill(threepiIM);
+   	HEMAX[5]->Fill(Emaxprompt);
    }
    //
    for (Int_t irow=0;irow<TBKGSUM1->GetEntries();irow++) { // threepi 
@@ -255,6 +261,7 @@ void gethisto() {
    	HScatter1[6]->Fill(tracksum,deltaE);
    	HScatter2[6]->Fill(pionphotonEsum,tracksum);
 		HIM[6]->Fill(threepiIM);
+		HEMAX[6]->Fill(Emaxprompt);
    }
    //
    for (Int_t irow=0;irow<TBKGSUM2->GetEntries();irow++) { // threepi 
@@ -265,6 +272,7 @@ void gethisto() {
    	HScatter1[7]->Fill(tracksum,deltaE);
    	HScatter2[7]->Fill(pionphotonEsum,tracksum);
    	HIM[7]->Fill(threepiIM);
+   	HEMAX[7]->Fill(Emaxprompt);
    }
    //
    for (Int_t irow=0;irow<TMCSUM->GetEntries();irow++) { // threepi 
@@ -275,6 +283,7 @@ void gethisto() {
    	HScatter1[8]->Fill(tracksum,deltaE);
    	HScatter2[8]->Fill(pionphotonEsum,tracksum);
    	HIM[8]->Fill(threepiIM);
+   	HEMAX[8]->Fill(Emaxprompt);
    }
    //
    for (Int_t irow=0;irow<TEEG->GetEntries();irow++) { // threepi 
@@ -285,6 +294,7 @@ void gethisto() {
    	HScatter1[9]->Fill(tracksum,deltaE);
    	HScatter2[9]->Fill(pionphotonEsum,tracksum);
    	HIM[9]->Fill(threepiIM);
+   	HEMAX[9]->Fill(Emaxprompt);
    }
    //
    for (Int_t irow=0;irow<TDATA->GetEntries();irow++) { // threepi 
@@ -295,10 +305,12 @@ void gethisto() {
    	HScatter1[10]->Fill(tracksum,deltaE);
    	HScatter2[10]->Fill(pionphotonEsum,tracksum);
    	HIM[10]->Fill(threepiIM);
+   	HEMAX[10]->Fill(Emaxprompt);
    }
    HCHI2[10]->SetMarkerStyle(2);
    HScatter2[10]->Fill(pionphotonEsum,tracksum);
    HIM[10]->SetMarkerStyle(2);
+   HEMAX[10]->SetMarkerStyle(2);
    
    TFile hf("./ROOT/HISTOS.root","recreate");
    for (Int_t i=0;i<NbTree;i++) {
@@ -308,6 +320,7 @@ void gethisto() {
 		HScatter1[i]->Write();
 		HScatter2[i]->Write();
 		HIM[i]->Write();
+		HEMAX[i]->Write();
 	}
 
 }

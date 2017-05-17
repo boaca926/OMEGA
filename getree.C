@@ -35,6 +35,7 @@ Double_t tree(double list[], int index)
 	Double_t isrE = 0.;
 	Double_t isrE_impv  = 0.;
 	Double_t pionphotonEsum = 0.;
+	Double_t threepiIM_nofit = 0.;
 	// tree names
 	TString OMEGAPI = gettreename(0); //
 	TString KPM = gettreename(1); //
@@ -65,6 +66,7 @@ Double_t tree(double list[], int index)
 	TString SISRE = getbraname(15);
 	TString SISRE_impv = getbraname(16);
 	TString SPionphotonEsum = getbraname(17);
+	TString SThreepiIM_nofit = getbraname(18);
 	
 	TTree *TOMEGAPI_MC = new TTree("T"+OMEGAPI+"_MC","recreate");
 	TTree *TKPM_MC = new TTree("T"+KPM+"_MC","recreate");
@@ -139,6 +141,7 @@ Double_t tree(double list[], int index)
 		tree_temp->Branch(SISRE,&isrE,SISRE+"/D");
 		tree_temp->Branch(SISRE_impv,&isrE_impv,SISRE_impv+"/D");
 		tree_temp->Branch(SPionphotonEsum,&pionphotonEsum,SPionphotonEsum+"/D");
+		tree_temp->Branch(SThreepiIM_nofit,&threepiIM_nofit,SThreepiIM_nofit+"/D");
 	}
 	
 	// define chain
@@ -196,6 +199,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SISRE,&isrE);
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
+						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
 					}	
                
             }
@@ -237,6 +241,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SISRE,&isrE);
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
+						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
 					}	
             }
          }
@@ -277,6 +282,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SISRE,&isrE);
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
+						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
 					}	
             }
          }
@@ -317,6 +323,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SISRE,&isrE);
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
+						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
 					}	
             }
          }
@@ -417,7 +424,7 @@ Double_t tree(double list[], int index)
    	allchainrho_pre->GetEntry(irow); //cout<<irow<<endl;
    	//cout<<CUTTAG<<endl;
    	// CUT TYPE
-		CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,list); //cout<<CUTYPE<<endl;
+		CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,list); //cout<<CUTYPE<<endl;
    	//
    	if (!CUTYPE && CUTTAG) continue;
    	//cout<<CUTTAG[0]<<endl;
@@ -434,7 +441,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchaineeg_pre->GetEntries();irow++) {
    	allchaineeg_pre->GetEntry(irow); 
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,list); 
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,list); 
    	if (!CUTYPE && CUTTAG) continue;
    	//cout<<cutype[0]<<endl;
    	for (Int_t i=0;i<scale;i++) {
@@ -449,7 +456,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchaindata_pre->GetEntries();irow++) {
    	allchaindata_pre->GetEntry(irow);
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,list); 
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,list); 
    	if (!CUTYPE && CUTTAG) continue;
    	dataNb_Pre++; 
    	TDATA_Pre->Fill();	
@@ -461,7 +468,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchainksl_pre->GetEntries();irow++) {
    	allchainksl_pre->GetEntry(irow); 
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,list); 
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,list); 
    	if (!CUTYPE && CUTTAG) continue; 	
    	//cout<<CUTTAG[0]<<endl;	
    	if (mctype == 1) {/// omega pi

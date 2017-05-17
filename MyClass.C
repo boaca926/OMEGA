@@ -17,6 +17,7 @@ void MyClass::Main()
 	Double_t bestPiTime = 0., bestETime = 0.;
 	Double_t deltaE = 0., tracksum = 0.;
 	Double_t threepiIM = 0., threepiIM_impv = 0., IMdiff = 0.;
+	Double_t threepiIM_nofit = 0.;
 	Double_t isrE = 0., isrE_impv = 0.;
 	Double_t Emaxprompt = 0., bestpiphoton1Ekinfit = 0., bestpiphoton2Ekinfit = 0., pionphotonEsum = 0.;
 	// get names
@@ -71,7 +72,8 @@ void MyClass::Main()
 	TString SBestpiphoton2Ekinfit = getbraname(14); std::cout<<getbraname(14)<<endl;
 	TString SISRE = getbraname(15); getbraname(15); std::cout<<getbraname(15)<<endl;
 	TString SISRE_impv = getbraname(16); getbraname(16); std::cout<<getbraname(16)<<endl; 
-	TString SPionphotonEsum = getbraname(17); getbraname(17); std::cout<<getbraname(17)<<endl;
+	TString SPionphotonEsum = getbraname(17); getbraname(17); std::cout<<getbraname(17)<<endl; 
+	TString SThreepiIM_nofit = getbraname(18); getbraname(18); std::cout<<getbraname(18)<<endl;
 	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -87,6 +89,7 @@ void MyClass::Main()
 		tree_temp->Branch(SDeltaE,&deltaE,SDeltaE+"/D");
 		tree_temp->Branch(STracksum,&tracksum,STracksum+"/D");
 		tree_temp->Branch(SThreepiIM,&threepiIM,SThreepiIM+"/D");
+		tree_temp->Branch(SThreepiIM_nofit,&threepiIM_nofit,SThreepiIM_nofit+"/D");
 		tree_temp->Branch(SThreepiIM_impv,&threepiIM_impv,SThreepiIM_impv+"/D");
 		tree_temp->Branch(SIMdiff,&IMdiff,SIMdiff+"/D");
 		tree_temp->Branch(SEmaxprompt,&Emaxprompt,SIMdiff+"/D");
@@ -572,6 +575,13 @@ void MyClass::Main()
 				}
 			}		
 		}// end permu. loop
+		
+		// not fitted
+		TLorentzVector ISRphoton=Getphoton4vector(inputvectormin(0),inputvectormin(1),inputvectormin(2),inputvectormin(3)); //cout<<ISRphoton.E()<<endl;
+		TLorentzVector pionphoton1=Getphoton4vector(inputvectormin(5),inputvectormin(6),inputvectormin(7),inputvectormin(8));
+		TLorentzVector pionphoton2=Getphoton4vector(inputvectormin(10),inputvectormin(11),inputvectormin(12),inputvectormin(13));
+		TLorentzVector threepions=pionphoton1+pionphoton2+bestppl+bestpmi;
+		threepiIM_nofit=(Beam-ISRphoton).M();
 		
 		// fitted
 		TLorentzVector ISRphotonkinfit=Getphoton4vector(inputvectorminkinfit(0),inputvectorminkinfit(1),inputvectorminkinfit(2),inputvectorminkinfit(3));
