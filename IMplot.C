@@ -50,17 +50,29 @@ void IMplot() {
 	histlist->Add(hThreepiIM_EEG);
 	histlist->Add(hThreepiIM_DATA);
 	
+	/// Substract data histo with MC sum histo
+	TH1D *hThreepiIM_DATACL = (TH1D*)hThreepiIM_DATA->Clone();
+	hThreepiIM_DATACL->Add(hThreepiIM_MCSUM,-1);
+	//Double_t datanb=hThreepiIM_DATA->GetEntries(); 
+	Double_t datanb=getentries(hThreepiIM_DATA);
+	//Double_t mcnb=hThreepiIM_MCSUM->GetEntries();
+	Double_t mcnb=getentries(hThreepiIM_MCSUM);
+	Double_t hdiff=hThreepiIM_DATACL->GetEntries();
+	std::cout<<"data entries = "<<datanb<<endl;
+	std::cout<<"mc entries = "<<mcnb<<endl;
+	std::cout<<"data - MC sum = "<<hdiff<<endl;
+	
 	/// plots of unfitted histos
 	TCanvas *c = new TCanvas("Chi2Distr","Chi2 Distr.",700,700);
-	c->Divide(1,1);
+	c->Divide(2,1);
 	
 	c->cd(1);
 	Double_t ymax = hThreepiIM_MCSUM->GetMaximum();
 	Double_t widthc1=getbinwidth(hThreepiIM_OMEGAPI);
-	hThreepiIM_MCSUM->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f",widthc1));
-	hThreepiIM_MCSUM->GetXaxis()->SetTitle("#chi^{2}");
-	hThreepiIM_MCSUM->GetXaxis()->SetRangeUser(400.,1000.);
-	//hThreepiIM_MCSUM->GetYaxis()->SetRangeUser(0.,ymax*1.2);
+	hThreepiIM_MCSUM->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f MeV",widthc1));
+	hThreepiIM_MCSUM->GetXaxis()->SetTitle("M_{#pi^{+}#pi^{-}#pi^{0}} [MeV/c^{2}]");
+	//hThreepiIM_MCSUM->GetXaxis()->SetRangeUser(200.,1000.);
+	hThreepiIM_MCSUM->GetYaxis()->SetRangeUser(0.,ymax*1.2);
 	hThreepiIM_MCSUM->GetYaxis()->SetTitleOffset(1.4);
 	hThreepiIM_MCSUM->Draw(); 
 	hThreepiIM_OMEGAPI->Draw("Same");
@@ -73,7 +85,7 @@ void IMplot() {
 	hThreepiIM_EEG->Draw("Same");
 	hThreepiIM_DATA->Draw("Samee1");
 	
-	legc1 = new TLegend(0.54,0.4,0.88,0.85);
+	legc1 = new TLegend(0.56,0.45,0.9,0.9);
 	legc1->SetFillStyle(0); 
 	legc1->SetBorderSize(0);  
 	legc1->SetNColumns(2);
@@ -83,7 +95,7 @@ void IMplot() {
 	legc1->AddEntry(hThreepiIM_KPM,"KPM","l");
 	legc1->AddEntry(hThreepiIM_THREEPIGAM,"#pi^{+}#pi^{-}#pi^{0}#gamma","l");
 	legc1->AddEntry(hThreepiIM_THREEPI,"#pi^{+}#pi^{-}#pi^{0}","l");
-	legc1->AddEntry(hThreepiIM_THREEPIGAM,"#eta#gamma","l");
+	legc1->AddEntry(hThreepiIM_ETAGAM,"#eta#gamma","l");
 	legc1->AddEntry(hThreepiIM_EEG,"e^{+}e^{-}#gamma","l");
 	legc1->AddEntry(hThreepiIM_BKGSUM1,"MC rest","l");
 	legc1->AddEntry(hThreepiIM_DATA,"Data","l");	
@@ -91,5 +103,32 @@ void IMplot() {
 	legc1->SetTextFont(132);
 	legc1->Draw("Same");
 	legtextsize(legc1, 0.03);
+	
+	c->cd(2);
+	hThreepiIM_MCSUM->Draw();
+	hThreepiIM_THREEPIGAM->Draw("Same");
+	hThreepiIM_OMEGAPI->Draw("Same");
+	hThreepiIM_KSL->Draw("Same");
+	hThreepiIM_BKGSUM2->Draw("Same");
+	hThreepiIM_DATA->Draw("Samee1");
+	
+	legc1 = new TLegend(0.56,0.45,0.9,0.9);
+	legc1->SetFillStyle(0); 
+	legc1->SetBorderSize(0);  
+	legc1->SetNColumns(2);
+	
+	legc1->AddEntry(hThreepiIM_OMEGAPI,"#omega#pi^{0}","l");
+	legc1->AddEntry(hThreepiIM_KSL,"KSKL","l");
+	legc1->AddEntry(hThreepiIM_THREEPIGAM,"#pi^{+}#pi^{-}#pi^{0}#gamma","l");
+	legc1->AddEntry(hThreepiIM_BKGSUM2,"MC rest","l");
+	legc1->AddEntry(hThreepiIM_DATA,"Data","l");	
+	legc1->AddEntry(hThreepiIM_MCSUM,"ALLCHAIN","l");
+	legc1->SetTextFont(132);
+	legc1->Draw("Same");
+	legtextsize(legc1, 0.03);
+	
+	//c->cd(3);
+	//hThreepiIM_DATACL->Draw();
+	 
 	
 }

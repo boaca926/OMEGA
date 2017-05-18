@@ -1,15 +1,15 @@
-const int NbTree = 11, NbVar = 22, NbCut = 5, NbMode = 4, scale = 6;
-const int NbHist = 100, bin = 1000, bin_Chi2 = 100, bin_TOF = 400, bin_DeltaE = 1000, bin_Tracksum = 500, bin_IM = 225, bin_pionPsum = 400;
-const double xmin = 0., xmin_Chi2 = 0., xmin_TOF = -10., xmin_DeltaE = -800., xmin_Tracksum = 100., xmin_IM = 0., xmin_pionPsum = 120.;
-const double xmax = 1000., xmax_Chi2 = 100., xmax_TOF = 10., xmax_DeltaE = 200., xmax_Tracksum = 600., xmax_IM = 1100., xmax_pionPsum = 520.;
-const double chi2cut = 32., tofcut1 = -0.5, tofcut2=4., deltaEcut=-215., Emaxcut=340.;
+const int NbTree = 11, NbVar = 24, NbCut = 7, NbMode = 4, scale = 6;
+const int NbHist = 100, bin = 1000, bin_Chi2 = 100, bin_TOF = 400, bin_DeltaE = 1000, bin_Tracksum = 500, bin_IM = 150, bin_pionPsum = 400, bin_pi0IM = 125;
+const double xmin = 0., xmin_Chi2 = 0., xmin_TOF = -10., xmin_DeltaE = -800., xmin_Tracksum = 100., xmin_IM = 600., xmin_pionPsum = 120., xmin_pi0IM = 50.;
+const double xmax = 1000., xmax_Chi2 = 100., xmax_TOF = 10., xmax_DeltaE = 200., xmax_Tracksum = 600., xmax_IM = 950., xmax_pionPsum = 520., xmax_pi0IM = 300.;
+const double chi2cut = 32., tofcut1 = -0.5, tofcut2=4., deltaEcut=-215., Emaxcut=320., pi0IMcut1 = 120., pi0IMcut2 = 150.;
 const double k=-5.;
-const double Cutlist_std[NbCut] = {chi2cut, tofcut1, tofcut2, deltaEcut, Emaxcut};
-const double cutstep_std[NbCut] ={2., 0.2, 1., 4., 1.};
+const double Cutlist_std[NbCut] = {chi2cut, tofcut1, tofcut2, deltaEcut, Emaxcut, pi0IMcut1, pi0IMcut2};
+const double cutstep_std[NbCut] ={2., 0.2, 1., 4., 1., 1., 1.};
 const int CUTTAG = 1; // 0 disable cut
 const int colorid[NbTree] = {7, 46, 15, 4, 6, 3, 20, 20, 2, 5, 1};
-const TString cutname[NbCut] = {"Chi2Cut","tofcut1","tofcut2","DeltaEcut","Emaxcut"};
-const TString xname[NbCut] = {"#chi^{2} cut","#Deltat_{e^{#pm}} cut","#Delta_{#pi^{#pm}} cut", "#deltaE cut", "Emax cut"};
+const TString cutname[NbCut] = {"Chi2Cut","tofcut1","tofcut2","DeltaEcut","Emaxcut", "pi0IMlowcut", "pi0IMupcut"};
+const TString xname[NbCut] = {"#chi^{2} cut","#Deltat_{e^{#pm}} cut","#Delta_{#pi^{#pm}} cut", "#deltaE cut", "Emax cut", "pi0IMlow cut", "pi0IMup cut"};
 const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
 
 // specify modification of cut values
@@ -17,11 +17,21 @@ const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
 // modpos = 1: tofcut1
 // modpos = 2: tofcut2
 // modpos = 3: deltaEcut
-const int modpos = 4; // chi2 loop over 2-102, nbstep=25, chicut = 52
-const int nbstep = 0; // nbstep=0 give standard cut value, number of cut modification = 2nstep+1
+const int modpos = 6; // chi2 loop over 2-102, nbstep=25, chicut = 52
+const int nbstep = 1; // nbstep=0 give standard cut value, number of cut modification = 2nstep+1
 const double step = cutstep_std[modpos]; 
 
-
+Double_t getentries(TH1D* h) {
+   Int_t binsize=0;
+   Double_t nb=0.;
+   Double_t xmax=0., xmin=0.;
+   binsize=h->GetNbinsX(); //cout<<binsize<<endl;
+   for (int i=0;i<binsize;i++) {
+   	nb+=h->GetBinContent(i);
+   }
+   
+   return nb;
+}
 
 void format_h(TH1D* h, Int_t fillcolor, Int_t fillstyle, Int_t width) {
 	h->SetLineWidth(width);
@@ -37,7 +47,10 @@ TString gettreename(Int_t index) {
 }
 
 TString getbraname(Int_t index) {
-	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue","BestPiTime","BestETime","DeltaE","tracksum","ThreepiIM","IMdiff","ThreepiIM_impv","Emaxprompt","bestpiphoton1Ekinfit","bestpiphoton2Ekinfit","ISRE","ISR_impv","pionphotonEsum","ThreepiIM_nofit","IsrErec_nofit","IsrE_nofit","DiffisrE"}; 
+	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", 	"pvalue","BestPiTime","BestETime","DeltaE","tracksum","ThreepiIM","IMdiff",
+	"ThreepiIM_impv","Emaxprompt","bestpiphoton1Ekinfit","bestpiphoton2Ekinfit",
+	"ISRE","ISR_impv","pionphotonEsum","ThreepiIM_nofit","IsrErec_nofit","IsrE_nofit",
+	"DiffisrE","pi0IM","IsrIMrec_nofit"}; 
 	
 	TString st = myArr[index]; 
 	return st;
@@ -74,7 +87,7 @@ void normlizehisto(TH1D* h, TH1D* hh) {
 	}
 }
 
-Int_t getcutype(Double_t chi2value, Double_t bestETime, Double_t bestPiTime, Double_t deltaE, Double_t Emax, Double_t cutlist[]) {
+Int_t getcutype(Double_t chi2value, Double_t bestETime, Double_t bestPiTime, Double_t deltaE, Double_t Emax, Double_t pi0IM, Double_t cutlist[]) {
 	//cout<<bestETime<<endl;
 	Int_t Type = 0;
 	Int_t type[NbCut];
@@ -116,8 +129,22 @@ Int_t getcutype(Double_t chi2value, Double_t bestETime, Double_t bestPiTime, Dou
 	else {
 		type[4] = 0;
 	}
+	// pi0IM cut1
+	if (pi0IM > cutlist[5]) {
+		type[5] = 1;
+	}
+	else {
+		type[5] = 0;
+	}
+	// pi0IM cut2
+	if (pi0IM < cutlist[6]) {
+		type[6] = 1;
+	}
+	else {
+		type[6] = 0;
+	}
 	// all cuts
-	if (type[0] && type[1] && type[2] && type[3] && type[4]) {
+	if (type[0] && type[1] && type[2] && type[3] && type[4] && type[5] && type[6]) {
 	//if (type[modpos]) {
 		Type = 1;
 	}

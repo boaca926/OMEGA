@@ -39,6 +39,8 @@ Double_t tree(double list[], int index)
 	Double_t isrErec_nofit = 0.;
 	Double_t isrE_nofit = 0.;
 	Double_t diffisrE = 0.;
+	Double_t pi0IM = 0.;
+	Double_t isrIMrec_nofit = 0.;
 	// tree names
 	TString OMEGAPI = gettreename(0); //
 	TString KPM = gettreename(1); //
@@ -73,7 +75,8 @@ Double_t tree(double list[], int index)
 	TString SIsrErec_nofit = getbraname(19);
 	TString SIsrE_nofit = getbraname(20);
 	TString SDiffisrE = getbraname(21);
-	
+	TString SPi0IM = getbraname(22);
+	TString SIsrIMrec_nofit = getbraname(23);
 	
 	TTree *TOMEGAPI_MC = new TTree("T"+OMEGAPI+"_MC","recreate");
 	TTree *TKPM_MC = new TTree("T"+KPM+"_MC","recreate");
@@ -152,6 +155,8 @@ Double_t tree(double list[], int index)
 		tree_temp->Branch(SIsrErec_nofit,&isrErec_nofit,SIsrErec_nofit+"/D");
 		tree_temp->Branch(SIsrE_nofit,&isrE_nofit,SIsrE_nofit+"/D");
 		tree_temp->Branch(SDiffisrE,&diffisrE,SDiffisrE+"/D");
+		tree_temp->Branch(SPi0IM,&pi0IM,SPi0IM+"/D");
+		tree_temp->Branch(SIsrIMrec_nofit,&isrIMrec_nofit,SIsrIMrec_nofit+"/D");
 	}
 	
 	// define chain
@@ -213,6 +218,8 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SIsrErec_nofit,&isrErec_nofit);
 						chain_temp->SetBranchAddress(SIsrE_nofit,&isrE_nofit);
 						chain_temp->SetBranchAddress(SDiffisrE,&diffisrE);
+						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
+						chain_temp->SetBranchAddress(SIsrIMrec_nofit,&isrIMrec_nofit);
 					}	
                
             }
@@ -258,6 +265,8 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SIsrErec_nofit,&isrErec_nofit);
 						chain_temp->SetBranchAddress(SIsrE_nofit,&isrE_nofit);
 						chain_temp->SetBranchAddress(SDiffisrE,&diffisrE);
+						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
+						chain_temp->SetBranchAddress(SIsrIMrec_nofit,&isrIMrec_nofit);
 					}	
             }
          }
@@ -302,6 +311,8 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SIsrErec_nofit,&isrErec_nofit);
 						chain_temp->SetBranchAddress(SIsrE_nofit,&isrE_nofit);
 						chain_temp->SetBranchAddress(SDiffisrE,&diffisrE);
+						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
+						chain_temp->SetBranchAddress(SIsrIMrec_nofit,&isrIMrec_nofit);
 					}	
             }
          }
@@ -346,6 +357,8 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SIsrErec_nofit,&isrErec_nofit);
 						chain_temp->SetBranchAddress(SIsrE_nofit,&isrE_nofit);
 						chain_temp->SetBranchAddress(SDiffisrE,&diffisrE);
+						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
+						chain_temp->SetBranchAddress(SIsrIMrec_nofit,&isrIMrec_nofit);
 					}	
             }
          }
@@ -446,7 +459,7 @@ Double_t tree(double list[], int index)
    	allchainrho_pre->GetEntry(irow); //cout<<irow<<endl;
    	//cout<<CUTTAG<<endl;
    	// CUT TYPE
-		CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,list); //cout<<CUTYPE<<endl;
+		CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,pi0IM,list); //cout<<CUTYPE<<endl;
    	//
    	if (!CUTYPE && CUTTAG) continue;
    	//cout<<CUTTAG[0]<<endl;
@@ -463,7 +476,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchaineeg_pre->GetEntries();irow++) {
    	allchaineeg_pre->GetEntry(irow); 
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,list); 
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,pi0IM,list); 
    	if (!CUTYPE && CUTTAG) continue;
    	//cout<<cutype[0]<<endl;
    	for (Int_t i=0;i<scale;i++) {
@@ -478,7 +491,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchaindata_pre->GetEntries();irow++) {
    	allchaindata_pre->GetEntry(irow);
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,list); 
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,pi0IM,list); 
    	if (!CUTYPE && CUTTAG) continue;
    	dataNb_Pre++; 
    	TDATA_Pre->Fill();	
@@ -490,7 +503,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchainksl_pre->GetEntries();irow++) {
    	allchainksl_pre->GetEntry(irow); 
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,list); 
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,pi0IM,list); 
    	if (!CUTYPE && CUTTAG) continue; 	
    	//cout<<CUTTAG[0]<<endl;	
    	if (mctype == 1) {/// omega pi

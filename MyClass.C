@@ -18,9 +18,10 @@ void MyClass::Main()
 	Double_t deltaE = 0., tracksum = 0.;
 	Double_t threepiIM = 0., threepiIM_impv = 0., IMdiff = 0.;
 	Double_t threepiIM_nofit = 0.;
-	Double_t isrErec_nofit = 0., isrE_nofit = 0., diffisrE = 0.;
+	Double_t isrErec_nofit = 0., isrIMrec_nofit = 0., isrE_nofit = 0., diffisrE = 0.;
 	Double_t isrE = 0., isrE_impv = 0.;
 	Double_t Emaxprompt = 0., bestpiphoton1Ekinfit = 0., bestpiphoton2Ekinfit = 0., pionphotonEsum = 0.;
+	Double_t pi0IM = 0.;
 	// get names
 	TString OMEGAPI = gettreename(0); 
 	TString KPM = gettreename(1); //std::cout<<gettreename(1)<<endl
@@ -72,12 +73,14 @@ void MyClass::Main()
 	TString SBestpiphoton1Ekinfit = getbraname(13); std::cout<<getbraname(13)<<endl;
 	TString SBestpiphoton2Ekinfit = getbraname(14); std::cout<<getbraname(14)<<endl;
 	TString SISRE = getbraname(15); getbraname(15); std::cout<<getbraname(15)<<endl;
-	TString SISRE_impv = getbraname(16); getbraname(16); std::cout<<getbraname(16)<<endl; 
-	TString SPionphotonEsum = getbraname(17); getbraname(17); std::cout<<getbraname(17)<<endl; 
-	TString SThreepiIM_nofit = getbraname(18); getbraname(18); std::cout<<getbraname(18)<<endl;
-	TString SIsrErec_nofit = getbraname(19); getbraname(19); std::cout<<getbraname(19)<<endl;
-	TString SIsrE_nofit = getbraname(20); getbraname(20); std::cout<<getbraname(20)<<endl;
-	TString SDiffisrE = getbraname(21); getbraname(21); std::cout<<getbraname(21)<<endl;
+	TString SISRE_impv = getbraname(16); std::cout<<getbraname(16)<<endl; 
+	TString SPionphotonEsum = getbraname(17); std::cout<<getbraname(17)<<endl; 
+	TString SThreepiIM_nofit = getbraname(18); std::cout<<getbraname(18)<<endl;
+	TString SIsrErec_nofit = getbraname(19); std::cout<<getbraname(19)<<endl;
+	TString SIsrE_nofit = getbraname(20); std::cout<<getbraname(20)<<endl;
+	TString SDiffisrE = getbraname(21); std::cout<<getbraname(21)<<endl; 
+	TString SPi0IM = getbraname(22); std::cout<<getbraname(22)<<endl;
+	TString SIsrIMrec_nofit = getbraname(23); std::cout<<getbraname(23)<<endl; 
 	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -105,6 +108,8 @@ void MyClass::Main()
 		tree_temp->Branch(SIsrErec_nofit,&isrErec_nofit,SIsrErec_nofit+"/D");
 		tree_temp->Branch(SIsrE_nofit,&isrE_nofit,SIsrE_nofit+"/D");
 		tree_temp->Branch(SDiffisrE,&diffisrE,SDiffisrE+"/D");
+		tree_temp->Branch(SPi0IM,&pi0IM,SPi0IM+"/D");
+		tree_temp->Branch(SIsrIMrec_nofit,&isrIMrec_nofit,SIsrIMrec_nofit+"/D");
 	}	
 
 	///
@@ -588,8 +593,9 @@ void MyClass::Main()
 		TLorentzVector pionphoton1=Getphoton4vector(inputvectormin(5),inputvectormin(6),inputvectormin(7),inputvectormin(8));
 		TLorentzVector pionphoton2=Getphoton4vector(inputvectormin(10),inputvectormin(11),inputvectormin(12),inputvectormin(13));
 		TLorentzVector threepions=pionphoton1+pionphoton2+bestppl+bestpmi;
-		threepiIM_nofit=(Beam-ISRphoton).M();
+		threepiIM_nofit = (Beam-ISRphoton).M();
 		isrErec_nofit = (Beam-threepions).E();
+		isrIMrec_nofit = (Beam-threepions).M();
 		isrE_nofit = ISRphoton.E();
 		diffisrE = isrE_nofit-isrErec_nofit;
 		
@@ -601,6 +607,7 @@ void MyClass::Main()
 		threepiIM=threepionskinfit.M();
 		IMdiff = threepiIM-IMthreepi_MC;
 		isrE = ISRphotonkinfit.E();
+		pi0IM = (pionphoton1kinfit+pionphoton2kinfit).M();
 		pionphotonEsum = (pionphoton1kinfit.Vect()).Mag()+(pionphoton2kinfit.Vect()).Mag();
 		
 		/// improved eta IM selection
