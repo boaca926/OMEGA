@@ -1,5 +1,5 @@
-const int NbTree = 11, NbVar = 19, NbCut = 5, NbMode = 4, scale = 6;
-const int NbHist = 100, bin = 1000, bin_Chi2 = 100, bin_TOF = 400, bin_DeltaE = 1000, bin_Tracksum = 500, bin_IM = 110, bin_pionPsum = 400;
+const int NbTree = 11, NbVar = 22, NbCut = 5, NbMode = 4, scale = 6;
+const int NbHist = 100, bin = 1000, bin_Chi2 = 100, bin_TOF = 400, bin_DeltaE = 1000, bin_Tracksum = 500, bin_IM = 225, bin_pionPsum = 400;
 const double xmin = 0., xmin_Chi2 = 0., xmin_TOF = -10., xmin_DeltaE = -800., xmin_Tracksum = 100., xmin_IM = 0., xmin_pionPsum = 120.;
 const double xmax = 1000., xmax_Chi2 = 100., xmax_TOF = 10., xmax_DeltaE = 200., xmax_Tracksum = 600., xmax_IM = 1100., xmax_pionPsum = 520.;
 const double chi2cut = 32., tofcut1 = -0.5, tofcut2=4., deltaEcut=-215., Emaxcut=340.;
@@ -37,7 +37,7 @@ TString gettreename(Int_t index) {
 }
 
 TString getbraname(Int_t index) {
-	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue","BestPiTime","BestETime","DeltaE","tracksum","ThreepiIM","IMdiff","ThreepiIM_impv","Emaxprompt","bestpiphoton1Ekinfit","bestpiphoton2Ekinfit","ISRE","ISR_impv","pionphotonEsum","ThreepiIM_nofit"}; 
+	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue","BestPiTime","BestETime","DeltaE","tracksum","ThreepiIM","IMdiff","ThreepiIM_impv","Emaxprompt","bestpiphoton1Ekinfit","bestpiphoton2Ekinfit","ISRE","ISR_impv","pionphotonEsum","ThreepiIM_nofit","IsrErec_nofit","IsrE_nofit","DiffisrE"}; 
 	
 	TString st = myArr[index]; 
 	return st;

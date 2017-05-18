@@ -36,6 +36,9 @@ Double_t tree(double list[], int index)
 	Double_t isrE_impv  = 0.;
 	Double_t pionphotonEsum = 0.;
 	Double_t threepiIM_nofit = 0.;
+	Double_t isrErec_nofit = 0.;
+	Double_t isrE_nofit = 0.;
+	Double_t diffisrE = 0.;
 	// tree names
 	TString OMEGAPI = gettreename(0); //
 	TString KPM = gettreename(1); //
@@ -67,6 +70,10 @@ Double_t tree(double list[], int index)
 	TString SISRE_impv = getbraname(16);
 	TString SPionphotonEsum = getbraname(17);
 	TString SThreepiIM_nofit = getbraname(18);
+	TString SIsrErec_nofit = getbraname(19);
+	TString SIsrE_nofit = getbraname(20);
+	TString SDiffisrE = getbraname(21);
+	
 	
 	TTree *TOMEGAPI_MC = new TTree("T"+OMEGAPI+"_MC","recreate");
 	TTree *TKPM_MC = new TTree("T"+KPM+"_MC","recreate");
@@ -142,6 +149,9 @@ Double_t tree(double list[], int index)
 		tree_temp->Branch(SISRE_impv,&isrE_impv,SISRE_impv+"/D");
 		tree_temp->Branch(SPionphotonEsum,&pionphotonEsum,SPionphotonEsum+"/D");
 		tree_temp->Branch(SThreepiIM_nofit,&threepiIM_nofit,SThreepiIM_nofit+"/D");
+		tree_temp->Branch(SIsrErec_nofit,&isrErec_nofit,SIsrErec_nofit+"/D");
+		tree_temp->Branch(SIsrE_nofit,&isrE_nofit,SIsrE_nofit+"/D");
+		tree_temp->Branch(SDiffisrE,&diffisrE,SDiffisrE+"/D");
 	}
 	
 	// define chain
@@ -200,6 +210,9 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
 						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
+						chain_temp->SetBranchAddress(SIsrErec_nofit,&isrErec_nofit);
+						chain_temp->SetBranchAddress(SIsrE_nofit,&isrE_nofit);
+						chain_temp->SetBranchAddress(SDiffisrE,&diffisrE);
 					}	
                
             }
@@ -242,6 +255,9 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
 						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
+						chain_temp->SetBranchAddress(SIsrErec_nofit,&isrErec_nofit);
+						chain_temp->SetBranchAddress(SIsrE_nofit,&isrE_nofit);
+						chain_temp->SetBranchAddress(SDiffisrE,&diffisrE);
 					}	
             }
          }
@@ -283,6 +299,9 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
 						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
+						chain_temp->SetBranchAddress(SIsrErec_nofit,&isrErec_nofit);
+						chain_temp->SetBranchAddress(SIsrE_nofit,&isrE_nofit);
+						chain_temp->SetBranchAddress(SDiffisrE,&diffisrE);
 					}	
             }
          }
@@ -324,6 +343,9 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
 						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
+						chain_temp->SetBranchAddress(SIsrErec_nofit,&isrErec_nofit);
+						chain_temp->SetBranchAddress(SIsrE_nofit,&isrE_nofit);
+						chain_temp->SetBranchAddress(SDiffisrE,&diffisrE);
 					}	
             }
          }

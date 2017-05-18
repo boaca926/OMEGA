@@ -18,6 +18,7 @@ void MyClass::Main()
 	Double_t deltaE = 0., tracksum = 0.;
 	Double_t threepiIM = 0., threepiIM_impv = 0., IMdiff = 0.;
 	Double_t threepiIM_nofit = 0.;
+	Double_t isrErec_nofit = 0., isrE_nofit = 0., diffisrE = 0.;
 	Double_t isrE = 0., isrE_impv = 0.;
 	Double_t Emaxprompt = 0., bestpiphoton1Ekinfit = 0., bestpiphoton2Ekinfit = 0., pionphotonEsum = 0.;
 	// get names
@@ -74,6 +75,9 @@ void MyClass::Main()
 	TString SISRE_impv = getbraname(16); getbraname(16); std::cout<<getbraname(16)<<endl; 
 	TString SPionphotonEsum = getbraname(17); getbraname(17); std::cout<<getbraname(17)<<endl; 
 	TString SThreepiIM_nofit = getbraname(18); getbraname(18); std::cout<<getbraname(18)<<endl;
+	TString SIsrErec_nofit = getbraname(19); getbraname(19); std::cout<<getbraname(19)<<endl;
+	TString SIsrE_nofit = getbraname(20); getbraname(20); std::cout<<getbraname(20)<<endl;
+	TString SDiffisrE = getbraname(21); getbraname(21); std::cout<<getbraname(21)<<endl;
 	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -98,6 +102,9 @@ void MyClass::Main()
 		tree_temp->Branch(SISRE,&isrE,SISRE+"/D");
 		tree_temp->Branch(SISRE_impv,&isrE_impv,SISRE_impv+"/D");
 		tree_temp->Branch(SPionphotonEsum,&pionphotonEsum,SPionphotonEsum+"/D");
+		tree_temp->Branch(SIsrErec_nofit,&isrErec_nofit,SIsrErec_nofit+"/D");
+		tree_temp->Branch(SIsrE_nofit,&isrE_nofit,SIsrE_nofit+"/D");
+		tree_temp->Branch(SDiffisrE,&diffisrE,SDiffisrE+"/D");
 	}	
 
 	///
@@ -582,6 +589,9 @@ void MyClass::Main()
 		TLorentzVector pionphoton2=Getphoton4vector(inputvectormin(10),inputvectormin(11),inputvectormin(12),inputvectormin(13));
 		TLorentzVector threepions=pionphoton1+pionphoton2+bestppl+bestpmi;
 		threepiIM_nofit=(Beam-ISRphoton).M();
+		isrErec_nofit = (Beam-threepions).E();
+		isrE_nofit = ISRphoton.E();
+		diffisrE = isrE_nofit-isrErec_nofit;
 		
 		// fitted
 		TLorentzVector ISRphotonkinfit=Getphoton4vector(inputvectorminkinfit(0),inputvectorminkinfit(1),inputvectorminkinfit(2),inputvectorminkinfit(3));
