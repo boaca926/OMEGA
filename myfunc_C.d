@@ -1,0 +1,72 @@
+
+# DO NOT DELETE
+
+./myfunc_C.so: /usr/local/include/root/TMath.h
+./myfunc_C.so: /usr/local/include/root/Rtypes.h
+./myfunc_C.so: /usr/local/include/root/RConfig.h
+./myfunc_C.so: /usr/local/include/root/RVersion.h
+./myfunc_C.so: /usr/local/include/root/DllImport.h
+./myfunc_C.so: /usr/local/include/root/Rtypeinfo.h
+./myfunc_C.so: /usr/local/include/root/snprintf.h
+./myfunc_C.so: /usr/local/include/root/strlcpy.h
+./myfunc_C.so: /usr/local/include/root/TGenericClassInfo.h
+./myfunc_C.so: /usr/local/include/root/TSchemaHelper.h
+./myfunc_C.so: /usr/local/include/root/TMathBase.h
+./myfunc_C.so: /usr/local/include/root/TError.h /usr/local/include/root/TH1.h
+./myfunc_C.so: /usr/local/include/root/TAxis.h
+./myfunc_C.so: /usr/local/include/root/TNamed.h
+./myfunc_C.so: /usr/local/include/root/TObject.h
+./myfunc_C.so: /usr/local/include/root/TStorage.h
+./myfunc_C.so: /usr/local/include/root/TVersionCheck.h
+./myfunc_C.so: /usr/local/include/root/Riosfwd.h
+./myfunc_C.so: /usr/local/include/root/TBuffer.h
+./myfunc_C.so: /usr/local/include/root/TString.h
+./myfunc_C.so: /usr/local/include/root/TAttAxis.h
+./myfunc_C.so: /usr/local/include/root/TArrayD.h
+./myfunc_C.so: /usr/local/include/root/TArray.h
+./myfunc_C.so: /usr/local/include/root/TAttLine.h
+./myfunc_C.so: /usr/local/include/root/TAttFill.h
+./myfunc_C.so: /usr/local/include/root/TAttMarker.h
+./myfunc_C.so: /usr/local/include/root/TArrayC.h
+./myfunc_C.so: /usr/local/include/root/TArrayS.h
+./myfunc_C.so: /usr/local/include/root/TArrayI.h
+./myfunc_C.so: /usr/local/include/root/TArrayF.h
+./myfunc_C.so: /usr/local/include/root/Foption.h
+./myfunc_C.so: /usr/local/include/root/TVectorFfwd.h
+./myfunc_C.so: /usr/local/include/root/TVectorDfwd.h
+./myfunc_C.so: /usr/local/include/root/TFitResultPtr.h
+./myfunc_C.so: /usr/local/include/root/TCanvas.h
+./myfunc_C.so: /usr/local/include/root/TPad.h
+./myfunc_C.so: /usr/local/include/root/TVirtualPad.h
+./myfunc_C.so: /usr/local/include/root/TAttPad.h
+./myfunc_C.so: /usr/local/include/root/TVirtualX.h
+./myfunc_C.so: /usr/local/include/root/TAttText.h
+./myfunc_C.so: /usr/local/include/root/GuiTypes.h
+./myfunc_C.so: /usr/local/include/root/Buttons.h
+./myfunc_C.so: /usr/local/include/root/TQObject.h
+./myfunc_C.so: /usr/local/include/root/TAttBBox2D.h
+./myfunc_C.so: /usr/local/include/root/TPoint.h
+./myfunc_C.so: /usr/local/include/root/TAttCanvas.h
+./myfunc_C.so: /usr/local/include/root/TCanvasImp.h
+./myfunc_C.so: /usr/local/include/root/TLegend.h
+./myfunc_C.so: /usr/local/include/root/TPave.h /usr/local/include/root/TBox.h
+./myfunc_C.so: /usr/local/include/root/Math/Functor.h
+./myfunc_C.so: /usr/local/include/root/Math/IFunction.h
+./myfunc_C.so: /usr/local/include/root/Math/IFunctionfwd.h
+./myfunc_C.so: /usr/local/include/root/Math/WrappedFunction.h
+./myfunc_C.so: /usr/local/include/root/Math/Integrator.h
+./myfunc_C.so: /usr/local/include/root/Math/AllIntegrationTypes.h
+./myfunc_C.so: /usr/local/include/root/Math/IntegratorOptions.h
+./myfunc_C.so: /usr/local/include/root/Math/VirtualIntegrator.h
+./myfunc_C.so: /usr/local/include/root/Math/Error.h
+./myfunc_C.so: /usr/local/include/root/TStopwatch.h
+./myfunc_C.so: /usr/local/include/root/TF1.h
+./myfunc_C.so: /usr/local/include/root/TFormula.h
+./myfunc_C.so: /usr/local/include/root/TBits.h
+./myfunc_C.so: /usr/local/include/root/TObjArray.h
+./myfunc_C.so: /usr/local/include/root/TSeqCollection.h
+./myfunc_C.so: /usr/local/include/root/TCollection.h
+./myfunc_C.so: /usr/local/include/root/TIterator.h
+./myfunc_C.so: /usr/local/include/root/Math/ParamFunctor.h
+./myfunc_C.so: /usr/local/include/root/cintdictversion.h /usr/local/include/root/RVersion.h
+myfunc_C__ROOTBUILDVERSION= 5.34/36

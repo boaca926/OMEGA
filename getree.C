@@ -17,7 +17,7 @@ Double_t tree(double list[], int index)
 	//std::cout<<str_index<<endl;
 	Double_t result[2] ={0., 0.};
 	// initialize variables
-	Int_t mctype = 0;
+	Int_t mctype_MC = 0;
 	Int_t CUTYPE = 0;
 	Double_t threepiIM_MC = 0.;
 	Double_t isrE_MC = 0.;
@@ -36,6 +36,8 @@ Double_t tree(double list[], int index)
 	Double_t isrE_impv  = 0.;
 	Double_t pionphotonEsum = 0.;
 	Double_t threepiIM_nofit = 0.;
+	Double_t mggdiffmin = 0;
+	Double_t pi0IM = 0.;
 	// tree names
 	TString OMEGAPI = gettreename(0); //
 	TString KPM = gettreename(1); //
@@ -67,6 +69,8 @@ Double_t tree(double list[], int index)
 	TString SISRE_impv = getbraname(16);
 	TString SPionphotonEsum = getbraname(17);
 	TString SThreepiIM_nofit = getbraname(18);
+	TString SMggdiffmin = getbraname(19);
+	TString SPi0IM = getbraname(20);
 	
 	TTree *TOMEGAPI_MC = new TTree("T"+OMEGAPI+"_MC","recreate");
 	TTree *TKPM_MC = new TTree("T"+KPM+"_MC","recreate");
@@ -105,32 +109,41 @@ Double_t tree(double list[], int index)
 	treelist->Add(TMCSUM_MC);
 	treelist->Add(TEEG_MC);
 	treelist->Add(TDATA);
-		
-	treelist->Add(TOMEGAPI_Pre);
-	treelist->Add(TKPM_Pre);
-	treelist->Add(TKSL_Pre);	
-	treelist->Add(TTHREEPI_Pre);
-	treelist->Add(TTHREEPIGAM_Pre);
-	treelist->Add(TETAGAM_Pre); 
-	treelist->Add(TBKGSUM1_Pre);
-	treelist->Add(TBKGSUM2_Pre);
-	treelist->Add(TMCSUM_Pre);
-	treelist->Add(TEEG_Pre);
-	treelist->Add(TDATA_Pre);
+	TCollection* treelist1 = new TList;
+	treelist1->Add(TOMEGAPI_Pre);
+	treelist1->Add(TKPM_Pre);
+	treelist1->Add(TKSL_Pre);	
+	treelist1->Add(TTHREEPI_Pre);
+	treelist1->Add(TTHREEPIGAM_Pre);
+	treelist1->Add(TETAGAM_Pre); 
+	treelist1->Add(TBKGSUM1_Pre);
+	treelist1->Add(TBKGSUM2_Pre);
+	treelist1->Add(TMCSUM_Pre);
+	treelist1->Add(TEEG_Pre);
+	treelist1->Add(TDATA_Pre);
 	
-	// scan the list and add branches	
+	// scan the list and add branches
 	TObject* treeout=0;
 	TIter treeliter(treelist);
 	while((treeout=treeliter.Next()) !=0) {
-		//treeout->Print();
 		TTree* tree_temp=dynamic_cast<TTree*>(treeout);
 		tree_temp->Branch(SIMthreepi+"_MC",&threepiIM_MC,SIMthreepi+"_MC/D");
 		tree_temp->Branch(SEisr+"_MC",&isrE_MC,SEisr+"/D");
+		tree_temp->Branch(Smctype+"_MC",&mctype_MC,Smctype+"_MC/I");
+	}
+		
+	TObject* treeout1=0;
+	TIter treeliter(treelist1);
+	while((treeout1=treeliter.Next()) !=0) {
+		//treeout->Print();
+		TTree* tree_temp=dynamic_cast<TTree*>(treeout1);
+		tree_temp->Branch(SIMthreepi+"_MC",&threepiIM_MC,SIMthreepi+"_MC/D");
+		tree_temp->Branch(SEisr+"_MC",&isrE_MC,SEisr+"/D");
+		tree_temp->Branch(Smctype+"_MC",&mctype_MC,Smctype+"_MC/I");
 		tree_temp->Branch(Schi2value,&chi2value,Schi2value+"/D");
 		tree_temp->Branch(SBestPiTime,&bestPiTime,SBestPiTime+"/D");
 		tree_temp->Branch(SBestETime,&bestETime,SBestETime+"/D");
 		tree_temp->Branch(SDeltaE,&deltaE,SDeltaE+"/D");
-		tree_temp->Branch(Smctype,&mctype,Smctype+"/I");
 		tree_temp->Branch(STracksum,&tracksum,STracksum+"/D");
 		tree_temp->Branch(SThreepiIM,&threepiIM,SThreepiIM+"/D");
 		tree_temp->Branch(SThreepiIM_impv,&threepiIM_impv,SThreepiIM_impv+"/D");
@@ -142,6 +155,8 @@ Double_t tree(double list[], int index)
 		tree_temp->Branch(SISRE_impv,&isrE_impv,SISRE_impv+"/D");
 		tree_temp->Branch(SPionphotonEsum,&pionphotonEsum,SPionphotonEsum+"/D");
 		tree_temp->Branch(SThreepiIM_nofit,&threepiIM_nofit,SThreepiIM_nofit+"/D");
+		tree_temp->Branch(SMggdiffmin,&mggdiffmin,SMggdiffmin+"/D");
+		tree_temp->Branch(SPi0IM,&pi0IM,SPi0IM+"/D");
 	}
 	
 	// define chain
@@ -161,11 +176,11 @@ Double_t tree(double list[], int index)
 	chainlist->Add(allchainksl_mc);
 	chainlist->Add(allchaineeg_mc);
 	chainlist->Add(allchaindata);
-	
-	chainlist->Add(allchainrho_pre);
-	chainlist->Add(allchainksl_pre);
-	chainlist->Add(allchaineeg_pre); 
-	chainlist->Add(allchaindata_pre);
+	TCollection* chainlist1 = new TList;
+	chainlist1->Add(allchainrho_pre);
+	chainlist1->Add(allchainksl_pre);
+	chainlist1->Add(allchaineeg_pre); 
+	chainlist1->Add(allchaindata_pre);
 
 	// mcrho samples, threepi-isr hadronic events
 	string line;
@@ -179,14 +194,24 @@ Double_t tree(double list[], int index)
                allchainrho_pre->Add(line.data());                            
                //cout << "Adding file: " << line << " to the chain of files" << endl;       
                // scan the list and add branches	
-					TObject* chainout=0;
+               TObject* chainout=0;
 					TIter chainliter(chainlist);
 					while((chainout=chainliter.Next()) !=0) {
 						//chainout->Print();
 						TTree* chain_temp=dynamic_cast<TTree*>(chainout);
 						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM_MC);
 						chain_temp->SetBranchAddress(SEisr+"_MC",&isrE_MC);
-						chain_temp->SetBranchAddress(Smctype,&mctype);
+						chain_temp->SetBranchAddress(Smctype+"_MC",&mctype_MC);
+					}
+						
+					TObject* chainout1=0;
+					TIter chainliter1(chainlist1);
+					while((chainout1=chainliter1.Next()) !=0) {
+						//chainout->Print();
+						TTree* chain_temp=dynamic_cast<TTree*>(chainout1);
+						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM_MC);
+						chain_temp->SetBranchAddress(SEisr+"_MC",&isrE_MC);
+						chain_temp->SetBranchAddress(Smctype+"_MC",&mctype_MC);
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
@@ -200,6 +225,8 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
 						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
+						chain_temp->SetBranchAddress(SMggdiffmin,&mggdiffmin);
+						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
 					}	
                
             }
@@ -221,14 +248,24 @@ Double_t tree(double list[], int index)
                allchainksl_pre->Add(line.data());                  
                //cout << "Adding file: " << line << " to the chain of files" << endl;       
                // scan the list and add branches	
-					TObject* chainout=0;
+               TObject* chainout=0;
 					TIter chainliter(chainlist);
 					while((chainout=chainliter.Next()) !=0) {
 						//chainout->Print();
 						TTree* chain_temp=dynamic_cast<TTree*>(chainout);
 						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM_MC);
 						chain_temp->SetBranchAddress(SEisr+"_MC",&isrE_MC);
-						chain_temp->SetBranchAddress(Smctype,&mctype);
+						chain_temp->SetBranchAddress(Smctype+"_MC",&mctype_MC);
+					}
+						
+					TObject* chainout1=0;
+					TIter chainliter1(chainlist1);
+					while((chainout1=chainliter1.Next()) !=0) {
+						//chainout->Print();
+						TTree* chain_temp=dynamic_cast<TTree*>(chainout1);
+						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM_MC);
+						chain_temp->SetBranchAddress(SEisr+"_MC",&isrE_MC);
+						chain_temp->SetBranchAddress(Smctype+"_MC",&mctype_MC);
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
@@ -242,6 +279,8 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
 						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
+						chain_temp->SetBranchAddress(SMggdiffmin,&mggdiffmin);
+						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
 					}	
             }
          }
@@ -262,14 +301,24 @@ Double_t tree(double list[], int index)
                allchaineeg_pre->Add(line.data());                  
                //cout << "Adding file: " << line << " to the chain of files" << endl;       
                // scan the list and add branches	
-					TObject* chainout=0;
+               TObject* chainout=0;
 					TIter chainliter(chainlist);
 					while((chainout=chainliter.Next()) !=0) {
 						//chainout->Print();
 						TTree* chain_temp=dynamic_cast<TTree*>(chainout);
 						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM_MC);
 						chain_temp->SetBranchAddress(SEisr+"_MC",&isrE_MC);
-						chain_temp->SetBranchAddress(Smctype,&mctype);
+						chain_temp->SetBranchAddress(Smctype+"_MC",&mctype_MC);
+					}
+						
+					TObject* chainout1=0;
+					TIter chainliter1(chainlist1);
+					while((chainout1=chainliter1.Next()) !=0) {
+						//chainout->Print();
+						TTree* chain_temp=dynamic_cast<TTree*>(chainout1);
+						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM_MC);
+						chain_temp->SetBranchAddress(SEisr+"_MC",&isrE_MC);
+						chain_temp->SetBranchAddress(Smctype+"_MC",&mctype_MC);
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
@@ -283,6 +332,8 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
 						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
+						chain_temp->SetBranchAddress(SMggdiffmin,&mggdiffmin);
+						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
 					}	
             }
          }
@@ -303,14 +354,24 @@ Double_t tree(double list[], int index)
                allchaindata_pre->Add(line.data());                  
                //cout << "Adding file: " << line << " to the chain of files" << endl;       
                // scan the list and add branches	
-					TObject* chainout=0;
+               TObject* chainout=0;
 					TIter chainliter(chainlist);
 					while((chainout=chainliter.Next()) !=0) {
 						//chainout->Print();
 						TTree* chain_temp=dynamic_cast<TTree*>(chainout);
 						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM_MC);
 						chain_temp->SetBranchAddress(SEisr+"_MC",&isrE_MC);
-						chain_temp->SetBranchAddress(Smctype,&mctype);
+						chain_temp->SetBranchAddress(Smctype+"_MC",&mctype_MC);
+					}
+						
+					TObject* chainout1=0;
+					TIter chainliter1(chainlist1);
+					while((chainout1=chainliter1.Next()) !=0) {
+						//chainout->Print();
+						TTree* chain_temp=dynamic_cast<TTree*>(chainout1);
+						chain_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM_MC);
+						chain_temp->SetBranchAddress(SEisr+"_MC",&isrE_MC);
+						chain_temp->SetBranchAddress(Smctype+"_MC",&mctype_MC);
 						chain_temp->SetBranchAddress(Schi2value,&chi2value);
 						chain_temp->SetBranchAddress(SBestPiTime,&bestPiTime);
 						chain_temp->SetBranchAddress(SBestETime,&bestETime);
@@ -324,7 +385,9 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SISRE_impv,&isrE_impv);
 						chain_temp->SetBranchAddress(SPionphotonEsum,&pionphotonEsum);
 						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
-					}	
+						chain_temp->SetBranchAddress(SMggdiffmin,&mggdiffmin);
+						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
+					}		
             }
          }
       }
@@ -341,7 +404,7 @@ Double_t tree(double list[], int index)
    Int_t omegamNb_MC=0;
    for (Int_t irow=0;irow<allchainrho_mc->GetEntries();irow++) {
    	allchainrho_mc->GetEntry(irow); 
-   	if (mctype == 4) { /// threepi gamma
+   	if (mctype_MC == 4) { /// threepi gamma
    		omegamNb_MC++; mcsumNb_MC++;
    		TTHREEPIGAM_MC->Fill();
    		TMCSUM_MC->Fill();
@@ -374,39 +437,39 @@ Double_t tree(double list[], int index)
    Int_t omegapiNb_MC=0, kpmNb_MC=0, kslNb_MC=0, threepiNb_MC=0, etagamNb_MC=0, bkgsum1Nb_MC=0, bkgsum2Nb_MC=0;
    for (Int_t irow=0;irow<allchainksl_mc->GetEntries();irow++) {
    	allchainksl_mc->GetEntry(irow); 
-   	if (mctype == 1) {/// omega pi
+   	if (mctype_MC == 1) {/// omega pi
    		omegapiNb_MC++; mcsumNb_MC++;
    		TOMEGAPI_MC->Fill();
    		TMCSUM_MC->Fill();
    	}	
-   	else if (mctype == 2) {// kpm
+   	else if (mctype_MC == 2) {// kpm
    		kpmNb_MC++; mcsumNb_MC++;
    		TKPM_MC->Fill();
    		TMCSUM_MC->Fill();
    	}
-   	else if (mctype == 3) {/// ksl
+   	else if (mctype_MC == 3) {/// ksl
    		kslNb_MC++; mcsumNb_MC++;
    		TKSL_MC->Fill();
    		TMCSUM_MC->Fill();
    	}
-   	else if (mctype == 5) {// threepi
+   	else if (mctype_MC == 5) {// threepi
    		threepiNb_MC++; mcsumNb_MC++;
    		TTHREEPI_MC->Fill();
    		TMCSUM_MC->Fill();
    	}
-		else if (mctype == 7) {// eta gamma
+		else if (mctype_MC == 7) {// eta gamma
 			etagamNb_MC++; mcsumNb_MC++; counter1++; //cout<<counter1<<endl;
 			TETAGAM_MC->Fill();
 			TMCSUM_MC->Fill();
 		}
 		
-		if (mctype==6 || mctype==8 || mctype==9) {// bkgsum1
+		if (mctype_MC==6 || mctype_MC==8 || mctype_MC==9) {// bkgsum1
 			bkgsum1Nb_MC++; mcsumNb_MC++;
 			TBKGSUM1_MC->Fill();
 			TMCSUM_MC->Fill();
 		}
 		
-		if (mctype==2 || mctype==5 || mctype==6 || mctype==7 || mctype==8 || mctype==9) {
+		if (mctype_MC==2 || mctype_MC==5 || mctype_MC==6 || mctype_MC==7 || mctype_MC==8 || mctype_MC==9) {
 			bkgsum2Nb_MC++;
 			TBKGSUM2_MC->Fill();
 		}
@@ -428,7 +491,7 @@ Double_t tree(double list[], int index)
    	//
    	if (!CUTYPE && CUTTAG) continue;
    	//cout<<CUTTAG[0]<<endl;
-   	if (mctype == 4) {
+   	if (mctype_MC == 4) {
    		omegamNb_Pre++; mcsumNb_Pre++;
    		TTHREEPIGAM_Pre->Fill();
    		TMCSUM_Pre->Fill();
@@ -471,39 +534,39 @@ Double_t tree(double list[], int index)
    	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,list); 
    	if (!CUTYPE && CUTTAG) continue; 	
    	//cout<<CUTTAG[0]<<endl;	
-   	if (mctype == 1) {/// omega pi
+   	if (mctype_MC == 1) {/// omega pi
    		omegapiNb_Pre++; mcsumNb_Pre++;
    		TOMEGAPI_Pre->Fill();
    		TMCSUM_Pre->Fill();
    	}
-   	else if (mctype == 2) {// kpm
+   	else if (mctype_MC == 2) {// kpm
    		kpmNb_Pre++; mcsumNb_Pre++;
    		TKPM_Pre->Fill();
    		TMCSUM_Pre->Fill();
    	}
-   	else if (mctype == 3) {/// ksl
+   	else if (mctype_MC == 3) {/// ksl
    		kslNb_Pre++; mcsumNb_Pre++;
    		TKSL_Pre->Fill();
    		TMCSUM_Pre->Fill();
    	}
-   	else if (mctype == 5) {// threepi
+   	else if (mctype_MC == 5) {// threepi
    		threepiNb_Pre++; mcsumNb_Pre++;
    		TTHREEPI_Pre->Fill();
    		TMCSUM_Pre->Fill();
    	}
-   	else if (mctype == 7) {/// eta gamma
+   	else if (mctype_MC == 7) {/// eta gamma
    		etagamNb_Pre++; mcsumNb_Pre++; 
 			TETAGAM_Pre->Fill();
 			TMCSUM_Pre->Fill();
    	}
    	
-   	if (mctype==6 || mctype==8 || mctype==9) {// bkgsum1
+   	if (mctype_MC==6 || mctype_MC==8 || mctype_MC==9) {// bkgsum1
 			bkgsum1Nb_Pre++; mcsumNb_Pre++;
 			TBKGSUM1_Pre->Fill();
 			TMCSUM_Pre->Fill();
 		}
 		
-		if (mctype==2 || mctype==5 || mctype==6 || mctype==7 || mctype==8 || mctype==9) {// bkgsum2
+		if (mctype_MC==2 || mctype_MC==5 || mctype_MC==6 || mctype_MC==7 || mctype_MC==8 || mctype_MC==9) {// bkgsum2
 			bkgsum2Nb_Pre++;
 			TBKGSUM2_Pre->Fill();
 		}
