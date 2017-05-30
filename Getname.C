@@ -11,13 +11,13 @@ const int colorid[NbTree] = {7, 46, 15, 4, 6, 3, 20, 20, 2, 5, 1};
 const TString cutname[NbCut] = {"Chi2Cut","tofcut1","tofcut2","DeltaEcut","Emaxcut"};
 const TString xname[NbCut] = {"#chi^{2} cut","#Deltat_{e^{#pm}} cut","#Delta_{#pi^{#pm}} cut", "#deltaE cut", "Emax cut"};
 const TString modname[NbMode] = {"RhoPi","QED","DATA","AllPhys"};
-const double sqrtS = 1019.; // center of mass energy
-const double me = 0.511; // mass of electron
+const double sqrtS = 1.019; // center of mass energy
+const double me = 0.511*0.001; // mass of electron
 const double pi=TMath::Pi();
-const double theta0 = 23.*pi/180.; // polar angle
+const double theta0 = 23*pi/180; // polar angle
 const double m_omega = 782.; // MeV
 double C = TMath::Power(2*me/sqrtS,2);
-const double alpha = 1/137.; // fine structure constant
+const double alpha = 1./137; // fine structure constant
 const double alphapi = alpha/pi;
 // specify modification of cut values
 // modpos = 0: chi2cut
