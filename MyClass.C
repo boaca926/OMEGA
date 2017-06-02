@@ -512,9 +512,9 @@ void MyClass::Main()
 						inputvectorkinfit_permu=Fillpermutvector(Row,bestinputvectorkinfit,i,j,k);
 						sigma2vectorkinfit_permu=Fillpermutvector(Row,bestsigma2vectorkinfit,i,j,k);
 						//chi2 test on invariant mass of two photons, fill pion photons 4 vectors						
-						pionphoton1_temp=Getphoton4vector(inputvectorkinfit_permu(5),inputvectorkinfit_permu(6),inputvectorkinfit_permu(7),inputvectorkinfit_permu(8)); //cout<<pionphoton1_temp.E()<<endl;
-						pionphoton2_temp=Getphoton4vector(inputvectorkinfit_permu(10),inputvectorkinfit_permu(11),inputvectorkinfit_permu(12),inputvectorkinfit_permu(13));
-						isrphoton_temp=Getphoton4vector(inputvectorkinfit_permu(0),inputvectorkinfit_permu(1),inputvectorkinfit_permu(2),inputvectorkinfit_permu(3));
+						pionphoton1_temp=Getphoton4vector(inputvector_permu(5),inputvector_permu(6),inputvector_permu(7),inputvector_permu(8)); //cout<<pionphoton1_temp.E()<<endl;
+						pionphoton2_temp=Getphoton4vector(inputvector_permu(10),inputvector_permu(11),inputvector_permu(12),inputvector_permu(13));
+						isrphoton_temp=Getphoton4vector(inputvector_permu(0),inputvector_permu(1),inputvector_permu(2),inputvector_permu(3));
 						//
 						pionphoton1boost_temp=pionphoton1_temp;
 						pionphoton1boost_temp.Boost(Boost3vector);
@@ -544,12 +544,12 @@ void MyClass::Main()
 						//Double_t mgg=(pionphoton1_temp+pionphoton2_temp).M(); //hIMtest->Fill(mgg_temp);
 						//cout<<mgg<<endl;
 						//
-						Double_t errormggsq=TMath::Power(mgg_temp/2,2)*(sigma2vectorkinfit_permu(5)/TMath::Power(inputvectorkinfit_permu(5),2)+sigma2vectorkinfit_permu(10)/TMath::Power(inputvectorkinfit_permu(10),2));
+						Double_t errormggsq=TMath::Power(mgg_temp/2,2)*(sigma2vector_permu(5)/TMath::Power(inputvector_permu(5),2)+sigma2vector_permu(10)/TMath::Power(inputvector_permu(10),2));
 						Double_t msq=TMath::Power(mgg_temp,2);
 						//Double_t errormggsq=TMath::Power(msq,2)*(sigma2vector_permu(5)/TMath::Power(inputvector_permu(5),2)+sigma2vector_permu(10)/TMath::Power(inputvector_permu(10),2));
 						//
-						Double_t chi2Eisreta_temp=Chi2Eisrtest(inputvectorkinfit_permu,sigma2vectorkinfit_permu,363.);
-						Double_t chi2Eisromega_temp=Chi2Eisrtest(inputvectorkinfit_permu,sigma2vectorkinfit_permu,209.);
+						Double_t chi2Eisreta_temp=Chi2Eisrtest(inputvector_permu,sigma2vector_permu,363.);
+						Double_t chi2Eisromega_temp=Chi2Eisrtest(inputvector_permu,sigma2vector_permu,209.);
 						Double_t chi2diff=chi2Eisromega_temp-chi2Eisreta_temp;						
 						//
 						Double_t mggdiff_temp=mgg_temp-massneupion;

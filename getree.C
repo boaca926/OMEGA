@@ -1,6 +1,10 @@
 #include "Getname.C"
 #include <iostream>
 #include <string>
+#include "DGFit.C"
+#include "Modelfit.C"
+#include "modelfit.C"
+#include "logfit.C"
 
 using namespace std;
 
@@ -487,7 +491,7 @@ Double_t tree(double list[], int index)
    	allchainrho_pre->GetEntry(irow); //cout<<irow<<endl;
    	//cout<<CUTTAG<<endl;
    	// CUT TYPE
-		CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,list); //cout<<CUTYPE<<endl;
+		CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,mggdiffmin,list); //cout<<CUTYPE<<endl;
    	//
    	if (!CUTYPE && CUTTAG) continue;
    	//cout<<CUTTAG[0]<<endl;
@@ -504,7 +508,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchaineeg_pre->GetEntries();irow++) {
    	allchaineeg_pre->GetEntry(irow); 
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,list); 
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,mggdiffmin,list); 
    	if (!CUTYPE && CUTTAG) continue;
    	//cout<<cutype[0]<<endl;
    	for (Int_t i=0;i<scale;i++) {
@@ -519,7 +523,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchaindata_pre->GetEntries();irow++) {
    	allchaindata_pre->GetEntry(irow);
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,list); 
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,mggdiffmin,list); 
    	if (!CUTYPE && CUTTAG) continue;
    	dataNb_Pre++; 
    	TDATA_Pre->Fill();	
@@ -531,7 +535,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchainksl_pre->GetEntries();irow++) {
    	allchainksl_pre->GetEntry(irow); 
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,list); 
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,mggdiffmin,list); 
    	if (!CUTYPE && CUTTAG) continue; 	
    	//cout<<CUTTAG[0]<<endl;	
    	if (mctype_MC == 1) {/// omega pi
@@ -573,7 +577,7 @@ Double_t tree(double list[], int index)
    }
    
    
-   Double_t SBLIST [3] = {0.,0.,0.};
+   Double_t SBLIST[3] = {0.,0.,0.};
    Double_t sb_Pre = omegamNb_Pre/(mcsumNb_Pre-omegamNb_Pre);
    SBLIST[0] = (omegamNb_Pre/mcsumNb_Pre)*dataNb_Pre;
    //count<<mcsumNb_Pre<<endl;
@@ -702,10 +706,21 @@ void getree () {
 		}*/
 		Cutlist[modpos]=Cutlist_std[modpos]-step*(nbstep-i);
 		//cout<<Cutlist[modpos]-Cutlist_std[modpos]<<endl;
-		sb_temp=tree(Cutlist,modpos)[0]; 
+		//sb_temp=tree(Cutlist,modpos)[0]; 
 		sblist[i]=sb_temp;
 		lb+=step; 
 	}
+	//
+	const int listindex=2;
+	int treeind_temp = 3;
+	int strind_temp[listindex] = {19,10};
+	for (int i=0;i<listindex;i++) {
+		DGFit(&treeind_temp,&strind_temp[i]);
+	}
+	//Modelfit();
+	//modelfit();
+	//logfit();
+	//
 	std::cout<<"\n---------"<<endl;
 	/*while (lb<upb+step) {
 		cout<<index_mod<<endl;
