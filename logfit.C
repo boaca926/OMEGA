@@ -9,7 +9,7 @@ Int_t npfits=0;
 Double_t myfunc(Double_t *x, Double_t *par) {
    Double_t xx = x[0];
    Int_t bin = hThreepiIM_DATA->GetXaxis()->FindBin(xx);
-   
+   N_b4=N_d-(N_s+N_b1+N_b2+N_b3);
    Double_t ws = N_d*par[0]/N_s; //std::cout<<"ws = "<<ws<<endl;
    Double_t wb1 = N_d*par[1]/N_b1;
    Double_t wb2 = N_d*par[2]/N_b2;
@@ -66,18 +66,35 @@ void logfit() {
 	TString DATA = gettreename(10);
 	
 	// get histos
-	hThreepiIM_OMEGAPI = (TH1D*)f->Get("hIM_"+OMEGAPI); 	hThreepiIM_OMEGAPI_fit=(TH1D*)hThreepiIM_OMEGAPI->Clone();
-	TH1D *hThreepiIM_KPM = (TH1D*)f->Get("hIM_"+KPM); 	
-	hThreepiIM_KSL = (TH1D*)f->Get("hIM_"+KSL); TH1D *hThreepiIM_KSL_fit=(TH1D*)hThreepiIM_KSL->Clone();
-	hThreepiIM_THREEPIGAM = (TH1D*)f->Get("hIM_"+THREEPIGAM); hThreepiIM_THREEPIGAM_fit=(TH1D*)hThreepiIM_THREEPIGAM->Clone();
-	TH1D *hThreepiIM_THREEPI = (TH1D*)f->Get("hIM_"+THREEPI);
-	hThreepiIM_ETAGAM = (TH1D*)f->Get("hIM_"+ETAGAM); TH1D *hThreepiIM_ETAGAM_fit=(TH1D*)hThreepiIM_ETAGAM->Clone();
+	hThreepiIM_OMEGAPI = (TH1D*)f->Get("hIM_"+OMEGAPI); 
+	TH1D *hThreepiIM_OMEGAPI_nofit=(TH1D*)hThreepiIM_OMEGAPI->Clone();
+	TH1D *hThreepiIM_OMEGAPI_fit=(TH1D*)hThreepiIM_OMEGAPI->Clone();
+	
+	//
+	TH1D *hThreepiIM_KPM= (TH1D*)f->Get("hIM_"+KPM); 
+	//	
+	hThreepiIM_KSL = (TH1D*)f->Get("hIM_"+KSL); 
+	TH1D *hThreepiIM_KSL_fit=(TH1D*)hThreepiIM_KSL->Clone();
+	TH1D *hThreepiIM_KSL_nofit=(TH1D*)hThreepiIM_KSL->Clone();
+	//
+	hThreepiIM_THREEPI = (TH1D*)f->Get("hIM_"+THREEPI); 
+	//
+	hThreepiIM_THREEPIGAM = (TH1D*)f->Get("hIM_"+THREEPIGAM); 
+	TH1D *hThreepiIM_THREEPIGAM_fit = (TH1D*)hThreepiIM_THREEPIGAM->Clone();
+	TH1D *hThreepiIM_THREEPIGAM_nofit = (TH1D*)hThreepiIM_THREEPIGAM->Clone();
+	//
+	hThreepiIM_ETAGAM = (TH1D*)f->Get("hIM_"+ETAGAM); 
+	TH1D *hThreepiIM_ETAGAM_fit=(TH1D*)hThreepiIM_ETAGAM->Clone();
+	TH1D *hThreepiIM_ETAGAM_nofit=(TH1D*)hThreepiIM_ETAGAM->Clone();
+	//
 	TH1D *hThreepiIM_BKGSUM1 = (TH1D*)f->Get("hIM_"+BKGSUM1); 
 	TH1D *hThreepiIM_BKGSUM2 = (TH1D*)f->Get("hIM_"+BKGSUM2); 
 	TH1D *hThreepiIM_MCSUM = (TH1D*)f->Get("hIM_"+MCSUM); 
 	TH1D *hThreepiIM_EEG = (TH1D*)f->Get("hIM_"+EEG); 
-	hThreepiIM_DATA = (TH1D*)f->Get("hIM_"+DATA); hThreepiIM_DATA_fit = hThreepiIM_DATA->Clone();
 	//
+	hThreepiIM_DATA = (TH1D*)f->Get("hIM_"+DATA); 
+	TH1D *hThreepiIM_DATA_fit = (TH1D*)hThreepiIM_DATA->Clone();
+	TH1D *hThreepiIM_DATA_nofit = (TH1D*)hThreepiIM_DATA->Clone();
 	// bkgsum
    hsum = (TH1D*)hThreepiIM_BKGSUM1->Clone(); // add bkgsum1
    hsum->Add(hThreepiIM_KPM,1); // add kpm
@@ -92,6 +109,18 @@ void logfit() {
    hmcsum->Add(hThreepiIM_OMEGAPI,1); // add omega pi0
    hmcsum->Add(hThreepiIM_ETAGAM,1); // add eta gamma
    hmcsum->Add(hThreepiIM_KSL,1); // add eta ksl
+   TH1D *hmcsum_nofit=(TH1D*)hmcsum->Clone();
+   format_h(hmcsum_nofit,2,0,1);
+   //
+	TCanvas *e = new TCanvas("unfitted","unfitted",700,700);
+	e->Divide(1,1);	
+	hThreepiIM_DATA_nofit->Draw("E1");
+	hThreepiIM_KSL_nofit->Draw("Same"); 
+	hThreepiIM_OMEGAPI_nofit->Draw("Same"); 
+	hThreepiIM_ETAGAM_nofit->Draw("Same"); 
+	hThreepiIM_THREEPIGAM_nofit->Draw("Same");
+	hmcsum_nofit->Draw("Same");
+	//
    N_mc=getentriesfit(hmcsum);
    std::cout<<"N_mc = "<<N_mc<<endl;
    //
@@ -153,17 +182,14 @@ void logfit() {
    minuit->ExecuteCommand("MIGRAD",arglist,2);*/
    
    /// plots of unfitted histos
-	TCanvas *e = new TCanvas("unfitted","unfitted",700,700);
-	e->Divide(1,1);	
-	/*hThreepiIM_DATA_fit->Draw("E1");
-	hThreepiIM_KSL_fit->Draw("Same"); 
-	hThreepiIM_OMEGAPI_fit->Draw("Same"); 
-	hThreepiIM_ETAGAM_fit->Draw("Same"); 
-	hThreepiIM_THREEPIGAM_fit->Draw("Same");*/
-	hsum_fit->Draw("Same");
 	TCanvas *d = new TCanvas("fitted","fitted",700,700);
 	d->Divide(1,1);
 	
+	Double_t ymax = hThreepiIM_DATA_fit->GetMaximum();
+	Double_t widthc1=getbinwidth(hThreepiIM_DATA_fit);
+	hThreepiIM_DATA_fit->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f [MeV]",widthc1));
+	hThreepiIM_DATA_fit->GetXaxis()->SetTitle("M(3#pi) [MeV]");
+	hThreepiIM_DATA_fit->GetYaxis()->SetRangeUser(0.,ymax*1.2);
 	hThreepiIM_KSL_fit->Scale(S_b3);
 	hsum_fit->Scale(S_b4);
 	hThreepiIM_THREEPIGAM_fit->Scale(S_s);
@@ -176,13 +202,32 @@ void logfit() {
 	hmcsum_fit->Add(hsum_fit,1);
 	format_h(hmcsum_fit,2,0,2);
 	//
+	hThreepiIM_DATA_fit->GetYaxis()->SetTitleOffset(1.2);
 	hThreepiIM_DATA_fit->Draw("E1");
 	hmcsum_fit->Draw("Same");
 	hThreepiIM_KSL_fit->Draw("Same");
+	hThreepiIM_OMEGAPI_fit->Draw("Same");
 	hThreepiIM_ETAGAM_fit->Draw("Same");
 	hThreepiIM_THREEPIGAM_fit->Draw("Same");
 	hsum_fit->Draw("Same");
-	//Draw("Same"); 
+	//
+	legc1 = new TLegend(0.64,0.4,0.88,0.85);
+	legc1->SetFillStyle(0); 
+	legc1->SetBorderSize(0);  
+	legc1->SetNColumns(1);
 	
+	legc1->AddEntry(hThreepiIM_OMEGAPI_fit,"#omega#pi^{0}","l");
+	legc1->AddEntry(hThreepiIM_KSL_fit,"KSKL","l");
+	legc1->AddEntry(hThreepiIM_THREEPIGAM_fit,"#pi^{+}#pi^{-}#pi^{0}#gamma","l");
+	legc1->AddEntry(hThreepiIM_ETAGAM_fit,"#eta#gamma","l");
+	legc1->AddEntry(hThreepiIM_DATA_fit,"Data","l");	
+
+	legc1->SetTextFont(132);
+	legc1->Draw("Same");
+	legtextsize(legc1, 0.03); 
+	
+	TFile hf("./Plots/threepiIMfitted.root","recreate");
+	d->Write();
+	e->Write();
 	
 }

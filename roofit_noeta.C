@@ -1,0 +1,165 @@
+#include "Getname.C"
+#include "RooGaussian.h"
+#include "TCanvas.h"
+#include "RooPlot.h"
+#include "TAxis.h"
+
+gSystem->Load("libRooFit");
+using namespace std;
+using namespace RooFit;
+
+void roofit_noeta() {
+	// get root file
+	TFile *findFile = new TFile("./ROOT/TREE_"+cutname[modpos]+".root","READ");
+	// get tree name
+	TString Data = gettreename(10);// data
+	TString Sig = gettreename(3);// omega gamma
+	TString Bkg1 = gettreename(0);// omega pi0
+	TString Bkg2 = gettreename(2);// KSL
+	TString Bkg3 = gettreename(7);// bkgsum2
+	TString Bkg5 = gettreename(5);// etagam
+	// declear variable
+	RooRealVar x("ThreepiIM","ThreepiIM",xmin_IM,xmax_IM);
+	//double scale=1.0/fsig;
+	// get MC & DATA sample
+	TTree *TData = (TTree*)findFile->Get("T"+Data+"_Pre"); // data
+	double N_d=0;
+   for (Int_t irow=0;irow<TData->GetEntries();irow++) {
+   	N_d++;
+   }
+   std::cout<<"N_d = "<<N_d<<endl;
+   // sig
+	TTree *TThreePiGam = (TTree*)findFile->Get("T"+Sig+"_Pre"); // signal omega gamma
+	double N_s=0;
+	double f0_init=0;
+   for (Int_t irow=0;irow<TThreePiGam->GetEntries();irow++) {
+   	N_s++;
+   }
+   f0_init=N_s/N_d;
+   std::cout<<"N_s = "<<N_s<<endl;
+   td::cout<<"f0_init = "<<f0_init<<endl;
+   //
+	TTree *TOmegaPi = (TTree*)findFile->Get("T"+Bkg1+"_Pre"); // bkg1 omega pi0
+	double N_bkg1=0;
+	double f1_init=0;
+   for (Int_t irow=0;irow<TOmegaPi->GetEntries();irow++) {
+   	N_bkg1++;
+   }
+   f1_init=N_bkg1/N_d;
+   std::cout<<"N_bkg1 = "<<N_bkg1<<endl;
+   td::cout<<"f1_init = "<<f1_init<<endl;
+   //
+	TTree *TKSL = (TTree*)findFile->Get("T"+Bkg2+"_Pre"); // bkg2 ksl
+	double N_bkg2=0;
+	double f2_init=0;
+   for (Int_t irow=0;irow<TKSL->GetEntries();irow++) {
+   	N_bkg2++;
+   }
+   f2_init=N_bkg2/N_d;
+   std::cout<<"N_bkg2 = "<<N_bkg2<<endl;
+   td::cout<<"f2_init = "<<f2_init<<endl;
+   //
+	TTree *TBKGSUM2 = new TTree("T"+Bkg3+"_Pre","recreate"); // bkg3 bkgsum2
+	double N_bkg3=0;
+	double f3_init=0;
+   for (Int_t irow=0;irow<TBKGSUM2->GetEntries();irow++) {
+   	N_bkg3++;
+   }
+   f3_init=N_bkg3/N_d;
+   std::cout<<"N_bkg3 = "<<N_bkg3<<endl;
+   td::cout<<"f3_init = "<<f3_init<<endl;
+	//
+	TTree *TETAGAM = (TTree*)findFile->Get("T"+Bkg5+"_Pre"); // bkg5 etagam
+	double N_bkg5=0;
+	double f5_init=0;
+   for (Int_t irow=0;irow<TETAGAM->GetEntries();irow++) {
+   	N_bkg5++;
+   }
+   f5_init=N_bkg5/N_d;
+   std::cout<<"N_bkg5 = "<<N_bkg5<<endl;
+   td::cout<<"f5_init = "<<f5_init<<endl;
+	// get pdfs
+	// resolution
+	RooRealVar mean("mean","mean of gaussian1",0.005,-1,1) ;
+   RooRealVar sigma("sigma","width of gaussian1",1.874,0.1,10);
+   // Build gaussian1 p.d.f in terms of x,mean and sigma
+   //RooGaussian gauss("gauss","resolution PDF",x,mean,sigma);
+	// data
+	RooDataSet data("data","data",RooArgSet(x),Import(*TData));
+	// sig pdf
+	//RooDataSet sigsample("sigsample","sigsample",RooArgSet(x),Import(*TThreePiGam));
+	RooDataSet sigsample("sigsample","sigsample",TThreePiGam,x);
+	RooKeysPdf sigpdf("sigpdf", "sigpdf", x, sigsample, RooKeysPdf::MirrorBoth, 1);
+	// bkg1 pdf
+	RooDataSet bkg1sample("bkg1sample","bkg1sample",TOmegaPi,x);
+	RooKeysPdf bkg1pdf("bkg1pdf", "bkg1pdf", x, bkg1sample, RooKeysPdf::MirrorBoth, 1);
+	// bkg2 pdf
+	RooDataSet bkg2sample("bkg2sample","bkg2sample",TKSL,x);
+	RooKeysPdf bkg2pdf("bkg2pdf", "bkg2pdf", x, bkg2sample, RooKeysPdf::MirrorBoth, 1);
+	// bkg3 pdf
+	/*RooDataSet bkg3sample("bkg3sample","bkg3sample",TBKGSUM2,x);
+	RooKeysPdf bkg3pdf("bkg3pdf", "bkg3pdf", x, bkg3sample, RooKeysPdf::MirrorBoth, 1);*/
+	// bkg4 pdf
+	/*RooRealVar c0("c0","coefficient #0", 0.1,-5.,5.); 
+	RooRealVar c1("c1","coefficient #1", 0.1,-5.,5.); 
+	RooRealVar c2("c2","coefficient #2", -0.1,-5.,5.); 
+	RooChebychev bkg4pdf("bkg4pdf","bkg4pdf",x,RooArgList(c0,c1,c2));*/
+	
+	/*RooRealVar a0("a0","a0",0.5,0.,1.) ;
+   RooRealVar a1("a1","a1",-0.2,0.,1.) ;
+   RooChebychev bkg4pdf("bkg4pdf","bkg4pdf",x,RooArgSet(a0,a1)) ;*/
+	
+	RooRealVar argpar("argpar","argus shape parameter",-5.0,-100.,-1.) ; 
+	RooArgusBG bkg4pdf("bkg4pdf","bkg4pdf",x,RooConst(890),argpar);
+	// bkg5 pdf
+	RooDataSet bkg5sample("bkg5sample","bkg5sample",TETAGAM,x);
+	RooKeysPdf bkg5pdf("bkg5pdf", "bkg5pdf", x, bkg5sample, RooKeysPdf::MirrorBoth, 1);
+	// get model
+	RooRealVar f0("fs","omega gamma fraction",f0_init,0.,1.);
+	RooRealVar f1("f1","omega pi0",f1_init,0.,1.);
+	RooRealVar f2("f2","ksl",f2_init,0.,1.);
+	RooRealVar f3("f3","bkgsum2",0.3,0.,1.);
+	RooRealVar f5("f5","bkgsum5",f5_init,0.,1.);
+	
+	RooAddPdf model("model","model",RooArgList(sigpdf,bkg1pdf,bkg2pdf,bkg4pdf),RooArgList(f0,f1,f2));
+	//RooAddPdf model("model","model",RooArgList(sigpdf,bkg1pdf,bkg4pdf),RooArgList(f0,f1));
+	// Draw all frames on a canvas
+	RooPlot* frame = x.frame(); 
+	//data.plotOn(frame);
+	data.plotOn(frame); 
+	model.plotOn(frame,LineStyle(kSolid),LineColor(kRed));
+	//gauss.plotOn(frame,LineStyle(kSolid),LineColor(6));
+	//sigpdf.plotOn(frame,LineStyle(kSolid),LineColor(4)); 
+	//bkg1pdf.plotOn(frame,LineStyle(kSolid),LineColor(7));
+	//bkg2pdf.plotOn(frame,LineStyle(kSolid),LineColor(15)); 
+	//bkg3pdf.plotOn(frame,LineStyle(kSolid),LineColor(2));
+	//bkg4pdf.plotOn(frame,LineStyle(kSolid),LineColor(1));
+	//bkg5pdf.plotOn(frame,LineStyle(kSolid),LineColor(5));
+	// fit
+	double range1 = xmin_IM, range2 = xmax_IM;
+	model.fitTo(data);
+	//model.fitTo(data,Range(range1,range2));
+	model.plotOn(frame,Name("bkg2pdf"),Components("bkg2pdf"),LineStyle(kDashed),LineColor(15),LineWidth(2));
+	model.plotOn(frame,Name("bkg4pdf"),Components("bkg4pdf"),LineStyle(kDashed),LineColor(1),LineWidth(2));
+	model.plotOn(frame,Name("sigpdf"),Components("sigpdf"),LineStyle(kDashed),LineColor(4),LineWidth(2));
+	model.plotOn(frame,Name("bkg1pdf"),Components("bkg1pdf"),LineStyle(kDashed),LineColor(7),LineWidth(2));
+	
+	model.Print("t");
+   TCanvas* c = new TCanvas("IMfit","IMfit",800,400) ;
+   //
+   x.setRange("window",range1,range2) ;
+   RooAbsReal* fracSigRange = sigpdf.createIntegral(x,x,"window");
+   RooAbsReal* fracBkg1Range = bkg1pdf.createIntegral(x,x,"window");
+   RooAbsReal* fracBkg4Range = bkg4pdf.createIntegral(x,x,"window");
+   //Double_t nsigWindow = nsig.getVal() * fracSigRange->getVal() ;
+   std::cout<<"<<<<<<<<<<<<<<"<<" sig_sum = "<<fracSigRange->getVal()<<"<<<<<<<<<<<<<<"<<endl;
+   std::cout<<"<<<<<<<<<<<<<<"<<" bkg1_sum = "<<fracBkg1Range->getVal()<<"<<<<<<<<<<<<<<"<<endl;
+   std::cout<<"<<<<<<<<<<<<<<"<<" bkg4_sum = "<<fracBkg4Range->getVal()<<"<<<<<<<<<<<<<<"<<endl;
+   //
+   c->Divide(1) ;
+   c->cd(1); 
+   gPad->SetLeftMargin(0.15); 
+   frame->GetXaxis()->SetRangeUser(range1,range2);
+   frame->GetYaxis()->SetTitleOffset(1.6); 
+   frame->Draw();
+}

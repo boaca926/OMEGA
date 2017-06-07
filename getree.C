@@ -491,7 +491,7 @@ Double_t tree(double list[], int index)
    	allchainrho_pre->GetEntry(irow); //cout<<irow<<endl;
    	//cout<<CUTTAG<<endl;
    	// CUT TYPE
-		CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,mggdiffmin,list); //cout<<CUTYPE<<endl;
+		CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,mggdiffmin,threepiIM,list); //cout<<CUTYPE<<endl;
    	//
    	if (!CUTYPE && CUTTAG) continue;
    	//cout<<CUTTAG[0]<<endl;
@@ -508,7 +508,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchaineeg_pre->GetEntries();irow++) {
    	allchaineeg_pre->GetEntry(irow); 
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,mggdiffmin,list); 
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,mggdiffmin,threepiIM,list); 
    	if (!CUTYPE && CUTTAG) continue;
    	//cout<<cutype[0]<<endl;
    	for (Int_t i=0;i<scale;i++) {
@@ -523,7 +523,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchaindata_pre->GetEntries();irow++) {
    	allchaindata_pre->GetEntry(irow);
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,mggdiffmin,list); 
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,mggdiffmin,threepiIM,list); 
    	if (!CUTYPE && CUTTAG) continue;
    	dataNb_Pre++; 
    	TDATA_Pre->Fill();	
@@ -535,7 +535,7 @@ Double_t tree(double list[], int index)
    for (Int_t irow=0;irow<allchainksl_pre->GetEntries();irow++) {
    	allchainksl_pre->GetEntry(irow); 
    	// CUT TYPE
-   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,mggdiffmin,list); 
+   	CUTYPE=getcutype(chi2value,bestETime,bestPiTime,deltaE,Emaxprompt,mggdiffmin,threepiIM,list); 
    	if (!CUTYPE && CUTTAG) continue; 	
    	//cout<<CUTTAG[0]<<endl;	
    	if (mctype_MC == 1) {/// omega pi
@@ -707,7 +707,7 @@ void getree () {
 		Cutlist[modpos]=Cutlist_std[modpos]-step*(nbstep-i);
 		//cout<<Cutlist[modpos]-Cutlist_std[modpos]<<endl;
 		//sb_temp=tree(Cutlist,modpos)[0]; 
-		sblist[i]=sb_temp;
+		//sblist[i]=sb_temp;
 		lb+=step; 
 	}
 	//
@@ -717,6 +717,7 @@ void getree () {
 	for (int i=0;i<listindex;i++) {
 		DGFit(&treeind_temp,&strind_temp[i]);
 	}
+	gethisto(0);
 	//Modelfit();
 	//modelfit();
 	//logfit();

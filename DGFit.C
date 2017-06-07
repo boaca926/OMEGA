@@ -110,12 +110,11 @@ void DGFit(int *treeind, int *strind) {
    
    if (strind[0] == 19) {
    	frame1->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f [MeV]",binwidth));
-   	frame1->GetXaxis()->SetTitle("M(#gamma#gamma)_{rec}-M_{#pi^{0}} [MeV]");
-   	
+   	frame1->GetXaxis()->SetTitle("M(#gamma#gamma)-M_{#pi^{0}} [MeV]");   	
    }
    else if (strind[0] == 10) {
    	frame1->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f [MeV]",binwidth));
-   	frame1->GetXaxis()->SetTitle("M(3#pi)_{rec}-M_{#pi^{0}} [MeV]");
+   	frame1->GetXaxis()->SetTitle("M(3#pi)_{rec}-M_{true} [MeV]");
    }	
    //
    TText* txt = new TText(2,100,"Signal") ;

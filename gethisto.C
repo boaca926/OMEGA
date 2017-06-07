@@ -74,7 +74,7 @@ void legtextsize(TLegend* l, Double_t size) {
 }
 
 
-void gethisto() {
+void gethisto(int index) {
    gStyle->SetOptTitle(0);
    gStyle->SetStatBorderSize(0);
    gStyle->SetOptStat(0);
@@ -182,10 +182,17 @@ void gethisto() {
 	TH2D *HScatter2[NbTree];
 	TH1D *HPi0IM[NbTree];
 	TH1D *HMggdiffmin[NbTree];
-	
+	double binscale_fit = binscale[index];
+	double threepiIMReso_fit = Resolu[index];
+	double binscale_fit = binscale[index];
+	std::cout<<"threepiIM bin width scale :"<<binscale_fit<<endl;
+	std::cout<<"threepiIM resulution :"<<threepiIMReso_fit<<endl;
+	std::cout<<"threepiIM bin width :"<<binscale_fit*threepiIMReso_fit<<endl;
+	//int bin_fit=(xmax_IM-xmin_IM)/(binscale[index]*Resolu[index]);
+	//std::cout<<"# bins :"<<bin_fit<<endl;
 	for (Int_t i=0;i<NbTree;i++) {
 		HEMAX[i] = new TH1D("HEMAX_"+gettreename(i),"Maximum energy of prompt photon",bin,xmin,xmax); format_h(HEMAX[i],colorid[i],0,1);
-		HIM[i] = new TH1D("hIM_"+gettreename(i),"Invariant mass",bin_IM,xmin_IM,xmax_IM); format_h(HIM[i],colorid[i],0,1);
+		HIM[i] = new TH1D("hIM_"+gettreename(i),"Invariant mass",bin_fit,xmin_IM,xmax_IM); format_h(HIM[i],colorid[i],0,1);
 		HCHI2[i] = new TH1D("hChi2Value_"+gettreename(i),"Chi2 values",bin_Chi2,xmin_Chi2,xmax_Chi2); format_h(HCHI2[i],colorid[i],0,1);
 		HTOF[i] = new TH2D("hToF_"+gettreename(i),"TOF",bin_TOF,xmin_TOF,xmax_TOF,bin_TOF,xmin_TOF,xmax_TOF);
 		HDeltaE[i] = new TH1D("hDeltaE_"+gettreename(i),"DeltaE",bin_DeltaE,xmin_DeltaE,xmax_DeltaE);

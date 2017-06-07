@@ -83,7 +83,7 @@ void IMplot() {
 	legc1->AddEntry(hThreepiIM_KPM,"KPM","l");
 	legc1->AddEntry(hThreepiIM_THREEPIGAM,"#pi^{+}#pi^{-}#pi^{0}#gamma","l");
 	legc1->AddEntry(hThreepiIM_THREEPI,"#pi^{+}#pi^{-}#pi^{0}","l");
-	legc1->AddEntry(hThreepiIM_THREEPIGAM,"#eta#gamma","l");
+	legc1->AddEntry(hThreepiIM_ETAGAM,"#eta#gamma","l");
 	legc1->AddEntry(hThreepiIM_EEG,"e^{+}e^{-}#gamma","l");
 	legc1->AddEntry(hThreepiIM_BKGSUM1,"MC rest","l");
 	legc1->AddEntry(hThreepiIM_DATA,"Data","l");	
