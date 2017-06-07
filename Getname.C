@@ -2,7 +2,7 @@ const double omegmass = 782., masswidth = 8.5;
 const double p0IMwidth = 2.05, threepiIMwidth = 1.945;
 const double Resolu[2] = {threepiIMwidth, p0IMwidth}; 
 const int NbTree = 11, NbVar = 22, NbCut = 7, NbMode = 4, scale = 6;
-const double xmin = 0., xmin_Chi2 = 0., xmin_TOF = -10., xmin_DeltaE = -800., xmin_Tracksum = 100., xmin_pi0IM = 100, xmin_IM = omegmass-12*masswidth,, xmin_pionPsum = 120., xmin_Mggdiffmin = -100.;
+const double xmin = 0., xmin_Chi2 = 0., xmin_TOF = -10., xmin_DeltaE = -800., xmin_Tracksum = 100., xmin_pi0IM = 100, xmin_IM = omegmass-12*masswidth, xmin_pionPsum = 120., xmin_Mggdiffmin = -100.;
 const double xmax = 1000., xmax_Chi2 = 100., xmax_TOF = 10., xmax_DeltaE = 200., xmax_Tracksum = 600., xmax_pi0IM = 170, xmax_IM = omegmass+12*masswidth, xmax_pionPsum = 520., xmax_Mggdiffmin = 100.;
 const int NbHist = 100, bin = 1000, bin_Chi2 = 100, bin_TOF = 400, bin_DeltaE = 1000, bin_Tracksum = 500, bin_pi0IM = 100, bin_IM = 155, bin_pionPsum = 400, bin_Mggdiffmin = 100;
 const double binscale[1]={2.5};
