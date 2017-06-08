@@ -5,6 +5,7 @@
 #include "Modelfit.C"
 #include "modelfit.C"
 #include "logfit.C"
+#include "roofit_noeta.C"
 
 using namespace std;
 
@@ -42,6 +43,7 @@ Double_t tree(double list[], int index)
 	Double_t threepiIM_nofit = 0.;
 	Double_t mggdiffmin = 0;
 	Double_t pi0IM = 0.;
+	Double_t threepiIM_rec = 0.;
 	// tree names
 	TString OMEGAPI = gettreename(0); //
 	TString KPM = gettreename(1); //
@@ -75,6 +77,7 @@ Double_t tree(double list[], int index)
 	TString SThreepiIM_nofit = getbraname(18);
 	TString SMggdiffmin = getbraname(19);
 	TString SPi0IM = getbraname(20);
+	TString SThreepiIM_rec = getbraname(22);
 	
 	TTree *TOMEGAPI_MC = new TTree("T"+OMEGAPI+"_MC","recreate");
 	TTree *TKPM_MC = new TTree("T"+KPM+"_MC","recreate");
@@ -161,6 +164,7 @@ Double_t tree(double list[], int index)
 		tree_temp->Branch(SThreepiIM_nofit,&threepiIM_nofit,SThreepiIM_nofit+"/D");
 		tree_temp->Branch(SMggdiffmin,&mggdiffmin,SMggdiffmin+"/D");
 		tree_temp->Branch(SPi0IM,&pi0IM,SPi0IM+"/D");
+		tree_temp->Branch(SThreepiIM_rec,&threepiIM_rec,SThreepiIM_rec+"/D");
 	}
 	
 	// define chain
@@ -231,6 +235,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
 						chain_temp->SetBranchAddress(SMggdiffmin,&mggdiffmin);
 						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
+						chain_temp->SetBranchAddress(SThreepiIM_rec,&threepiIM_rec);
 					}	
                
             }
@@ -285,6 +290,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
 						chain_temp->SetBranchAddress(SMggdiffmin,&mggdiffmin);
 						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
+						chain_temp->SetBranchAddress(SThreepiIM_rec,&threepiIM_rec);
 					}	
             }
          }
@@ -338,6 +344,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
 						chain_temp->SetBranchAddress(SMggdiffmin,&mggdiffmin);
 						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
+						chain_temp->SetBranchAddress(SThreepiIM_rec,&threepiIM_rec);
 					}	
             }
          }
@@ -391,6 +398,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SThreepiIM_nofit,&threepiIM_nofit);
 						chain_temp->SetBranchAddress(SMggdiffmin,&mggdiffmin);
 						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
+						chain_temp->SetBranchAddress(SThreepiIM_rec,&threepiIM_rec);
 					}		
             }
          }
@@ -706,7 +714,7 @@ void getree () {
 		}*/
 		Cutlist[modpos]=Cutlist_std[modpos]-step*(nbstep-i);
 		//cout<<Cutlist[modpos]-Cutlist_std[modpos]<<endl;
-		//sb_temp=tree(Cutlist,modpos)[0]; 
+		sb_temp=tree(Cutlist,modpos)[0]; 
 		//sblist[i]=sb_temp;
 		lb+=step; 
 	}
@@ -715,12 +723,13 @@ void getree () {
 	int treeind_temp = 3;
 	int strind_temp[listindex] = {19,10};
 	for (int i=0;i<listindex;i++) {
-		DGFit(&treeind_temp,&strind_temp[i]);
+		//DGFit(&treeind_temp,&strind_temp[i]);
 	}
 	gethisto(0);
+	roofit_noeta();
 	//Modelfit();
 	//modelfit();
-	//logfit();
+	logfit();
 	//
 	std::cout<<"\n---------"<<endl;
 	/*while (lb<upb+step) {

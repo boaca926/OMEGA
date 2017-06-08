@@ -1,13 +1,13 @@
 const double omegmass = 782., masswidth = 8.5;
 const double p0IMwidth = 2.05, threepiIMwidth = 1.945;
 const double Resolu[2] = {threepiIMwidth, p0IMwidth}; 
-const int NbTree = 11, NbVar = 22, NbCut = 7, NbMode = 4, scale = 6;
-const double xmin = 0., xmin_Chi2 = 0., xmin_TOF = -10., xmin_DeltaE = -800., xmin_Tracksum = 100., xmin_pi0IM = 100, xmin_IM = omegmass-12*masswidth, xmin_pionPsum = 120., xmin_Mggdiffmin = -100.;
-const double xmax = 1000., xmax_Chi2 = 100., xmax_TOF = 10., xmax_DeltaE = 200., xmax_Tracksum = 600., xmax_pi0IM = 170, xmax_IM = omegmass+12*masswidth, xmax_pionPsum = 520., xmax_Mggdiffmin = 100.;
+const int NbTree = 11, NbVar = 23, NbCut = 7, NbMode = 4, scale = 6, scale_width = 18;
+const double xmin = 0., xmin_Chi2 = 0., xmin_TOF = -10., xmin_DeltaE = -800., xmin_Tracksum = 10000., xmin_pi0IM = 100, xmin_IM = omegmass-scale_width*masswidth, xmin_pionPsum = 120., xmin_Mggdiffmin = -100.;
+const double xmax = 1000., xmax_Chi2 = 10000., xmax_TOF = 10., xmax_DeltaE = 200., xmax_Tracksum = 600., xmax_pi0IM = 170, xmax_IM = omegmass+scale_width*masswidth, xmax_pionPsum = 520., xmax_Mggdiffmin = 100.;
 const int NbHist = 100, bin = 1000, bin_Chi2 = 100, bin_TOF = 400, bin_DeltaE = 1000, bin_Tracksum = 500, bin_pi0IM = 100, bin_IM = 155, bin_pionPsum = 400, bin_Mggdiffmin = 100;
 const double binscale[1]={2.5};
 const int bin_fit = (xmax_IM-xmin_IM)/(binscale[0]*Resolu[0]);
-const double chi2cut = 20., tofcut1 = -0.5, tofcut2=4., deltaEcut=-215., Emaxcut=320., deltaPi0IM=4*p0IMwidth, delta3piIM=12*masswidth;
+const double chi2cut = 20., tofcut1 = -0.5, tofcut2=4., deltaEcut=-215., Emaxcut=320., deltaPi0IM=4*p0IMwidth, delta3piIM=scale_width*masswidth;
 const double k=-5.;
 const double Cutlist_std[NbCut] = {chi2cut, tofcut1, tofcut2, deltaEcut, Emaxcut, deltaPi0IM, delta3piIM};
 const double cutstep_std[NbCut] ={2., 0.2, 1., 4., 1., p0IMwidth, threepiIMwidth};
@@ -59,7 +59,7 @@ TString gettreename(Int_t index) {
 TString getbraname(Int_t index) {
 	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue","BestPiTime","BestETime","DeltaE","tracksum","ThreepiIM","IMdiff","ThreepiIM_impv","Emaxprompt",
 "bestpiphoton1Ekinfit","bestpiphoton2Ekinfit","ISRE","ISR_impv","pionphotonEsum","ThreepiIM_nofit","Mggdiffmin",
-"Pi0IM","ThreepiIM_MC"}; 
+"Pi0IM","ThreepiIM_MC","ThreepiIM_rec"}; 
 	
 	TString st = myArr[index]; 
 	return st;
@@ -153,7 +153,8 @@ Int_t getcutype(Double_t chi2value, Double_t bestETime, Double_t bestPiTime, Dou
 		type[6] = 0;
 	}
 	// all cuts
-	if (type[0] && type[1] && type[2] && type[3] && type[4]) {
+	//if (type[0] && type[1] && type[2] && type[3]) {
+	if (type[0] && type[1] && type[2] && type[3] && type[6]) {
 	//if (type[modpos]) {
 		Type = 1;
 	}

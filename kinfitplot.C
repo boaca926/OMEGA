@@ -71,8 +71,8 @@ void kinfitplot() {
 	Double_t widthc1=getbinwidth(hChi2_OMEGAPI);
 	hChi2_MCSUM->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f",widthc1));
 	hChi2_MCSUM->GetXaxis()->SetTitle("#chi^{2}");
-	hChi2_MCSUM->GetXaxis()->SetRangeUser(0.,70.);
-	hChi2_MCSUM->GetYaxis()->SetRangeUser(0.,ymax*1.2);
+	hChi2_MCSUM->GetXaxis()->SetRangeUser(2000.,xmax_Chi2);
+	hChi2_MCSUM->GetYaxis()->SetRangeUser(1.,ymax*1.2);
 	hChi2_MCSUM->GetYaxis()->SetTitleOffset(1.4);
 	hChi2_MCSUM->Draw(); 
 	hChi2_OMEGAPI->Draw("Same");

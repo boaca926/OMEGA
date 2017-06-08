@@ -16,7 +16,7 @@ void MyClass::Main()
 	Double_t chi2value = 0., pvalue = 0.;
 	Double_t bestPiTime = 0., bestETime = 0.;
 	Double_t deltaE = 0., tracksum = 0.;
-	Double_t threepiIM = 0., threepiIM_impv = 0., IMdiff = 0.;
+	Double_t threepiIM_rec = 0., threepiIM = 0., threepiIM_impv = 0., IMdiff = 0.;
 	Double_t threepiIM_nofit = 0.;
 	Double_t isrE = 0., isrE_impv = 0.;
 	Double_t Emaxprompt = 0., bestpiphoton1Ekinfit = 0., bestpiphoton2Ekinfit = 0., pionphotonEsum = 0.;
@@ -78,6 +78,7 @@ void MyClass::Main()
 	TString SThreepiIM_nofit = getbraname(18); getbraname(18); std::cout<<getbraname(18)<<endl;
 	TString SMggdiffmin = getbraname(19); getbraname(19); std::cout<<getbraname(19)<<endl;
 	TString SPi0IM = getbraname(20); getbraname(20); std::cout<<getbraname(20)<<endl; 
+	TString SThreepiIM_rec = getbraname(22); getbraname(22); std::cout<<getbraname(22)<<endl;
 	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -114,6 +115,7 @@ void MyClass::Main()
 		tree_temp->Branch(SPionphotonEsum,&pionphotonEsum,SPionphotonEsum+"/D");
 		tree_temp->Branch(SMggdiffmin,&mggdiffmin,SMggdiffmin+"/D"); 
 		tree_temp->Branch(SPi0IM,&pi0IM,SPi0IM+"/D");
+		tree_temp->Branch(SThreepiIM_rec,&threepiIM_rec,SThreepiIM_rec+"/D");
 	}	
 
 	///
@@ -604,6 +606,7 @@ void MyClass::Main()
 		TLorentzVector pionphoton1kinfit=Getphoton4vector(inputvectorminkinfit(5),inputvectorminkinfit(6),inputvectorminkinfit(7),inputvectorminkinfit(8));
 		TLorentzVector pionphoton2kinfit=Getphoton4vector(inputvectorminkinfit(10),inputvectorminkinfit(11),inputvectorminkinfit(12),inputvectorminkinfit(13));
 		TLorentzVector threepionskinfit=pionphoton1kinfit+pionphoton2kinfit+bestpplkinfit+bestpmikinfit;
+		threepiIM_rec=(Beam-pionphoton1kinfit-pionphoton2kinfit).M();
 		threepiIM=threepionskinfit.M();
 		IMdiff = threepiIM-IMthreepi_MC;
 		isrE = ISRphotonkinfit.E();

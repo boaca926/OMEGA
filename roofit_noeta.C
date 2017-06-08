@@ -45,7 +45,7 @@ void roofit_noeta() {
    for (Int_t irow=0;irow<TOmegaPi->GetEntries();irow++) {
    	N_bkg1++;
    }
-   f1_init=N_bkg1/N_d;
+   f1_init=(N_bkg1/N_d)*5.7/8;
    std::cout<<"N_bkg1 = "<<N_bkg1<<endl;
    td::cout<<"f1_init = "<<f1_init<<endl;
    //
@@ -109,20 +109,25 @@ void roofit_noeta() {
    RooRealVar a1("a1","a1",-0.2,0.,1.) ;
    RooChebychev bkg4pdf("bkg4pdf","bkg4pdf",x,RooArgSet(a0,a1)) ;*/
 	
-	RooRealVar argpar("argpar","argus shape parameter",-5.0,-100.,-1.) ; 
-	RooArgusBG bkg4pdf("bkg4pdf","bkg4pdf",x,RooConst(890),argpar);
+	RooRealVar argpar("argpar","argus shape parameter",-3,-100.,-1.); 
+	//RooRealVar cut("argpar","argus shape parameter",900,850.,1000);
+	RooArgusBG bkg4pdf("bkg4pdf","bkg4pdf",x,RooConst(910),argpar);
+	//RooArgusBG bkg4pdf("bkg4pdf","bkg4pdf",x,900,argpar);
 	// bkg5 pdf
 	RooDataSet bkg5sample("bkg5sample","bkg5sample",TETAGAM,x);
 	RooKeysPdf bkg5pdf("bkg5pdf", "bkg5pdf", x, bkg5sample, RooKeysPdf::MirrorBoth, 1);
 	// get model
-	RooRealVar f0("fs","omega gamma fraction",f0_init,0.,1.);
-	RooRealVar f1("f1","omega pi0",f1_init,0.,1.);
-	RooRealVar f2("f2","ksl",f2_init,0.,1.);
-	RooRealVar f3("f3","bkgsum2",0.3,0.,1.);
-	RooRealVar f5("f5","bkgsum5",f5_init,0.,1.);
-	
-	RooAddPdf model("model","model",RooArgList(sigpdf,bkg1pdf,bkg2pdf,bkg4pdf),RooArgList(f0,f1,f2));
-	//RooAddPdf model("model","model",RooArgList(sigpdf,bkg1pdf,bkg4pdf),RooArgList(f0,f1));
+	RooRealVar sigfrac("sigfrac","sigfrac",f0_init,0.,1.);
+	RooRealVar f1("f1","omega pi0",f1_init);
+	RooRealVar f2("f2","ksl",f2_init);
+	RooRealVar f5("f5","etagam",f5_init);
+	RooRealVar f4("f4","argus",1-f0_init-f1_init-f2_init-f5_init,0.,1.);
+	RooAddPdf bkgsum("bkgsum","Bkgsum",RooArgList(bkg1pdf,bkg2pdf,bkg4pdf,bkg5pdf),RooArgList(f1,f2,f4,f5)) ;
+	RooAddPdf sig("sig","Signal",sigpdf,sigfrac) ;
+	RooAddPdf model("model","model",RooArgList(sigpdf,bkgsum),sigfrac);
+	RooRealVar nsig("nsig","signal fraction",10000,0.,100000.) ;
+	RooRealVar nbkg("nbkg","background fraction",5000,0.,100000.) ;
+	//RooAddPdf model("model","model",RooArgList(sig,bkgsum),RooArgList(nsig,nbkg));
 	// Draw all frames on a canvas
 	RooPlot* frame = x.frame(); 
 	//data.plotOn(frame);
@@ -136,14 +141,18 @@ void roofit_noeta() {
 	//bkg4pdf.plotOn(frame,LineStyle(kSolid),LineColor(1));
 	//bkg5pdf.plotOn(frame,LineStyle(kSolid),LineColor(5));
 	// fit
-	double range1 = xmin_IM, range2 = xmax_IM;
-	model.fitTo(data);
-	//model.fitTo(data,Range(range1,range2));
+	double scale_temp = 16;
+	double range1 = omegmass-scale_temp*masswidth, range2 = omegmass+scale_temp*masswidth;
+	RooFitResult* rf = model.fitTo(data,Range(range1,range2));
+	//model.fitTo(data,Range(range1,range2),Extended(kTRUE));
 	model.plotOn(frame,Name("bkg2pdf"),Components("bkg2pdf"),LineStyle(kDashed),LineColor(15),LineWidth(2));
 	model.plotOn(frame,Name("bkg4pdf"),Components("bkg4pdf"),LineStyle(kDashed),LineColor(1),LineWidth(2));
 	model.plotOn(frame,Name("sigpdf"),Components("sigpdf"),LineStyle(kDashed),LineColor(4),LineWidth(2));
 	model.plotOn(frame,Name("bkg1pdf"),Components("bkg1pdf"),LineStyle(kDashed),LineColor(7),LineWidth(2));
-	
+	model.plotOn(frame,Name("bkg5pdf"),Components("bkg5pdf"),LineStyle(kDashed),LineColor(3),LineWidth(2));
+	//add parameter estimated signals: esig
+	double esig = N_d*sigfrac.getVal();
+	//double eint = 
 	model.Print("t");
    TCanvas* c = new TCanvas("IMfit","IMfit",800,400) ;
    //
@@ -151,10 +160,16 @@ void roofit_noeta() {
    RooAbsReal* fracSigRange = sigpdf.createIntegral(x,x,"window");
    RooAbsReal* fracBkg1Range = bkg1pdf.createIntegral(x,x,"window");
    RooAbsReal* fracBkg4Range = bkg4pdf.createIntegral(x,x,"window");
+   std::cout<<"<<<<<<<<<<<<<<"<<" fit x range: ["<<range1<<","<<range2<<"]"<<" <<<<<<<<<<<<<<"<<endl;
+   std::cout<<"<<<<<<<<<<<<<<"<<" total number of signal = "<<esig<<" <<<<<<<<<<<<<<"<<endl;
+   RooArgSet* params = model.getVariables();
+   params->Print("v");
    //Double_t nsigWindow = nsig.getVal() * fracSigRange->getVal() ;
-   std::cout<<"<<<<<<<<<<<<<<"<<" sig_sum = "<<fracSigRange->getVal()<<"<<<<<<<<<<<<<<"<<endl;
-   std::cout<<"<<<<<<<<<<<<<<"<<" bkg1_sum = "<<fracBkg1Range->getVal()<<"<<<<<<<<<<<<<<"<<endl;
-   std::cout<<"<<<<<<<<<<<<<<"<<" bkg4_sum = "<<fracBkg4Range->getVal()<<"<<<<<<<<<<<<<<"<<endl;
+   std::cout<<"<<<<<<<<<<<<<<"<<" sig_frac = "<<fracSigRange->getVal()<<"<<<<<<<<<<<<<<"<<endl;
+   //std::cout<<"<<<<<<<<<<<<<<"<<" bkg1_sum = "<<fracBkg1Range->getVal()<<"<<<<<<<<<<<<<<"<<endl;
+   //std::cout<<"<<<<<<<<<<<<<<"<<" bkg4_sum = "<<fracBkg4Range->getVal()<<"<<<<<<<<<<<<<<"<<endl;
+   //std::cout<<"<<<<<<<<<<<<<<"<<" f1 = "<<f1.getVal()<<"<<<<<<<<<<<<<<"<<endl;
+   //
    //
    c->Divide(1) ;
    c->cd(1); 
@@ -162,4 +177,7 @@ void roofit_noeta() {
    frame->GetXaxis()->SetRangeUser(range1,range2);
    frame->GetYaxis()->SetTitleOffset(1.6); 
    frame->Draw();
+   
+   TFile hf("./Plots/fitresult.root","recreate");
+	c->Write();
 }
