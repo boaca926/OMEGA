@@ -61,20 +61,39 @@ void kinfitplot() {
 		HCHI2_Norm[i]=histo_normal;	
 		i++;
 	}
+	// compare histos
+	double res[bin_Chi2], x[bin_Chi2], chi2sum=0.,chi2_temp=0., chi_temp = 0.;
+	double data_temp = 0., mc_temp = 0.;
+	int nbinX_d = hChi2_MCSUM->GetNbinsX();
+	TAxis *xaxis_d = hChi2_MCSUM->GetXaxis();
+	hChi2_MCSUM->Chi2Test(hChi2_DATA,"UW P",res);
+	for (int i=1;i<=bin_Chi2;i++) {
+		x[i]=xaxis_d->GetBinCenter(i);
+		data_temp=hChi2_DATA->GetBinContent(i);
+		mc_temp=hChi2_MCSUM->GetBinContent(i);
+		chi_temp=(data_temp-mc_temp);
+		chi2_temp=chi_temp*chi_temp/mc_temp;
+		chi2sum+=chi2_temp;
+		//cout<<mc_temp<<","<<data_temp<<","<<data_temp-mc_temp<<endl;
+		//cout<<chi2_temp<<","<<chi2sum<<endl;
+	}
+	//cout<<chi2sum<<endl;
+	//std::cout<<"chi2/ndf = "<<chi2<<endl;
+	
 	
 	/// plots of unfitted histos
 	TCanvas *c = new TCanvas("Chi2Distr","Chi2 Distr.",700,700);
-	c->Divide(1,1);
+	c->Divide(2);
 	
 	c->cd(1);
-	Double_t ymax = hChi2_MCSUM->GetMaximum();
+	Double_t ymax = hChi2_DATA->GetMaximum();
 	Double_t widthc1=getbinwidth(hChi2_OMEGAPI);
-	hChi2_MCSUM->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f",widthc1));
-	hChi2_MCSUM->GetXaxis()->SetTitle("#chi^{2}");
-	hChi2_MCSUM->GetXaxis()->SetRangeUser(2000.,xmax_Chi2);
-	hChi2_MCSUM->GetYaxis()->SetRangeUser(1.,ymax*1.2);
-	hChi2_MCSUM->GetYaxis()->SetTitleOffset(1.4);
-	hChi2_MCSUM->Draw(); 
+	hChi2_DATA->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f",widthc1));
+	hChi2_DATA->GetXaxis()->SetTitle("#chi^{2}");
+	//hChi2_DATA->GetXaxis()->SetRangeUser(2000.,xmax_Chi2);
+	hChi2_DATA->GetYaxis()->SetRangeUser(1.,ymax*1.2);
+	hChi2_DATA->GetYaxis()->SetTitleOffset(1.4);	 
+	hChi2_DATA->Draw("e1");
 	hChi2_OMEGAPI->Draw("Same");
 	hChi2_KPM->Draw("Same"); 	
 	hChi2_KSL->Draw("Same");
@@ -83,7 +102,8 @@ void kinfitplot() {
 	hChi2_ETAGAM->Draw("Same"); 
 	hChi2_BKGSUM1->Draw("Same");	
 	hChi2_EEG->Draw("Same");
-	hChi2_DATA->Draw("Samee1");
+	hChi2_MCSUM->Draw("Same");
+	
 	TLine *l_cut = new TLine(chi2cut,0.,chi2cut,ymax); 
 	format_l(l_cut,4,2,1);
 	l_cut->Draw("Same");
@@ -118,7 +138,22 @@ void kinfitplot() {
 	legc1->Draw("Same");
 	legtextsize(legc1, 0.03);
 	
+	c->cd(2);
+	
 	TFile hf("./Plots/Chi2Plots.root","recreate");
 	c->Write();
+	TGraph* gf= new TGraph(nbinX_d,x,res);
+	gf->GetYaxis()->SetTitleOffset(1.2);
+	gf->GetXaxis()->SetTitle("");
+	gf->GetYaxis()->SetRangeUser(-10,10);
+	gf->GetYaxis()->SetTitle("");	
+	gf->SetLineWidth(3); 
+	gf->SetMarkerStyle(21);
+	gf->SetLineColor(1);
+	gf->SetMarkerSize(.5);
+	gf->SetTitle("Normalized Residuals");
+	gf->Draw("AP");
+  
+  
 	
 }

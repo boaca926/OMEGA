@@ -8,18 +8,28 @@ gSystem->Load("libRooFit");
 using namespace std;
 using namespace RooFit;
 
+void cross(RooDataHist* h, int bin) {
+	TH1D* hhdata = h->createHistogram("ThreepiIM",bin);
+	double binsize=hhdata->GetNbinsX();
+	std::cout<<"binsize = "<<binsize<<endl;
+	hhdata->Draw();
+}
+
 void roofit_noeta() {
+	Double_t threepiIM = 0.;
+	TString SThreepiIM = getbraname(9); 
 	// get root file
-	TFile *findFile = new TFile("./ROOT/TREE_"+cutname[modpos]+".root","READ");
+	TFile *findFile = new TFile("./ROOT/TREE_cutted.root","READ");
 	// get tree name
 	TString Data = gettreename(10);// data
 	TString Sig = gettreename(3);// omega gamma
 	TString Bkg1 = gettreename(0);// omega pi0
 	TString Bkg2 = gettreename(2);// KSL
 	TString Bkg3 = gettreename(7);// bkgsum2
-	TString Bkg5 = gettreename(5);// etagam
 	// declear variable
 	RooRealVar x("ThreepiIM","ThreepiIM",xmin_IM,xmax_IM);
+	const int binnb=10;
+	x.setBins(binnb);
 	//double scale=1.0/fsig;
 	// get MC & DATA sample
 	TTree *TData = (TTree*)findFile->Get("T"+Data+"_Pre"); // data
@@ -59,7 +69,7 @@ void roofit_noeta() {
    std::cout<<"N_bkg2 = "<<N_bkg2<<endl;
    td::cout<<"f2_init = "<<f2_init<<endl;
    //
-	TTree *TBKGSUM2 = new TTree("T"+Bkg3+"_Pre","recreate"); // bkg3 bkgsum2
+	TTree *TBKGSUM2 = (TTree*)findFile->Get("T"+Bkg3+"_Pre"); // bkg3 bkgsum2
 	double N_bkg3=0;
 	double f3_init=0;
    for (Int_t irow=0;irow<TBKGSUM2->GetEntries();irow++) {
@@ -68,16 +78,9 @@ void roofit_noeta() {
    f3_init=N_bkg3/N_d;
    std::cout<<"N_bkg3 = "<<N_bkg3<<endl;
    td::cout<<"f3_init = "<<f3_init<<endl;
-	//
-	TTree *TETAGAM = (TTree*)findFile->Get("T"+Bkg5+"_Pre"); // bkg5 etagam
-	double N_bkg5=0;
-	double f5_init=0;
-   for (Int_t irow=0;irow<TETAGAM->GetEntries();irow++) {
-   	N_bkg5++;
-   }
-   f5_init=N_bkg5/N_d;
-   std::cout<<"N_bkg5 = "<<N_bkg5<<endl;
-   td::cout<<"f5_init = "<<f5_init<<endl;
+   //
+   f4_init=1-f0_init-f1_init-f2_init-f3_init;
+   td::cout<<"f4_init = "<<f4_init<<endl;
 	// get pdfs
 	// resolution
 	RooRealVar mean("mean","mean of gaussian1",0.005,-1,1) ;
@@ -86,6 +89,9 @@ void roofit_noeta() {
    //RooGaussian gauss("gauss","resolution PDF",x,mean,sigma);
 	// data
 	RooDataSet data("data","data",RooArgSet(x),Import(*TData));
+	RooDataHist* hdata = data.binnedClone();
+   // Represent data in dh as pdf in x
+   RooHistPdf hdatapdf("hdatapdf","hdatapdf",x,*hdata,0);
 	// sig pdf
 	//RooDataSet sigsample("sigsample","sigsample",RooArgSet(x),Import(*TThreePiGam));
 	RooDataSet sigsample("sigsample","sigsample",TThreePiGam,x);
@@ -97,33 +103,31 @@ void roofit_noeta() {
 	RooDataSet bkg2sample("bkg2sample","bkg2sample",TKSL,x);
 	RooKeysPdf bkg2pdf("bkg2pdf", "bkg2pdf", x, bkg2sample, RooKeysPdf::MirrorBoth, 1);
 	// bkg3 pdf
-	/*RooDataSet bkg3sample("bkg3sample","bkg3sample",TBKGSUM2,x);
-	RooKeysPdf bkg3pdf("bkg3pdf", "bkg3pdf", x, bkg3sample, RooKeysPdf::MirrorBoth, 1);*/
+	RooDataSet bkg3sample("bkg3sample","bkg3sample",TBKGSUM2,x);
+	RooKeysPdf bkg3pdf("bkg3pdf", "bkg3pdf", x, bkg3sample, RooKeysPdf::MirrorBoth, 1);
 	// bkg4 pdf
-	/*RooRealVar c0("c0","coefficient #0", 0.1,-5.,5.); 
-	RooRealVar c1("c1","coefficient #1", 0.1,-5.,5.); 
+	/*RooRealVar c0("c0","coefficient #0", -0.1,-5.,5.); 
+	RooRealVar c1("c1","coefficient #1", -0.1,-5.,5.); 
 	RooRealVar c2("c2","coefficient #2", -0.1,-5.,5.); 
 	RooChebychev bkg4pdf("bkg4pdf","bkg4pdf",x,RooArgList(c0,c1,c2));*/
 	
-	/*RooRealVar a0("a0","a0",0.5,0.,1.) ;
-   RooRealVar a1("a1","a1",-0.2,0.,1.) ;
-   RooChebychev bkg4pdf("bkg4pdf","bkg4pdf",x,RooArgSet(a0,a1)) ;*/
+	RooRealVar a0("a0","a0",0.5,-5.,5.) ;
+   RooRealVar a1("a1","a1",-0.2,-5.,5.) ;
+   RooChebychev bkg4pdf("bkg4pdf","bkg4pdf",x,RooArgSet(a0,a1));
 	
-	RooRealVar argpar("argpar","argus shape parameter",-3,-100.,-1.); 
+	/*RooRealVar argpar("argpar","argus shape parameter",-3,-100.,-1.); 
 	//RooRealVar cut("argpar","argus shape parameter",900,850.,1000);
 	RooArgusBG bkg4pdf("bkg4pdf","bkg4pdf",x,RooConst(910),argpar);
-	//RooArgusBG bkg4pdf("bkg4pdf","bkg4pdf",x,900,argpar);
-	// bkg5 pdf
-	RooDataSet bkg5sample("bkg5sample","bkg5sample",TETAGAM,x);
-	RooKeysPdf bkg5pdf("bkg5pdf", "bkg5pdf", x, bkg5sample, RooKeysPdf::MirrorBoth, 1);
+	//RooArgusBG bkg4pdf("bkg4pdf","bkg4pdf",x,900,argpar);*/
+
 	// get model
-	RooRealVar sigfrac("sigfrac","sigfrac",f0_init,0.,1.);
+	RooRealVar sigfrac("sigfrac","sigfrac",f0_init);
 	RooRealVar f1("f1","omega pi0",f1_init);
 	RooRealVar f2("f2","ksl",f2_init);
-	RooRealVar f5("f5","etagam",f5_init);
-	RooRealVar f4("f4","argus",1-f0_init-f1_init-f2_init-f5_init,0.,1.);
-	RooAddPdf bkgsum("bkgsum","Bkgsum",RooArgList(bkg1pdf,bkg2pdf,bkg4pdf,bkg5pdf),RooArgList(f1,f2,f4,f5)) ;
-	RooAddPdf sig("sig","Signal",sigpdf,sigfrac) ;
+	RooRealVar f3("f3","bkgsum2",f3_init);
+	RooRealVar f4("f4","argus",f4_init,0.,1.);
+	RooAddPdf bkgsum("bkgsum","Bkgsum",RooArgList(bkg1pdf,bkg2pdf,bkg3pdf,bkg4pdf),RooArgList(f1,f2,f3,f4)) ;
+	//RooAddPdf sig("sig","Signal",sigpdf,sigfrac) ;
 	RooAddPdf model("model","model",RooArgList(sigpdf,bkgsum),sigfrac);
 	RooRealVar nsig("nsig","signal fraction",10000,0.,100000.) ;
 	RooRealVar nbkg("nbkg","background fraction",5000,0.,100000.) ;
@@ -132,24 +136,30 @@ void roofit_noeta() {
 	RooPlot* frame = x.frame(); 
 	//data.plotOn(frame);
 	data.plotOn(frame); 
-	model.plotOn(frame,LineStyle(kSolid),LineColor(kRed));
+	//model.plotOn(frame,LineStyle(kSolid),LineColor(kBlue));
 	//gauss.plotOn(frame,LineStyle(kSolid),LineColor(6));
 	//sigpdf.plotOn(frame,LineStyle(kSolid),LineColor(4)); 
 	//bkg1pdf.plotOn(frame,LineStyle(kSolid),LineColor(7));
 	//bkg2pdf.plotOn(frame,LineStyle(kSolid),LineColor(15)); 
 	//bkg3pdf.plotOn(frame,LineStyle(kSolid),LineColor(2));
 	//bkg4pdf.plotOn(frame,LineStyle(kSolid),LineColor(1));
-	//bkg5pdf.plotOn(frame,LineStyle(kSolid),LineColor(5));
 	// fit
-	double scale_temp = 16;
+	double scale_temp = scale_width-0;
 	double range1 = omegmass-scale_temp*masswidth, range2 = omegmass+scale_temp*masswidth;
+	//double range1 = 450., range2 = 630.;
 	RooFitResult* rf = model.fitTo(data,Range(range1,range2));
+	TH1D* hhdata = hdata->createHistogram("ThreepiIM",binnb);
+	double binsize=hhdata->GetNbinsX();
+	std::cout<<"binsize = "<<binsize<<endl;
 	//model.fitTo(data,Range(range1,range2),Extended(kTRUE));
+	//hdatapdf.plotOn(frame,LineStyle(kSolid),LineColor(kBlack),LineWidth(2));
+	model.plotOn(frame,LineStyle(kSolid),LineColor(kRed));
+	model.plotOn(frame,Name("bkg3pdf"),Components("bkg3pdf"),LineStyle(kDashed),LineColor(20),LineWidth(2));
 	model.plotOn(frame,Name("bkg2pdf"),Components("bkg2pdf"),LineStyle(kDashed),LineColor(15),LineWidth(2));
 	model.plotOn(frame,Name("bkg4pdf"),Components("bkg4pdf"),LineStyle(kDashed),LineColor(1),LineWidth(2));
-	model.plotOn(frame,Name("sigpdf"),Components("sigpdf"),LineStyle(kDashed),LineColor(4),LineWidth(2));
+	model.plotOn(frame,Name("sigpdf"),Components("sigpdf"),LineColor(4),LineWidth(2));
 	model.plotOn(frame,Name("bkg1pdf"),Components("bkg1pdf"),LineStyle(kDashed),LineColor(7),LineWidth(2));
-	model.plotOn(frame,Name("bkg5pdf"),Components("bkg5pdf"),LineStyle(kDashed),LineColor(3),LineWidth(2));
+	model.plotOn(frame,Name("bkgsum"),Components("bkgsum"),LineColor(8),LineWidth(2));
 	//add parameter estimated signals: esig
 	double esig = N_d*sigfrac.getVal();
 	//double eint = 
@@ -171,13 +181,18 @@ void roofit_noeta() {
    //std::cout<<"<<<<<<<<<<<<<<"<<" f1 = "<<f1.getVal()<<"<<<<<<<<<<<<<<"<<endl;
    //
    //
-   c->Divide(1) ;
+   c->Divide(2) ;
    c->cd(1); 
    gPad->SetLeftMargin(0.15); 
    frame->GetXaxis()->SetRangeUser(range1,range2);
    frame->GetYaxis()->SetTitleOffset(1.6); 
    frame->Draw();
    
+   c->cd(2);
+   hhdata->Draw();
+   
    TFile hf("./Plots/fitresult.root","recreate");
 	c->Write();
+	
+
 }

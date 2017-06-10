@@ -85,7 +85,7 @@ void gethisto(int index) {
 		TFile *f= new TFile("./ROOT/TREE_Pre.root");
 	}
 	else {
-		TFile *f= new TFile("./ROOT/TREE_"+cutname[modpos]+".root");
+		TFile *f= new TFile("./ROOT/TREE_cutted.root");
 	}	
 	// define variables
 	Double_t threepiIM_MC = 0.;
@@ -320,7 +320,7 @@ void gethisto(int index) {
    	HMggdiffmin[8]->Fill(mggdiffmin);
    }
    //
-   for (Int_t irow=0;irow<TEEG->GetEntries();irow++) { // threepi 
+   for (Int_t irow=0;irow<TEEG->GetEntries();irow++) { // eeg
    	TEEG->GetEntry(irow); 
    	HCHI2[9]->Fill(chi2value);
    	HTOF[9]->Fill(bestPiTime,bestETime);
@@ -333,7 +333,7 @@ void gethisto(int index) {
    	HMggdiffmin[9]->Fill(mggdiffmin);
    }
    //
-   for (Int_t irow=0;irow<TDATA->GetEntries();irow++) { // threepi 
+   for (Int_t irow=0;irow<TDATA->GetEntries();irow++) { // data
    	TDATA->GetEntry(irow); 
    	HCHI2[10]->Fill(chi2value);
    	HTOF[10]->Fill(bestPiTime,bestETime);

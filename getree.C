@@ -56,6 +56,7 @@ Double_t tree(double list[], int index)
 	TString MCSUM = gettreename(8);
 	TString EEG = gettreename(9); //std::cout<<EEG<<endl;
 	TString DATA = gettreename(10); //std::cout<<DATA<<endl;
+	TString BKGSUM = gettreename(11);
 	// branche names
 	TString Smctype = getbraname(0);
 	TString SIMthreepi = getbraname(1); //std::cout<<getbraname(1)<<endl;
@@ -100,6 +101,7 @@ Double_t tree(double list[], int index)
 	TTree *TBKGSUM1_Pre = new TTree("T"+BKGSUM1+"_Pre","recreate");
 	TTree *TBKGSUM2_Pre = new TTree("T"+BKGSUM2+"_Pre","recreate");
 	TTree *TMCSUM_Pre = new TTree("T"+MCSUM+"_Pre","recreate");
+	TTree *TBKGSUM_Pre = new TTree("T"+BKGSUM+"_Pre","recreate");
 	TTree *TEEG_Pre = new TTree("T"+EEG+"_Pre","recreate");
 	TTree *TDATA_Pre = new TTree("T"+DATA+"_Pre","recreate");
 	
@@ -126,6 +128,7 @@ Double_t tree(double list[], int index)
 	treelist1->Add(TBKGSUM1_Pre);
 	treelist1->Add(TBKGSUM2_Pre);
 	treelist1->Add(TMCSUM_Pre);
+	treelist1->Add(TBKGSUM_Pre);
 	treelist1->Add(TEEG_Pre);
 	treelist1->Add(TDATA_Pre);
 	
@@ -523,6 +526,7 @@ Double_t tree(double list[], int index)
    		eegNb_Pre++; mcsumNb_Pre++;
    		TEEG_Pre->Fill();
    		TMCSUM_Pre->Fill();
+   		TBKGSUM_Pre->Fill();
    	}
    }
    
@@ -572,6 +576,10 @@ Double_t tree(double list[], int index)
 			TMCSUM_Pre->Fill();
    	}
    	
+   	if (mctype_MC == 2 || mctype_MC == 5 || mctype_MC==6 || mctype_MC==8 || mctype_MC==9) {// bkgsum
+   		TBKGSUM_Pre->Fill();
+   	}
+   	
    	if (mctype_MC==6 || mctype_MC==8 || mctype_MC==9) {// bkgsum1
 			bkgsum1Nb_Pre++; mcsumNb_Pre++;
 			TBKGSUM1_Pre->Fill();
@@ -587,7 +595,8 @@ Double_t tree(double list[], int index)
    
    Double_t SBLIST[3] = {0.,0.,0.};
    Double_t sb_Pre = omegamNb_Pre/(mcsumNb_Pre-omegamNb_Pre);
-   SBLIST[0] = (omegamNb_Pre/mcsumNb_Pre)*dataNb_Pre;
+   //SBLIST[0] = (omegamNb_Pre/mcsumNb_Pre)*dataNb_Pre;
+   SBLIST[0] = omegamNb_Pre/TMath::Sqrt(mcsumNb_Pre);
    //count<<mcsumNb_Pre<<endl;
    //cout<<dataNb<<endl;
    //cout<<TMath::Sqrt(mcsumNb_Pre)<<endl;
@@ -647,7 +656,8 @@ Double_t tree(double list[], int index)
 			TFile ftree("./ROOT/TREE_Pre.root","recreate");
 		}
 		else {
-			TFile ftree("./ROOT/TREE_"+cutname[index]+".root","recreate");
+			//TFile ftree("./ROOT/TREE_"+cutname[index]+".root","recreate");
+			TFile ftree("./ROOT/TREE_cutted.root","recreate");
 		}	
 		TOMEGAPI_Pre->Write();
 		TTHREEPIGAM_Pre->Write();
@@ -658,6 +668,7 @@ Double_t tree(double list[], int index)
 		TBKGSUM1_Pre->Write();
 		TBKGSUM2_Pre->Write();
 		TMCSUM_Pre->Write();
+		TBKGSUM_Pre->Write();
 		TEEG_Pre->Write();
 		TDATA_Pre->Write();
 	}	
@@ -714,8 +725,11 @@ void getree () {
 		}*/
 		Cutlist[modpos]=Cutlist_std[modpos]-step*(nbstep-i);
 		//cout<<Cutlist[modpos]-Cutlist_std[modpos]<<endl;
+		if (!CUTTAG) {
+			//std::cout<<"CUTTAG = "<<CUTTAG<<endl;
+		}
 		sb_temp=tree(Cutlist,modpos)[0]; 
-		//sblist[i]=sb_temp;
+		sblist[i]=sb_temp;
 		lb+=step; 
 	}
 	//
@@ -726,9 +740,7 @@ void getree () {
 		//DGFit(&treeind_temp,&strind_temp[i]);
 	}
 	gethisto(0);
-	roofit_noeta();
-	//Modelfit();
-	//modelfit();
+	//roofit_noeta();
 	logfit();
 	//
 	std::cout<<"\n---------"<<endl;

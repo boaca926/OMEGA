@@ -16,7 +16,7 @@ void DGFit(int *treeind, int *strind) {
 	//cout<<strind[0]<<endl;
 	TString str_temp = getbraname(strind[0]); // get branch name
 	TString tree_temp = gettreename(treeind[0]);
-	TFile *find_MC = new TFile("./ROOT/TREE_"+cutname[modpos]+".root","READ");
+	TFile *find_MC = new TFile("./ROOT/TREE_cutted.root","READ");
 	//std::cout<<cutname[modpos]<<endl;
 	//set fit inteval
 	double xxmin = 0., xxmax = 0., mean_temp = 0., binwidth = 0.;
@@ -58,7 +58,7 @@ void DGFit(int *treeind, int *strind) {
 	// Create a binned dataset with 20 bins and 500 events
    RooDataHist* hist1 = mc.binnedClone();
    // Represent data in dh as pdf in x
-   RooHistPdf histpdf1("histpdf1","histpdf1",x,*hist1,0) ;
+   RooHistPdf histpdf1("histpdf1","histpdf1",x,*hist1,0);
 	
 	/*RooPlot* xframe = x.frame(); 
 	gauss.plotOn(xframe); 

@@ -189,7 +189,7 @@ void logfit() {
 	Double_t widthc1=getbinwidth(hThreepiIM_DATA_fit);
 	hThreepiIM_DATA_fit->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f [MeV]",widthc1));
 	hThreepiIM_DATA_fit->GetXaxis()->SetTitle("M(3#pi) [MeV]");
-	hThreepiIM_DATA_fit->GetYaxis()->SetRangeUser(0.,ymax*1.2);
+	//hThreepiIM_DATA_fit->GetYaxis()->SetRangeUser(0.,ymax*1.2);
 	hThreepiIM_KSL_fit->Scale(S_b3);
 	hsum_fit->Scale(S_b4);
 	hThreepiIM_THREEPIGAM_fit->Scale(S_s);

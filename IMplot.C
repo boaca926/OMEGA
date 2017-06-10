@@ -55,14 +55,14 @@ void IMplot() {
 	c->Divide(1,1);
 	
 	c->cd(1);
-	Double_t ymax = hThreepiIM_MCSUM->GetMaximum();
+	Double_t ymax = hThreepiIM_DATA->GetMaximum();
 	Double_t widthc1=getbinwidth(hThreepiIM_OMEGAPI);
-	hThreepiIM_MCSUM->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f",widthc1));
-	hThreepiIM_MCSUM->GetXaxis()->SetTitle("#chi^{2}");
-	hThreepiIM_MCSUM->GetXaxis()->SetRangeUser(400.,1000.);
-	//hThreepiIM_MCSUM->GetYaxis()->SetRangeUser(0.,ymax*1.2);
-	hThreepiIM_MCSUM->GetYaxis()->SetTitleOffset(1.4);
-	hThreepiIM_MCSUM->Draw(); 
+	hThreepiIM_DATA->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f",widthc1));
+	hThreepiIM_DATA->GetXaxis()->SetTitle("M(3#pi) MeV");
+	hThreepiIM_DATA->GetXaxis()->SetRangeUser(400.,1500.);
+	//hThreepiIM_DATA->GetYaxis()->SetRangeUser(1.,ymax*1.2);
+	hThreepiIM_DATA->GetYaxis()->SetTitleOffset(1.4);
+	hThreepiIM_DATA->Draw("e1"); 
 	hThreepiIM_OMEGAPI->Draw("Same");
 	hThreepiIM_KPM->Draw("Same"); 	
 	hThreepiIM_KSL->Draw("Same");
@@ -71,7 +71,8 @@ void IMplot() {
 	hThreepiIM_ETAGAM->Draw("Same"); 
 	hThreepiIM_BKGSUM1->Draw("Same");	
 	hThreepiIM_EEG->Draw("Same");
-	hThreepiIM_DATA->Draw("Samee1");
+	//hThreepiIM_DATA->Draw("Samee1");
+	hThreepiIM_MCSUM->Draw("Same"); 
 	
 	legc1 = new TLegend(0.54,0.4,0.88,0.85);
 	legc1->SetFillStyle(0); 
