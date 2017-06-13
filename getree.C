@@ -559,6 +559,7 @@ Double_t tree(double list[], int index)
    		kpmNb_Pre++; mcsumNb_Pre++;
    		TKPM_Pre->Fill();
    		TMCSUM_Pre->Fill();
+   		TBKGSUM_Pre->Fill();
    	}
    	else if (mctype_MC == 3) {/// ksl
    		kslNb_Pre++; mcsumNb_Pre++;
@@ -569,6 +570,7 @@ Double_t tree(double list[], int index)
    		threepiNb_Pre++; mcsumNb_Pre++;
    		TTHREEPI_Pre->Fill();
    		TMCSUM_Pre->Fill();
+   		TBKGSUM_Pre->Fill();
    	}
    	else if (mctype_MC == 7) {/// eta gamma
    		etagamNb_Pre++; mcsumNb_Pre++; 
@@ -576,14 +578,11 @@ Double_t tree(double list[], int index)
 			TMCSUM_Pre->Fill();
    	}
    	
-   	if (mctype_MC == 2 || mctype_MC == 5 || mctype_MC==6 || mctype_MC==8 || mctype_MC==9) {// bkgsum
-   		TBKGSUM_Pre->Fill();
-   	}
-   	
    	if (mctype_MC==6 || mctype_MC==8 || mctype_MC==9) {// bkgsum1
 			bkgsum1Nb_Pre++; mcsumNb_Pre++;
 			TBKGSUM1_Pre->Fill();
 			TMCSUM_Pre->Fill();
+			TBKGSUM_Pre->Fill();
 		}
 		
 		if (mctype_MC==2 || mctype_MC==5 || mctype_MC==6 || mctype_MC==7 || mctype_MC==8 || mctype_MC==9) {// bkgsum2
@@ -741,7 +740,7 @@ void getree () {
 	}
 	gethisto(0);
 	//roofit_noeta();
-	logfit();
+	//logfit();
 	//
 	std::cout<<"\n---------"<<endl;
 	/*while (lb<upb+step) {

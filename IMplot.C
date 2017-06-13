@@ -50,6 +50,11 @@ void IMplot() {
 	histlist->Add(hThreepiIM_EEG);
 	histlist->Add(hThreepiIM_DATA);
 	
+	const int binsize=hThreepiIM_DATA->GetNbinsX();
+	cout<<bin_fit<<endl;
+	double res[308];
+	hThreepiIM_MCSUM->Chi2Test(hThreepiIM_DATA,"UW P",res);
+	
 	/// plots of unfitted histos
 	TCanvas *c = new TCanvas("Chi2Distr","Chi2 Distr.",700,700);
 	c->Divide(1,1);
@@ -59,7 +64,7 @@ void IMplot() {
 	Double_t widthc1=getbinwidth(hThreepiIM_OMEGAPI);
 	hThreepiIM_DATA->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f",widthc1));
 	hThreepiIM_DATA->GetXaxis()->SetTitle("M(3#pi) MeV");
-	hThreepiIM_DATA->GetXaxis()->SetRangeUser(400.,1500.);
+	//hThreepiIM_DATA->GetXaxis()->SetRangeUser(400.,1500.);
 	//hThreepiIM_DATA->GetYaxis()->SetRangeUser(1.,ymax*1.2);
 	hThreepiIM_DATA->GetYaxis()->SetTitleOffset(1.4);
 	hThreepiIM_DATA->Draw("e1"); 

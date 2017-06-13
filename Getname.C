@@ -4,12 +4,12 @@ const double Resolu[2] = {threepiIMwidth, p0IMwidth};
 const int NbTree = 12, NbVar = 23, NbCut = 9, NbMode = 4, scale = 6, scale_width = 14;
 const double xmin = 0., xmin_Chi2 = 0., xmin_TOF = -10., xmin_DeltaE = -800., xmin_Tracksum = 10000., xmin_pi0IM = 100, xmin_pionPsum = 120., xmin_Mggdiffmin = -100.;
 const double xmax = 1000., xmax_Chi2 = 1000., xmax_TOF = 10., xmax_DeltaE = 200., xmax_Tracksum = 600., xmax_pi0IM = 170., xmax_pionPsum = 520., xmax_Mggdiffmin = 100.;
-const double xmin_IM = omegmass-scale_width*masswidth, xmax_IM = omegmass+scale_width*masswidth;
-//const double xmin_IM = 0., xmax_IM =1500.;
+//const double xmin_IM = omegmass-scale_width*masswidth, xmax_IM = omegmass+scale_width*masswidth;
+const double xmin_IM = 450., xmax_IM =910.;
 const int NbHist = 100, bin = 1000, bin_Chi2 = 50, bin_TOF = 400, bin_DeltaE = 1000, bin_Tracksum = 500, bin_pi0IM = 100, bin_IM = 155, bin_pionPsum = 400, bin_Mggdiffmin = 100;
 const double binscale[1]={2.5};
 const int bin_fit = (xmax_IM-xmin_IM)/(binscale[0]*Resolu[0]);
-const double chi2cut = 30., tofcut1 = -0.5, tofcut2=4., deltaEcut=-215., Emaxcut=320., deltaPi0IM=4*p0IMwidth, delta3piIM=scale_width*masswidth, xmin1_IM = 450., xmax1_IM = 630.;
+const double chi2cut = 30., tofcut1 = -0.5, tofcut2=4., deltaEcut=-215., Emaxcut=320., deltaPi0IM=4*p0IMwidth, delta3piIM=scale_width*masswidth, xmin1_IM = 450., xmax1_IM = 670.;
 const double k=-5.;
 const double Cutlist_std[NbCut] = {chi2cut, tofcut1, tofcut2, deltaEcut, Emaxcut, deltaPi0IM, delta3piIM, xmin_IM, xmax_IM};
 const double cutstep_std[NbCut] ={2., 0.2, 1., 4., 1., p0IMwidth, threepiIMwidth, 0.,0.};
@@ -156,7 +156,7 @@ Int_t getcutype(Double_t chi2value, Double_t bestETime, Double_t bestPiTime, Dou
 		type[6] = 0;
 	}
 	// all cuts
-	if (type[0] && type[1] && type[2] && type[3] && type[4]) {
+	if (type[0] && type[1] && type[2] && type[3]) {
 	//if (!type[0] && type[1] && type[2] && type[3] && type[4]) {// get ksl fraction
 		Type = 1;
 	}
