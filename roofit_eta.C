@@ -18,16 +18,18 @@ void cross(RooDataHist* h, int bin) {
 
 void roofit_eta() {
 	Double_t threepiIM = 0.;
+	TString SIMthreepi = getbraname(1); 
 	TString SThreepiIM = getbraname(9);// 
 	// get root file
 	TFile *findFile = new TFile("./ROOT/TREE_cutted.root","READ");
+	TFile *findFile1 = new TFile("./ROOT/TREE_Gen.root","READ");
 	// get trees 
 	TString Omegpi = gettreename(0);// omega pi0
 	TString Ksl = gettreename(2);// KSL
 	TString Omegam = gettreename(3);// omega gamma
 	TString Etagam = gettreename(5);// eta gamma
 	TString Data = gettreename(10);// data
-	TString MCrest = gettreename(11);// mc rest = ksl + 
+	TString MCrest = gettreename(11);// mc rest = ksl 
 	
 	TTree *TData = (TTree*)findFile->Get("T"+Data+"_Pre"); // data
 	TTree *TEtagam = (TTree*)findFile->Get("T"+Etagam+"_Pre"); // etagam
@@ -36,6 +38,8 @@ void roofit_eta() {
 	TTree *TMCrest = (TTree*)findFile->Get("T"+MCrest+"_Pre"); // MCrest
 	TTree *TOmegam = (TTree*)findFile->Get("T"+Omegam+"_Pre"); // omega gamma
 	
+	TTree *TOmegam_Gen = (TTree*)findFile1->Get("T"+Omegam+"_MC"); // omega gamma MC true
+	
 	TCollection* treelist = new TList;
 	treelist->Add(TData);
 	treelist->Add(TEtagam);
@@ -43,6 +47,7 @@ void roofit_eta() {
 	treelist->Add(TOmegpi);
 	treelist->Add(TMCrest);
 	treelist->Add(TOmegam);
+	treelist->Add(TOmegam_Gen);
 	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -50,17 +55,18 @@ void roofit_eta() {
 		//treeout->Print();
 		TTree* tree_temp=dynamic_cast<TTree*>(treeout);
 		tree_temp->SetBranchAddress(SThreepiIM,&threepiIM);
+		tree_temp->SetBranchAddress(SIMthreepi+"_MC",&threepiIM);
 	}	
 	// declear variable
-	double fitcut=630;
+	const double fitcut=630;
 	RooRealVar x("ThreepiIM","ThreepiIM",xmin_IM,fitcut);
-	RooRealVar xx("ThreepiIM","ThreepiIM",fitcut,xmax_IM);	
+	RooRealVar xx("ThreepiIM","ThreepiIM",fitcut,xmax_IM);
+	RooRealVar y("IMthreepi_MC","IMthreepi_MC",fitcut,xmax_IM);	
 	const int binnb=100;
-	x.setBins(binnb); xx.setBins(binnb);
-	x.setRange("window",xmin_IM,fitcut); xx.setRange("window1",fitcut,xmax_IM);
-	
-	// data
-	
+	x.setBins(binnb); xx.setBins(binnb); y.setBins(binnb);
+	x.setRange("window",xmin_IM,fitcut); xx.setRange("window1",fitcut,xmax_IM); y.setRange("window2",fitcut,xmax_IM); 
+
+	// data	
 	double N_d=0, n_d=0;
 	for (Int_t irow=0;irow<TData->GetEntries();irow++) {
 		TData->GetEntry(irow); 
@@ -74,13 +80,16 @@ void roofit_eta() {
    }
    std::cout<<"N_d = "<<N_d<<" in range ["<<xmin_IM<<","<<fitcut<<"]"<<endl;
    std::cout<<"n_d = "<<n_d<<" in range ["<<fitcut<<","<<xmax_IM<<"]"<<endl;
+   
 	RooDataSet data("data","data",RooArgSet(x),Import(*TData));
 	RooDataHist* hdata = data.binnedClone();
 	RooHistPdf hdatapdf("hdatapdf","hdatapdf",x,*hdata,0);
 	TH1D* hhdata = hdata->createHistogram("ThreepiIM",binnb);
 	
 	RooDataSet data_above("data_above","data_above",RooArgSet(xx),Import(*TData));
-	
+	RooDataHist* hdata_above = data_above.binnedClone();
+	RooHistPdf hdatapdf_above("hdatapdf_above","hdatapdf_above",xx,*hdata_above,0);
+	TH1D* hhdata_above = hdata_above->createHistogram("ThreepiIM",binnb);
 	
 	// etagam	
 	double N_etagam=0, fetagam_init=0;
@@ -104,6 +113,7 @@ void roofit_eta() {
    
    RooDataSet etagam_above("etagam_above","etagam_above",TEtagam,xx);
    RooKeysPdf etagampdf_above("etagampdf_above", "etagampdf_above", xx, etagam_above, RooKeysPdf::MirrorBoth, 1);
+   
    // ksl   
    double N_ksl=0, fksl_init=0;
    double n_ksl=0, ffksl_init=0;
@@ -125,6 +135,7 @@ void roofit_eta() {
    
    RooDataSet ksl("ksl","ksl",TKsl,x);
    RooKeysPdf kslpdf("kslpdf", "kslpdf", x, ksl, RooKeysPdf::MirrorBoth, 1);
+   
    // omegpi 
    double N_omegpi=0, fomegpi_init=0;
    double n_omegpi=0, ffomegpi_init=0;
@@ -146,6 +157,23 @@ void roofit_eta() {
    
    RooDataSet omegpi_above("omegpi_above","omegpi_above",TOmegpi,xx);
    RooKeysPdf omegpipdf_above("omegpipdf_above", "omegpipdf_above", xx, omegpi_above, RooKeysPdf::MirrorBoth, 1);
+   
+   // omegam generated
+   double Nomegam_gen=0;
+	for (Int_t irow=0;irow<TOmegam_Gen->GetEntries();irow++) {
+		TOmegam_Gen->GetEntry(irow);
+		if (threepiIM >= fitcut && threepiIM < xmax_IM) {
+			//cout<<threepiIM<<endl;
+			Nomegam_gen++;
+		}
+	}
+	std::cout<<"Nomegam_gen = "<<Nomegam_gen<<endl;
+	
+	RooDataSet omegamgen_above("omegamgen_above","omegamgen_above",RooArgSet(y),Import(*TOmegam_Gen));
+	RooDataHist* homegamgen_above = omegamgen_above.binnedClone();
+	RooHistPdf homegamgenpdf_above("homegamgenpdf_above","homegamgenpdf_above",y,*homegamgen_above,0);
+	TH1D* hhomegamgen_above = homegamgen_above->createHistogram("IMthreepi_MC",binnb);
+	
    // omegam
    double N_omegam=0, fomegam_init=0;
    double n_omegam=0, ffomegam_init=0;
@@ -190,10 +218,10 @@ void roofit_eta() {
    RooDataSet mcrest_above("mcrest_above","mcrest_above",TMCrest,xx);
    RooKeysPdf mcrestpdf_above("mcrestpdf_above", "mcrestpdf_above", xx, mcrest_above, RooKeysPdf::MirrorBoth, 1);
    // threepi gamma
-   RooRealVar a0("a0","a0",0.5,-5.,5.) ;
-   RooRealVar a1("a1","a1",-0.2,-5.,5.) ;
+   RooRealVar a0("a0","a0",0.5,-10.,10.) ;
+   RooRealVar a1("a1","a1",-0.2,-10.,10.) ;
    RooChebychev threepigampdf_above("threepigampdf_above","threepigampdf_above",xx,RooArgSet(a0,a1));
-   ffthreepigam_init=1-ffmcrest_init-ffomegam_init-ffomegpi_init-ffksl_init-ffetagam_init;
+   double ffthreepigam_init=1-ffmcrest_init-ffomegam_init-ffomegpi_init-ffksl_init-ffetagam_init;
    
    // constrcut model for fit in control region [xmin fitcut]
    double factor = 1.0/(fetagam_init+fksl_init+fomegpi_init+fomegam_init+fmcrest_init);
@@ -215,7 +243,7 @@ void roofit_eta() {
    double scale_eta = 0;
    scale_eta = sigfrac.getVal()/fetagam_init;// sig fraction after fit: 0.862038
    std::cout<<"<<<<<<<<<<<<<< DETERMINED SCALE OF etagam S = "<<scale_eta<<" <<<<<<<<<<<<<<"<<endl;
-   model.Print("t");
+   //model.Print("t");
 	// Draw all frames on a canvas
 	RooPlot* frame = x.frame(); 
 	data.plotOn(frame);
@@ -239,15 +267,20 @@ void roofit_eta() {
    RooRealVar ffomegam("ffomegam","fomegam fraction",ffomegam_init);  
    RooRealVar ffmcrest("ffmcrest","mcrest fraction",ffmcrest_init);
    RooRealVar ffthreepigam("ffthreepigam","threepigam fraction",ffthreepigam_init,0,1);
-   RooRealVar ffetagam("ffetagam","sig fraction",ffetagam_init);
+   RooRealVar ffetagam("ffetagam","sig fraction",scale_eta*ffetagam_init);
    RooAddPdf sig_above("sig_above","signal_above",threepigampdf_above,ffthreepigam);
    RooAddPdf bkgsum_above("bkgsum_above","bkgsum_above",RooArgList(kslpdf_above,omegpipdf_above,omegampdf_above,mcrestpdf_above,etagampdf_above),RooArgList(ffksl,ffomegpi,ffomegam,ffmcrest,ffetagam));
    RooAddPdf model_above("model_above","model_above",RooArgList(sig_above,bkgsum_above),ffthreepigam);
    //
    RooFitResult* rrf = model_above.fitTo(data_above,Range(fitcut,xmax_IM));
+   model_above.Print("t");
 	//
 	RooPlot* frame_above = xx.frame();
 	data_above.plotOn(frame_above);
+	// cross section
+	
+	
+	// plot
 	/*etagampdf_above.plotOn(frame_above,LineStyle(kSolid),LineColor(3));
 	kslpdf_above.plotOn(frame_above,LineStyle(kSolid),LineColor(15));
 	omegpipdf_above.plotOn(frame_above,LineStyle(kSolid),LineColor(7));
@@ -255,6 +288,7 @@ void roofit_eta() {
 	mcrestpdf_above.plotOn(frame_above,LineStyle(kSolid),LineColor(20));
 	threepigampdf_above.plotOn(frame_above,LineStyle(kSolid),LineColor(6));*/
 	
+	hdatapdf_above.plotOn(frame,LineStyle(kSolid),LineColor(1),LineWidth(2));
 	model_above.plotOn(frame_above,Name("model_above"),LineStyle(kSolid),LineColor(kRed));	
 	model_above.plotOn(frame_above,Name("etagampdf_above"),Components("etagampdf_above"),LineStyle(kSolid),LineColor(3));
 	model_above.plotOn(frame_above,Name("kslpdf_above"),Components("kslpdf_above"),LineStyle(kSolid),LineColor(15));
@@ -264,7 +298,7 @@ void roofit_eta() {
 	//model_above.plotOn(frame_above,Name("bkgsum_above"),Components("bkgsum_above"),LineStyle(kSolid),LineColor(1));
 	model_above.plotOn(frame_above,Name("sig_above"),Components("sig_above"),LineStyle(kSolid),LineColor(6));
 	
-	TCanvas* c = new TCanvas("IMfit","IMfit",800,400) ;
+	/*TCanvas* c = new TCanvas("IMfit","IMfit",800,400);
 	c->Divide(2) ;
    c->cd(1);   
    Double_t ymax = hhdata->GetMaximum();
@@ -276,6 +310,11 @@ void roofit_eta() {
    gPad->SetLogy();
    
    c->cd(2); 
-	frame_above->Draw();
+	frame_above->Draw();*/
+	
+	TCanvas* d = new TCanvas("cross section","cross section",800,400);
+	d->Divide(2) ;
+   d->cd(1); 
+   hhomegamgen_above->Draw();
 	
 }
