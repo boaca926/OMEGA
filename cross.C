@@ -52,7 +52,7 @@ void cross() {
 	// declear variable
 	RooRealVar x("ThreepiIM","ThreepiIM",xmin_IM,xmax_IM);
 	const int binnb=10;
-	x.setBins(binnb);
+	//x.setBins(binnb);
 	
 	// data	
 	double N_d=0;
@@ -132,26 +132,25 @@ void cross() {
    // constrcut model for fit in control region [xmin fitcut]
    RooRealVar fksl("fksl","ksl fraction",fksl_init);
    RooRealVar fomegpi("fomegpi","omegpi fraction",fomegpi_init); 
-  // RooRealVar fomegam("fomegam","fomegam fraction",fomegam_init);
+   RooRealVar fomegam("fomegam","fomegam fraction",fomegam_init);
    RooRealVar fmcrest("fmcrest","mcrest fraction",fmcrest_init);
    RooRealVar fthreepigam("fthreepigam","threepigam fraction",fthreepigam_init);
    RooRealVar sigfrac("sigfrac","signal fraction",fomegam_init);
    RooAddPdf sig("sig","Signal",omegampdf,sigfrac);
    RooAddPdf bkgsum("bkgsum","bkgsum",RooArgList(omegpipdf,threepigampdf),RooArgList(fomegpi,fthreepigam));
-   //RooAddPdf model("model","model",RooArgList(sig,bkgsum),fomegam);
-   //RooAddPdf sig("sig","Signal",omegampdf,sigfrac) ;
+   RooAddPdf model("model","model",RooArgList(sig,bkgsum),fomegam);
    RooRealVar nsig("nsig","signal fraction",10000,0.,100000.) ;
 	RooRealVar nbkgsum("nbkgsum","background fraction",10000,0.,100000.) ;
 	//RooAddPdf model("model","model",RooArgList(sig,bkgsum),RooArgList(nsig,nbkgsum));
 	RooAddPdf model("model","model",RooArgList(sig,bkgsum),sigfrac);
 	// fit
-   //RooFitResult* rf = model.fitTo(data,Extended(kTRUE));
-   RooFitResult* rf = model.fitTo(data);
+   RooFitResult* rf = model.fitTo(data,Extended(),Save());
+   //RooFitResult* rf = model.fitTo(data);
    model.Print("t");
    // cross section
    // loop over all bins in data and test errors
    double nbdata = 0, binsize = 0, entries = 0, errdata = 0;
-   double xlow = 0, xupp = 0, nbbkg = 0;
+   double xlow = 0, xupp = 0, sigfrac_bin = 0;
    // check bin size of the data histo
    TAxis* axis = hhdata->GetXaxis();
    binsize = hhdata->GetNbinsX();
@@ -168,12 +167,19 @@ void cross() {
    	// calculate bkg content
    	xlow = axis->GetBinLowEdge(i);
 		xupp = axis->GetBinUpEdge(i);
-		x.setRange("intrange",xlow,xupp) ;
-		RooAbsReal* fracBkgRange_bin = bkgsum.createIntegral(x,x,"intrange");
-		nbbkg = (N_d-N_omegpi-N_omegam)*fracBkgRange_bin->getVal();
+		
 		std::cout<<"integrate range "<<"["<<xlow<<", "<<xupp<<"]"<<endl;
-		cout<<nbbkg<<endl;
+		//cout<<sigfrac_bin<<endl;
    }
+  	x.setRange("intrange",xmin_IM,xmin_IM+3) ;
+  	//x.setRange("intrange",750,750+60) ;
+	RooAbsReal* fracSigRange_bin = bkgsum.createIntegral(x,x,"intrange");
+	//
+	//sigfrac_bin = fracSigRange_bin->getVal();
+	//RooAbsPdf* paramPdf= rf->createHessePdf(RooArgSet(c0,c1,c2)); 
+	Double_t err =  fracSigRange_bin->getPropagatedError(*rf);
+	std::cout<<"/////////////"<<fracSigRange_bin->getVal()<<endl;
+	std::cout<<"/////////////"<<err<<endl;
    // Draw all frames on a canvas
 	RooPlot* frame = x.frame(); 
 	data.plotOn(frame);
