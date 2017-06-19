@@ -300,7 +300,7 @@ void MyClass::Main()
 				rtsq = TMath::Power(xcl[k]-bx,2)+TMath::Power(ycl[k]-by,2);
 				rt = TMath::Sqrt(rtsq);
 				
-				if (rt > 200) {// hits on barrel
+				if (rt > 200.) {// hits on barrel
 			      Sig2X_candidates[promptnb] = xyres*xyres;
 			      Sig2Y_candidates[promptnb] = xyres*xyres;
 				   Sig2Z_candidates[promptnb] = TMath::Power(zres*TMath::Sqrt(1000./enecl[k]),2);
@@ -889,8 +889,8 @@ TVectorD MyClass::gfunc(TVectorD etavector, Int_t rownb, TLorentzVector beam) {
 	ppz1=pp1tran*cotan1;
 	ppz2=pp2tran*cotan2;
 
-	pp1sq=TMath::Power(ppx1,2)+TMath::Power(ppy1,2)+TMath::Power(ppz1,2);
-	pp2sq=TMath::Power(ppx2,2)+TMath::Power(ppy2,2)+TMath::Power(ppz2,2);
+	pp1sq=TMath::Power(ppx1,2.)+TMath::Power(ppy1,2.)+TMath::Power(ppz1,2.);
+	pp2sq=TMath::Power(ppx2,2.)+TMath::Power(ppy2,2.)+TMath::Power(ppz2,2.);
 		
 	Epp1=TMath::Sqrt(masschpion*masschpion+pp1sq);
 	Epp2=TMath::Sqrt(masschpion*masschpion+pp2sq);
@@ -968,8 +968,8 @@ TMatrixD MyClass::Getafunc(TVectorD etavector, Int_t rownb, Int_t colnb) {
 	ppz1=pp1tran*cotan1;
 	ppz2=pp2tran*cotan2;
 
-	pp1sq=TMath::Power(ppx1,2)+TMath::Power(ppy1,2)+TMath::Power(ppz1,2);
-	pp2sq=TMath::Power(ppx2,2)+TMath::Power(ppy2,2)+TMath::Power(ppz2,2);
+	pp1sq=TMath::Power(ppx1,2.)+TMath::Power(ppy1,2.)+TMath::Power(ppz1,2.);
+	pp2sq=TMath::Power(ppx2,2.)+TMath::Power(ppy2,2.)+TMath::Power(ppz2,2.);
 	pp1=TMath::Sqrt(pp1sq);
 	pp2=TMath::Sqrt(pp2sq);
 		
@@ -981,8 +981,8 @@ TMatrixD MyClass::Getafunc(TVectorD etavector, Int_t rownb, Int_t colnb) {
 	
 
 	// fill dgdeta array
-	dg1deta[15]=-pp1tran*TMath::Power(pp1,2)/Epp1, dg1deta[16]=pp1tran*pp1tran*cotan1/Epp1;
-	dg1deta[18]=-pp2tran*TMath::Power(pp2,2)/Epp2, dg1deta[19]=pp2tran*pp2tran*cotan2/Epp2;
+	dg1deta[15]=-pp1tran*TMath::Power(pp1,2.)/Epp1, dg1deta[16]=pp1tran*pp1tran*cotan1/Epp1;
+	dg1deta[18]=-pp2tran*TMath::Power(pp2,2.)/Epp2, dg1deta[19]=pp2tran*pp2tran*cotan2/Epp2;
 
 	dg2deta[0]=hatx1, dg2deta[1]=hatE1*(TMath::Power(haty1,2)+TMath::Power(hatz1,2)), dg2deta[2]=-hatE1*hatx1*haty1, dg2deta[3]=-hatE1*hatz1*hatx1;
 	dg2deta[5]=hatx2, dg2deta[6]=hatE2*(TMath::Power(haty2,2)+TMath::Power(hatz2,2)), dg2deta[7]=-hatE2*hatx2*haty2, dg2deta[8]=-hatE2*hatz2*hatx2;
@@ -1163,7 +1163,7 @@ Double_t MyClass::Chi2Eisrtest(TVectorD inputvector, TVectorD sigma2vector, Doub
 	Double_t chi2isrE=0., isrEdiff=0., isrEdiff1=0.;
 	
 	isrEdiff=inputvector(0)-isrenergy;//362
-	chi2isrE=TMath::Power(isrEdiff,2)/sigma2vector(0);
+	chi2isrE=TMath::Power(isrEdiff,2.)/sigma2vector(0);
 	
 	return chi2isrE;
 

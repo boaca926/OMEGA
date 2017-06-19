@@ -736,7 +736,7 @@ void getree () {
 	int treeind_temp = 3;
 	int strind_temp[listindex] = {19,10};
 	for (int i=0;i<listindex;i++) {
-		//DGFit(&treeind_temp,&strind_temp[i]);
+		DGFit(&treeind_temp,&strind_temp[i]);
 	}
 	gethisto(0);
 	//roofit_noeta();
