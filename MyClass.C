@@ -21,6 +21,8 @@ void MyClass::Main()
 	Double_t isrE = 0., isrE_impv = 0.;
 	Double_t Emaxprompt = 0., bestpiphoton1Ekinfit = 0., bestpiphoton2Ekinfit = 0., pionphotonEsum = 0.;
 	Double_t pi0IM = 0., mggdiffmin = 0;
+	double Eratio = 0.;
+	double rpca = 0., delta_z=0.;
 	// get names
 	TString OMEGAPI = gettreename(0); 
 	TString KPM = gettreename(1); //std::cout<<gettreename(1)<<endl
@@ -79,6 +81,8 @@ void MyClass::Main()
 	TString SMggdiffmin = getbraname(19); getbraname(19); std::cout<<getbraname(19)<<endl;
 	TString SPi0IM = getbraname(20); getbraname(20); std::cout<<getbraname(20)<<endl; 
 	TString SThreepiIM_rec = getbraname(22); getbraname(22); std::cout<<getbraname(22)<<endl;
+	TString SEratio = getbraname(23); getbraname(23); std::cout<<getbraname(23)<<endl;
+	TString SRpca = getbraname(24); getbraname(24); std::cout<<getbraname(24)<<endl;
 	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -116,6 +120,8 @@ void MyClass::Main()
 		tree_temp->Branch(SMggdiffmin,&mggdiffmin,SMggdiffmin+"/D"); 
 		tree_temp->Branch(SPi0IM,&pi0IM,SPi0IM+"/D");
 		tree_temp->Branch(SThreepiIM_rec,&threepiIM_rec,SThreepiIM_rec+"/D");
+		tree_temp->Branch(SEratio,&Eratio,SEratio+"/D");
+		tree_temp->Branch(SRpca,&rpca,SRpca+"/D");
 	}	
 
 	///
@@ -129,6 +135,7 @@ void MyClass::Main()
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
+      //if (jentry > 0) continue;
       // if (Cut(ientry) < 0) continue;
       Beam.SetPxPyPzE(bpx,bpy,bpz,bene); //Beam.Print();
       TVector3 Boost3vector = -Beam.BoostVector();
@@ -265,26 +272,30 @@ void MyClass::Main()
       TVector3 gammapos(0.,0.,0.);
 		Double_t gammatheta = 0., rtsq = 0., rt = 0., xyres=1.2, zres = 1.4, eres_b = 0.057;
 		Double_t eres_ec = 0.061, tres_a_bar = 0.055, tres_a_ec = 0.060, tres_b_bar = 0.147, tres_b_ec = 0.147;
-		Double_t Emax_temp=0, Esum_temp=0., phoE_temp=0., phoEmin=1000000000.;
-		Double_t EsumPrompt_temp=0., phoEPrompt_temp=0.;
+		Double_t Emax_temp=0, Esum=0., phoEmin=1000000000.;
+		Double_t EsumPrompt=0.;
 		Double_t Rclus_temp=0, tclus_temp=0., tclusdiff_temp=0.;
-		Int_t promptnb=0;
+		Int_t promptnb=0, counter = 0;
 		Bool_t rightEprompt=kFALSE;
 		for (Int_t k = 0; k < nclu; k++) {// loop over all clusters
 			gammapos.SetXYZ(xcl[k]-bx, ycl[k]-by, zcl[k]-bz);
 			Rclus_temp=gammapos.Mag();
-			
+			Esum = Esum + enecl[k];
+			//std::cout<<"cluster energy = "<<enecl[k]<<", E_total = "<<Esum<<"at cluster ["<<k<<"]"<<endl;
+			//counter++;
+			//if (counter > 3) break;
 			gammatheta=gammapos.Theta()*TMath::RadToDeg();
 			if (enecl[k]>Emax_temp) {
 				Emax_temp=enecl[k];
 				tclusdiff_temp=Rclus_temp/(speedc*tcl[k]);
 			}	
 			//speedc
-			Esum_temp=phoE_temp+enecl[k];
-			phoE_temp=Esum_temp;
+			
 			if (charged_new[k] == 0 && intime[k] && enecl[k] >= egammamin && gammatheta > minangle && gammatheta < maxangle && mmclu[k] != 5) {
-				EsumPrompt_temp=phoEPrompt_temp+enecl[k];
-				phoEPrompt_temp=EsumPrompt_temp;
+				EsumPrompt=EsumPrompt+enecl[k];
+				//std::cout<<"-----------------------------------------------------------------------------------------------"<<endl;
+				//std::cout<<"prompt photon energy = "<<enecl[k]<<", Esum_prompt = "<<EsumPrompt<<" at cluster ["<<k<<"]"<<endl;
+				//std::cout<<"-----------------------------------------------------------------------------------------------"<<endl;
 				if (enecl[k] > 50.) rightEprompt = kTRUE;	
 				// select least cluster energy
 				if (enecl[k] < phoEmin) {
@@ -318,13 +329,15 @@ void MyClass::Main()
 				//printf("promptnb=%d: E=%1.4lf, x=%lf, y=%lf, z=%lf, t=%lf \n ",promptnb, E_candidates[promptnb], X_candidates[promptnb], Y_candidates[promptnb], Z_candidates[promptnb], T_candidates[promptnb]);
 				promptnb++;
 			}
-		} 
+		}
+		Eratio = EsumPrompt/Esum;
+		//std::cout<<"E_total = "<<Esum<<endl; 
+		//std::cout<<"Esum_prompt = "<<EsumPrompt<<endl;
+		//std::cout<<"Esum_prompt/E_total = "<<Eratio<<endl;
 		
 		/// track info
-		Float_t rpca = 0.0, delta_r=0.0, delta_z=0.0;
 		for (Int_t k = 0; k < nt; k++) {
-			rpca = sqrt(xpca[k]*xpca[k]+ypca[k]*ypca[k]);
-			delta_r = sqrt((bx-xpca[k])*(bx-xpca[k]) + (by-ypca[k])*(by-ypca[k]));
+			rpca = sqrt((bx-xpca[k])*(bx-xpca[k])+(by-ypca[k])*(by-ypca[k]));
 			delta_z = bz-zpca[k];
 			//hrdist->Fill(delta_r);
 		}

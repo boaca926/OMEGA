@@ -210,6 +210,7 @@ void gethisto(int index) {
    	HTOF[0]->Fill(bestPiTime,bestETime);
    	HDeltaE[0]->Fill(deltaE);
    	HScatter1[0]->Fill(tracksum,deltaE);
+   	HTracksum[0]->Fill(tracksum);
    	HScatter2[0]->Fill(pionphotonEsum,tracksum);
    	HIM[0]->Fill(threepiIM);
    	HEMAX[0]->Fill(Emaxprompt);
@@ -223,6 +224,7 @@ void gethisto(int index) {
    	HTOF[1]->Fill(bestPiTime,bestETime);
    	HDeltaE[1]->Fill(deltaE);
    	HScatter1[1]->Fill(tracksum,deltaE);
+   	HTracksum[1]->Fill(tracksum);
    	HScatter2[1]->Fill(pionphotonEsum,tracksum);
    	HIM[1]->Fill(threepiIM);
    	HEMAX[1]->Fill(Emaxprompt);
@@ -235,6 +237,7 @@ void gethisto(int index) {
    	HCHI2[2]->Fill(chi2value);
    	HTOF[2]->Fill(bestPiTime,bestETime);
    	HScatter1[2]->Fill(tracksum,deltaE);
+   	HTracksum[2]->Fill(tracksum);
    	HScatter2[2]->Fill(pionphotonEsum,tracksum);
    	HIM[2]->Fill(threepiIM);
    	HEMAX[2]->Fill(Emaxprompt);
@@ -248,6 +251,7 @@ void gethisto(int index) {
    	HTOF[3]->Fill(bestPiTime,bestETime);
    	HDeltaE[3]->Fill(deltaE);
    	HScatter1[3]->Fill(tracksum,deltaE);
+   	HTracksum[3]->Fill(tracksum);
    	HScatter2[3]->Fill(pionphotonEsum,tracksum);
    	HIM[3]->Fill(threepiIM);
    	HEMAX[3]->Fill(Emaxprompt);
@@ -261,6 +265,7 @@ void gethisto(int index) {
    	HTOF[4]->Fill(bestPiTime,bestETime);
    	HDeltaE[4]->Fill(deltaE);
    	HScatter1[4]->Fill(tracksum,deltaE);
+   	HTracksum[4]->Fill(tracksum);
    	HScatter2[4]->Fill(pionphotonEsum,tracksum);
    	HIM[4]->Fill(threepiIM);
    	HEMAX[4]->Fill(Emaxprompt);
@@ -274,6 +279,7 @@ void gethisto(int index) {
    	HTOF[5]->Fill(bestPiTime,bestETime);
    	HDeltaE[5]->Fill(deltaE);
    	HScatter1[5]->Fill(tracksum,deltaE);
+   	HTracksum[5]->Fill(tracksum);
    	HScatter2[5]->Fill(pionphotonEsum,tracksum);
    	HIM[5]->Fill(threepiIM);
    	HEMAX[5]->Fill(Emaxprompt);
@@ -287,6 +293,7 @@ void gethisto(int index) {
    	HTOF[6]->Fill(bestPiTime,bestETime);
    	HDeltaE[6]->Fill(deltaE);
    	HScatter1[6]->Fill(tracksum,deltaE);
+   	HTracksum[6]->Fill(tracksum);
    	HScatter2[6]->Fill(pionphotonEsum,tracksum);
 		HIM[6]->Fill(threepiIM);
 		HEMAX[6]->Fill(Emaxprompt);
@@ -300,6 +307,7 @@ void gethisto(int index) {
    	HTOF[7]->Fill(bestPiTime,bestETime);
    	HDeltaE[7]->Fill(deltaE);
    	HScatter1[7]->Fill(tracksum,deltaE);
+   	HTracksum[7]->Fill(tracksum);
    	HScatter2[7]->Fill(pionphotonEsum,tracksum);
    	HIM[7]->Fill(threepiIM);
    	HEMAX[7]->Fill(Emaxprompt);
@@ -313,6 +321,7 @@ void gethisto(int index) {
    	HTOF[8]->Fill(bestPiTime,bestETime);
    	HDeltaE[8]->Fill(deltaE);
    	HScatter1[8]->Fill(tracksum,deltaE);
+   	HTracksum[8]->Fill(tracksum);
    	HScatter2[8]->Fill(pionphotonEsum,tracksum);
    	HIM[8]->Fill(threepiIM);
    	HEMAX[8]->Fill(Emaxprompt);
@@ -326,6 +335,7 @@ void gethisto(int index) {
    	HTOF[9]->Fill(bestPiTime,bestETime);
    	HDeltaE[9]->Fill(deltaE);
    	HScatter1[9]->Fill(tracksum,deltaE);
+   	HTracksum[9]->Fill(tracksum);
    	HScatter2[9]->Fill(pionphotonEsum,tracksum);
    	HIM[9]->Fill(threepiIM);
    	HEMAX[9]->Fill(Emaxprompt);
@@ -339,6 +349,7 @@ void gethisto(int index) {
    	HTOF[10]->Fill(bestPiTime,bestETime);
    	HDeltaE[10]->Fill(deltaE);
    	HScatter1[10]->Fill(tracksum,deltaE);
+   	HTracksum[10]->Fill(tracksum);
    	HScatter2[10]->Fill(pionphotonEsum,tracksum);
    	HIM[10]->Fill(threepiIM);
    	HEMAX[10]->Fill(Emaxprompt);
@@ -346,11 +357,10 @@ void gethisto(int index) {
    	HMggdiffmin[10]->Fill(mggdiffmin);
    }
    HCHI2[10]->SetMarkerStyle(2);
-   HScatter2[10]->Fill(pionphotonEsum,tracksum);
+   HTracksum[10]->SetMarkerStyle(2);
    HIM[10]->SetMarkerStyle(2);
    HEMAX[10]->SetMarkerStyle(2);
    HPi0IM[10]->SetMarkerStyle(2);
-   HMggdiffmin[10]->Fill(mggdiffmin);
    
    TFile hf("./ROOT/HISTOS.root","recreate");
    for (Int_t i=0;i<NbTree;i++) {
@@ -363,6 +373,7 @@ void gethisto(int index) {
 		HEMAX[i]->Write();
 		HPi0IM[i]->Write();
 		HMggdiffmin[i]->Write();
+		HTracksum[i]->Write();
 	}
 
 }

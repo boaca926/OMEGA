@@ -429,7 +429,7 @@ MyClass::MyClass(TTree *tree) : fChain(0)
    masschpion=139.57; 
    pstrnb=2;
    Row=21, Col=21; row=7;
-   minangle=23, maxangle=157, egammamin=10.;
+   minangle=23, maxangle=157, egammamin=15.;
    pi=TMath::Pi();
    
    for (Int_t i = 0; i < 100; i++) {

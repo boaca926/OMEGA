@@ -1,7 +1,7 @@
 const double omegmass = 782., masswidth = 8.5;
 const double p0IMwidth = 2.05, threepiIMwidth = 1.945;
 const double Resolu[2] = {threepiIMwidth, p0IMwidth}; 
-const int NbTree = 12, NbVar = 23, NbCut = 9, NbMode = 4, scale = 6, scale_width = 14;
+const int NbTree = 12, NbVar = 25, NbCut = 9, NbMode = 4, scale = 6, scale_width = 14;
 const double xmin = 0., xmin_Chi2 = 0., xmin_TOF = -10., xmin_DeltaE = -800., xmin_Tracksum = 10000., xmin_pi0IM = 100, xmin_pionPsum = 120., xmin_Mggdiffmin = -100.;
 const double xmax = 1000., xmax_Chi2 = 1000., xmax_TOF = 10., xmax_DeltaE = 200., xmax_Tracksum = 600., xmax_pi0IM = 170., xmax_pionPsum = 520., xmax_Mggdiffmin = 100.;
 //const double xmin_IM = omegmass-scale_width*masswidth, xmax_IM = omegmass+scale_width*masswidth;
@@ -61,7 +61,7 @@ TString gettreename(Int_t index) {
 TString getbraname(Int_t index) {
 	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue","BestPiTime","BestETime","DeltaE","tracksum","ThreepiIM","IMdiff","ThreepiIM_impv","Emaxprompt",
 "bestpiphoton1Ekinfit","bestpiphoton2Ekinfit","ISRE","ISR_impv","pionphotonEsum","ThreepiIM_nofit","Mggdiffmin",
-"Pi0IM","ThreepiIM_MC","ThreepiIM_rec"}; 
+"Pi0IM","ThreepiIM_MC","ThreepiIM_rec","Eratio","RPca"}; 
 	
 	TString st = myArr[index]; 
 	return st;
