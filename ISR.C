@@ -65,9 +65,32 @@ double getdelta(double *m, int *index) {
 	}
 	W = A*B-C+D; 
 	delta = W/W0_temp-1;
-	cout<<index[0]<<endl;
+	//cout<<index[0]<<endl;
 	
 	return delta;
+}
+
+double getWfunc(double *m) {
+	double beta = 0., L = 0.;
+	double x = 0., A = 0., a = 0., mm = 0, B = 0., C = 0., d = 0., D = 0., pi = 0.;
+	double y1 = TMath::Cos(theta0);
+	double W = 0.;
+	
+	pi = TMath::Pi();
+	mm = m[0];
+	x = 1.-TMath::Power(mm/sqrtS,2.);
+	L = TMath::Log(TMath::Power(sqrtS/me,2.));
+	beta = 2.*alphapi*(L-1.);
+	a  = beta-1.;	
+	A = beta*TMath::Power(x,a);
+	B = 1.+alphapi*(pi*pi/3.-1./2.)+(3./4.)*beta-(beta*beta/24.)*(L/3.+2.*pi*pi-37./4.);
+	C=beta*(1.-x/2.);
+	d=(1.+3.*(1.-x)*(1.-x));
+	D=(beta*beta/8.)*(4.*(2.-x)*TMath::Log(1./x)-d*TMath::Log(1.-x)/x-6.+x);
+
+	W = A*B-C+D; 
+	
+	return W;
 }
 
 double getRatio(double *sqrts, double *xx) {

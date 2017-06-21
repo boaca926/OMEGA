@@ -4,10 +4,12 @@
 #include "RooPlot.h"
 #include "TAxis.h"
 #include "gethisto.C"
+#include "ISR.C"
 
 gSystem->Load("libRooFit");
 using namespace std;
 using namespace RooFit;
+
 
 void cross() {
 	gStyle->SetOptTitle(0);
@@ -52,7 +54,7 @@ void cross() {
 	// declear variable
 	RooRealVar x("ThreepiIM","ThreepiIM",xmin_IM,xmax_IM);
 	RooRealVar y("IMthreepi_MC","IMthreepi_MC",xmin_IM,xmax_IM);
-	const int binnb=50;
+	const int binnb=200;
 	x.setBins(binnb); y.setBins(binnb);
 	double binwidth_temp = (xmax_IM-xmin_IM)/binnb;
 	//cout<<binwidth_temp<<endl;
@@ -177,7 +179,7 @@ void cross() {
    double nbbkg = 0, err_nbbkg = 0;
    double fbkg_bin = 0, nbbkg_bin = 0, err_nbbkg_bin=0;;
    // check bin size of the data histo
-   TAxis* axis = hhdata->GetXaxis();
+   TAxis* axis_hhdata = hhdata->GetXaxis();
    binsize = hhdata->GetNbinsX(); entries=getentriesfit(hhdata);
    nbbkg = nbkgsum.getVal();
    err_nbbkg = nbkgsum.getError();
@@ -193,8 +195,8 @@ void cross() {
    	nbdata = hhdata->GetBinContent(i);
    	errdata = hhdata->GetBinError(i);
    	// calculate bkg content
-   	xlow = axis->GetBinLowEdge(i);
-		xupp = axis->GetBinUpEdge(i);
+   	xlow = axis_hhdata->GetBinLowEdge(i);
+		xupp = axis_hhdata->GetBinUpEdge(i);
 		x.setRange("intrange",xlow,xupp) ; // set range
 		RooAbsReal* fracBkgRange_bin = bkgsum.createIntegral(x,x,"intrange"); // integrate
 		fbkg_bin = fracBkgRange_bin->getVal(); // get bkg sum fraction
@@ -229,10 +231,15 @@ void cross() {
    //hhomegamgen->Sumw2();
    TH1D *Heffcy_bin=(TH1D*)hhomegam->Clone();
    Heffcy_bin->Divide(Heffcy_bin,hhomegamgen);
-   double error_nbomegam_gen = 0, p_nbomegam = 0, error_effic_omegam = 0;
+   // histo HHratio_bin = divide histo number of omegam candidate by histo efficiency
+	TH1D *HHratio_bin=(TH1D*)HNsig_bin->Clone();
+	HHratio_bin->Divide(HHratio_bin,Heffcy_bin);
+	//
+   double error_nbomegam_gen = 0, p_nbomegam = 0, error_effic_omegam = 0, mvalue = 0.;
+   double Wvalue = 0.;
    for (int i = 1;i<=binsize;i++) {
    //for (int i = 1;i<=20; i++) {
-   	std::cout<<"--------------------------------------------------"<<endl;
+   	//std::cout<<"--------------------------------------------------"<<endl;
    	//sted::cout<<"expected # bkg sum  = "<<HNbkgsum_bin->GetBinContent(i)<<"+/-"<<HNbkgsum_bin->GetBinError(i)<<endl;
    	error_nbomegam_gen = hhomegamgen->GetBinError(i);
    	p_nbomegam = hhomegam->GetBinContent(i)/hhomegamgen->GetBinContent(i);
@@ -242,11 +249,17 @@ void cross() {
    	//cout<<error_nbomegam_gen<<endl;
    	//cout<<effic_omegam<<endl;
    	//cout<<p_nbomegam<<endl;
-   	sted::cout<<"omegam generated  = "<<hhomegamgen->GetBinContent(i)<<"+/-"<<error_nbomegam_gen<<endl;
-   	sted::cout<<"omegam reconst.  = "<<hhomegam->GetBinContent(i)<<"+/-"<<hhomegam->GetBinError(i)<<endl;
-   	sted::cout<<"omegam efficiency  = "<<Heffcy_bin->GetBinContent(i)<<"+/-"<<Heffcy_bin->GetBinError(i)<<endl;
+   	//sted::cout<<"omegam candidate  = "<<HNsig_bin->GetBinContent(i)<<"+/-"<<HNsig_bin->GetBinError(i)<<endl;
+   	//sted::cout<<"omegam generated  = "<<hhomegamgen->GetBinContent(i)<<"+/-"<<error_nbomegam_gen<<endl;
+   	//sted::cout<<"omegam reconst.  = "<<hhomegam->GetBinContent(i)<<"+/-"<<hhomegam->GetBinError(i)<<endl;
+   	//sted::cout<<"omegam efficiency  = "<<Heffcy_bin->GetBinContent(i)<<"+/-"<<Heffcy_bin->GetBinError(i)<<endl;
+   	//check histo HHratio_bin
+   	//sted::cout<<"HHratio_bin  = "<<HHratio_bin->GetBinContent(i)<<"+/-"<<HHratio_bin->GetBinError(i)<<endl;
+   	mvalue = axis_hhdata->GetBinCenter(i)/1000.;
+   	Wvalue = getWfunc(&mvalue);
+   	//std::cout<<"m value = "<<mvalue<<", W value = "<<Wvalue<<endl;
    }
-	
+   
 	//
 	//sigfrac_bin = fracSigRange_bin->getVal();
 	//RooAbsPdf* paramPdf= rf->createHessePdf(RooArgSet(c0,c1,c2)); 
@@ -322,7 +335,10 @@ void cross() {
    hhomegam->Draw("histo"); 
    
    TCanvas* b6 = new TCanvas("b6","omegam effeciency",800,400);
-   Heffcy_bin->Draw();
+   Heffcy_bin->Draw(); 
+   
+   TCanvas* b7 = new TCanvas("b7","HHratio_bin",800,400);
+   HHratio_bin->Draw();
 	
 	TCanvas* c = new TCanvas("IMfit","IMfit",800,400);
 	frame->GetXaxis()->SetTitle("M(3#pi) [MeV]");	
@@ -350,4 +366,7 @@ void cross() {
 	
    Double_t chi2 = frame->chiSquare(3);
    std::cout<<"chi2 value = "<<chi2<<", ndf = "<<3<<endl;
+   
+   TFile hf("./ROOT/HISTOS.root","recreate");
+   HHratio_bin->Write();
 }
