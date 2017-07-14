@@ -34,23 +34,23 @@ void DGFit(int *treeind, int *strind) {
 	RooRealVar x(str_temp,str_temp,xxmin,xxmax); 
 	x.setBins(binnb);
 	
-	// construct gauss1	
-   RooRealVar mean1("mean1","mean of gaussian1",mean_temp,xxmin,xxmax) ;
-   RooRealVar sigma1("sigma1","width of gaussian1",2,0.1,10);
+	// construct gauss2	
+   RooRealVar mean2("mean2","mean of gaussian2",xxmin+(xxmax-xxmin)/2,-1.,1.) ;
+   RooRealVar sigma2("sigma2","width of gaussian2",2,0.1,10);
+   // Build gaussian2 p.d.f in terms of x,mean and sigma
+   RooGaussian gauss2("gauss2","gaussian2 PDF",x,mean2,sigma2);
+   
+   // construct gauss1	
+   RooRealVar mean1("mean1","mean of gaussian1",mean_temp,-1.,1.) ;
+   RooRealVar sigma1("sigma1","width of gaussian1",2,0.01,100);
    // Build gaussian1 p.d.f in terms of x,mean and sigma
    RooGaussian gauss1("gauss1","gaussian1 PDF",x,mean1,sigma1);
-   
-   // construct gauss2	
-   RooRealVar mean2("mean2","mean of gaussian2",xxmin+(xxmax-xxmin)/2,xxmin,xxmax) ;
-   RooRealVar sigma2("sigma2","width of gaussian2",2,0.01,100);
-   // Build gaussian1 p.d.f in terms of x,mean and sigma
-   RooGaussian gauss2("gauss2","gaussian2 PDF",x,mean2,sigma2);
     
    // set model
-   RooRealVar f1("f1","gauss1 fraction",0.5,0.,1.) ;
+   RooRealVar f2("f2","gauss2 fraction",0.5,0.,1.) ;
    
    // model(x) = f1*gauss1(x) + (1-f1)*gauss2(x);
-   RooAddPdf model("model","model",RooArgList(gauss1,gauss2),f1); 
+   RooAddPdf model("model","model",RooArgList(gauss2,gauss1),f2); 
 	// get MC or data sample
 	TTree *tree = (TTree*)find_MC->Get("T"+tree_temp+"_Pre");
 	
@@ -73,7 +73,7 @@ void DGFit(int *treeind, int *strind) {
    RooPlot* frame1 = x.frame(Title("Gaussian p.d.f. with data"));
    histpdf1.plotOn(frame1,Name("MC"));
    //mc.plotOn(frame1);
-   model.fitTo(mc,Range(-10,10)); 
+   model.fitTo(mc,Range(-20,20)); 
    model.plotOn(frame1,Name("gauss1"),Components("gauss1"),LineStyle(kDashed),LineColor(kRed));
 	model.plotOn(frame1,Name("gauss2"),Components("gauss2"),LineStyle(kDashed),LineColor(kBlack));
 	model.plotOn(frame1,Name("gauss1+gauss2"),Components("gauss*"),LineStyle(kSolid),LineColor(kGreen)) ; 
@@ -101,7 +101,8 @@ void DGFit(int *treeind, int *strind) {
    sigma2.Print();
    
    RooArgSet* params = gauss2.getVariables();
-   RooRealVar* sigma2_fit = (RooRealVar*) params->find("sigma2") ; 
+   //RooRealVar* sigma2_fit = (RooRealVar*) params->find("sigma2"); 
+   RooRealVar* sigma2_fit = (RooRealVar*) params->find("sigma2"); 
 
    // Draw all frames on a canvas
    TCanvas* c = new TCanvas("ggfit","model",800,800) ;
@@ -110,10 +111,12 @@ void DGFit(int *treeind, int *strind) {
    
    if (strind[0] == 19) {
    	frame1->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f [MeV]",binwidth));
+   	frame1->GetXaxis()->SetTitleOffset(1.4);
    	frame1->GetXaxis()->SetTitle("M(#gamma#gamma)-M_{#pi^{0}} [MeV]");   	
    }
    else if (strind[0] == 10) {
    	frame1->GetYaxis()->SetTitle(TString::Format("Entries/%0.1f [MeV]",binwidth));
+   	frame1->GetXaxis()->SetTitleOffset(1.4);
    	frame1->GetXaxis()->SetTitle("M(3#pi)_{rec}-M_{true} [MeV]");
    }	
    //
@@ -122,7 +125,7 @@ void DGFit(int *treeind, int *strind) {
   	txt->SetTextColor(kRed) ;
   	frame1->addObject(txt) ;
    // Add arrow to frame
-   double sigmascale = 3., sigcut = 0.; std::cout<<"<<<<<<<<<<<<<<"<<" sigma2_fit = "<<sigma2_fit->getVal()<<"<<<<<<<<<<<<<<"<<endl;
+   double sigmascale = 3., sigcut = 0.; std::cout<<"<<<<<<<<<<<<<<"<<" sigma1_fit = "<<sigma2_fit->getVal()<<"<<<<<<<<<<<<<<"<<endl;
    double yy = 0.04, yy1 = 0.002,;
    sigcut  = sigmascale*sigma2_fit->getVal();
   	TArrow* arrow = new TArrow(-sigcut,yy,-sigcut,yy1,0.01,"|>") ;
@@ -133,7 +136,7 @@ void DGFit(int *treeind, int *strind) {
   	frame1->addObject(arrow) ;
   	frame1->addObject(arrow1) ;
    frame1->Draw();
-   legc1 = new TLegend(0.63,0.3,0.88,0.7);
+   legc1 = new TLegend(0.63,0.5,0.88,0.7);
 	legc1->SetFillStyle(0); 
 	legc1->SetBorderSize(0);  
 	legc1->SetNColumns(1);

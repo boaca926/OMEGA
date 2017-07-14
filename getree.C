@@ -44,6 +44,7 @@ Double_t tree(double list[], int index)
 	Double_t mggdiffmin = 0;
 	Double_t pi0IM = 0.;
 	Double_t threepiIM_rec = 0.;
+	double cospolar = 0.;
 	// tree names
 	TString OMEGAPI = gettreename(0); //
 	TString KPM = gettreename(1); //
@@ -79,6 +80,7 @@ Double_t tree(double list[], int index)
 	TString SMggdiffmin = getbraname(19);
 	TString SPi0IM = getbraname(20);
 	TString SThreepiIM_rec = getbraname(22);
+	TString SCospolar = getbraname(25);
 	
 	TTree *TOMEGAPI_MC = new TTree("T"+OMEGAPI+"_MC","recreate");
 	TTree *TKPM_MC = new TTree("T"+KPM+"_MC","recreate");
@@ -168,6 +170,7 @@ Double_t tree(double list[], int index)
 		tree_temp->Branch(SMggdiffmin,&mggdiffmin,SMggdiffmin+"/D");
 		tree_temp->Branch(SPi0IM,&pi0IM,SPi0IM+"/D");
 		tree_temp->Branch(SThreepiIM_rec,&threepiIM_rec,SThreepiIM_rec+"/D");
+		tree_temp->Branch(SCospolar,&cospolar,SCospolar+"/D");
 	}
 	
 	// define chain
@@ -239,6 +242,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SMggdiffmin,&mggdiffmin);
 						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
 						chain_temp->SetBranchAddress(SThreepiIM_rec,&threepiIM_rec);
+						chain_temp->SetBranchAddress(SCospolar,&cospolar);
 					}	
                
             }
@@ -294,6 +298,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SMggdiffmin,&mggdiffmin);
 						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
 						chain_temp->SetBranchAddress(SThreepiIM_rec,&threepiIM_rec);
+						chain_temp->SetBranchAddress(SCospolar,&cospolar);
 					}	
             }
          }
@@ -348,6 +353,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SMggdiffmin,&mggdiffmin);
 						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
 						chain_temp->SetBranchAddress(SThreepiIM_rec,&threepiIM_rec);
+						chain_temp->SetBranchAddress(SCospolar,&cospolar);
 					}	
             }
          }
@@ -402,6 +408,7 @@ Double_t tree(double list[], int index)
 						chain_temp->SetBranchAddress(SMggdiffmin,&mggdiffmin);
 						chain_temp->SetBranchAddress(SPi0IM,&pi0IM);
 						chain_temp->SetBranchAddress(SThreepiIM_rec,&threepiIM_rec);
+						chain_temp->SetBranchAddress(SCospolar,&cospolar);
 					}		
             }
          }
@@ -484,7 +491,7 @@ Double_t tree(double list[], int index)
 			TMCSUM_MC->Fill();
 		}
 		
-		if (mctype_MC==2 || mctype_MC==5 || mctype_MC==6 || mctype_MC==7 || mctype_MC==8 || mctype_MC==9) {
+		if (mctype_MC==2 || mctype_MC==5 || mctype_MC==6 || mctype_MC==7 || mctype_MC==8 || mctype_MC==9) {// bkgsum2
 			bkgsum2Nb_MC++;
 			TBKGSUM2_MC->Fill();
 		}
@@ -732,9 +739,9 @@ void getree () {
 		lb+=step; 
 	}
 	//
-	const int listindex=2;
+	const int listindex=1;
 	int treeind_temp = 3;
-	int strind_temp[listindex] = {19,10};
+	int strind_temp[listindex] = {19};// 19
 	for (int i=0;i<listindex;i++) {
 		DGFit(&treeind_temp,&strind_temp[i]);
 	}

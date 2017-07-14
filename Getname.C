@@ -1,16 +1,16 @@
 const double omegmass = 782., masswidth = 8.5;
-const double p0IMwidth = 2.05, threepiIMwidth = 1.945;
+const double p0IMwidth = 2.05, threepiIMwidth = 2.556;
 const double Resolu[2] = {threepiIMwidth, p0IMwidth}; 
-const int NbTree = 12, NbVar = 25, NbCut = 9, NbMode = 4, scale = 6, scale_width = 14;
+const int NbTree = 12, NbVar = 26, NbCut = 9, NbMode = 4, scale = 6, scale_width = 14;
 const double xmin = 0., xmin_Chi2 = 0., xmin_TOF = -10., xmin_DeltaE = -800., xmin_Tracksum = 10000., xmin_pi0IM = 100, xmin_pionPsum = 120., xmin_Mggdiffmin = -100.;
 const double xmax = 1000., xmax_Chi2 = 1000., xmax_TOF = 10., xmax_DeltaE = 200., xmax_Tracksum = 600., xmax_pi0IM = 170., xmax_pionPsum = 520., xmax_Mggdiffmin = 100.;
 //const double xmin_IM = omegmass-scale_width*masswidth, xmax_IM = omegmass+scale_width*masswidth;
-const double xmin_IM = 620., xmax_IM =910.;
+const double xmin_IM = 720., xmax_IM =840.;
 const int NbHist = 100, bin = 1000, bin_Chi2 = 50, bin_TOF = 400, bin_DeltaE = 1000, bin_Tracksum = 500, bin_pi0IM = 100, bin_IM = 155, bin_pionPsum = 400, bin_Mggdiffmin = 100;
 const double binscale[1]={2.5};
 const int bin_fit = (xmax_IM-xmin_IM)/(binscale[0]*Resolu[0]);
 const double chi2cut = 30., tofcut1 = -0.5, tofcut2=4., deltaEcut=-215., Emaxcut=320., deltaPi0IM=4*p0IMwidth, delta3piIM=scale_width*masswidth, xmin1_IM = 450., xmax1_IM = 670.;
-const double k=-5.;
+const double k_tpi=-5.;
 const double Cutlist_std[NbCut] = {chi2cut, tofcut1, tofcut2, deltaEcut, Emaxcut, deltaPi0IM, delta3piIM, xmin_IM, xmax_IM};
 const double cutstep_std[NbCut] ={2., 0.2, 1., 4., 1., p0IMwidth, threepiIMwidth, 0.,0.};
 const int CUTTAG = 1; // 0 disable cut
@@ -26,6 +26,7 @@ const double m_omega = 782.; // MeV
 double C = TMath::Power(2*me/sqrtS,2);
 const double alpha = 1./137; // fine structure constant
 const double alphapi = alpha/pi;
+const double intlumi = 189.724*1e3;// bar -1
 // specify modification of cut values
 // modpos = 0: chi2cut
 // modpos = 1: tofcut1
@@ -61,7 +62,7 @@ TString gettreename(Int_t index) {
 TString getbraname(Int_t index) {
 	TString myArr[NbVar] = {"mctype","IMthreepi","Eisr", "chi2value", "pvalue","BestPiTime","BestETime","DeltaE","tracksum","ThreepiIM","IMdiff","ThreepiIM_impv","Emaxprompt",
 "bestpiphoton1Ekinfit","bestpiphoton2Ekinfit","ISRE","ISR_impv","pionphotonEsum","ThreepiIM_nofit","Mggdiffmin",
-"Pi0IM","ThreepiIM_MC","ThreepiIM_rec","Eratio","RPca"}; 
+"Pi0IM","ThreepiIM_MC","ThreepiIM_rec","Eratio","RPca","Cospolar"}; 
 	
 	TString st = myArr[index]; 
 	return st;
@@ -120,7 +121,7 @@ Int_t getcutype(Double_t chi2value, Double_t bestETime, Double_t bestPiTime, Dou
 		type[1] = 0;
 	}
 	// tof cut2
-	if (bestETime < k*bestPiTime+cutlist[2]) {
+	if (bestETime < k_tpi*bestPiTime+cutlist[2]) {
 		type[2] = 1;
 	}
 	else {
@@ -157,7 +158,7 @@ Int_t getcutype(Double_t chi2value, Double_t bestETime, Double_t bestPiTime, Dou
 	}
 	// all cuts
 	if (type[0] && type[1] && type[2] && type[3] && type[4] && type[5] && type[6]) {
-	//if (!type[0] && type[1] && type[2] && type[3] && type[4]) {// get ksl fraction
+	//if (type[0] && type[1] && type[2] && type[3] && type[4] && type[6]) {
 		Type = 1;
 	}
 	else {

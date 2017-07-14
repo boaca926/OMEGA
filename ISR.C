@@ -58,10 +58,12 @@ double getdelta(double *m, int *index) {
 	d=(1.+3.*(1.-x)*(1.-x));
 	D=(beta*beta/8.)*(4.*(2.-x)*TMath::Log(1./x)-d*TMath::Log(1.-x)/x-6.+x);
 	if (index[0]) {
-	W0_temp = (alphapi/x)*(TMath::Log(TMath::Power(sqrtS/me,2))-1)*(2-2*x+x*x);
+		W0_temp = (alphapi/x)*(TMath::Log(TMath::Power(sqrtS/me,2))-1)*(2-2*x+x*x);
+		//std::cout<<"full range"<<endl;
 	}
 	else {
 		W0_temp = (alphapi/x)*((2.-2.*x+x*x)*TMath::Log((1.+y1)/(1.-y1))-x*x*y1);
+		//std::cout<<"large angle"<<endl;		
 	}
 	W = A*B-C+D; 
 	delta = W/W0_temp-1;
@@ -71,10 +73,32 @@ double getdelta(double *m, int *index) {
 }
 
 double getWfunc(double *m) {
-	double beta = 0., L = 0.;
+	double delta = 0., beta = 0., L = 0.;
 	double x = 0., A = 0., a = 0., mm = 0, B = 0., C = 0., d = 0., D = 0., pi = 0.;
 	double y1 = TMath::Cos(theta0);
 	double W = 0.;
+	double W0_temp = 0., W00_temp = 0.;
+	pi = TMath::Pi();
+	mm = m[0];
+	x = 1.-TMath::Power(mm/sqrtS,2.);
+	L = TMath::Log(TMath::Power(sqrtS/me,2.));
+	beta = 2.*alphapi*(L-1.);
+	a  = beta-1.;	
+	A = beta*TMath::Power(x,a);
+	B = 1.+alphapi*(pi*pi/3.-1./2.)+(3./4.)*beta-(beta*beta/24.)*(L/3.+2.*pi*pi-37./4.);
+	C=beta*(1.-x/2.);
+	d=(1.+3.*(1.-x)*(1.-x));
+	D=(beta*beta/8.)*(4.*(2.-x)*TMath::Log(1./x)-d*TMath::Log(1.-x)/x-6.+x);
+	W = A*B-C+D; 
+	
+	return W;
+}
+
+double getW0func(double *m) {
+	double beta = 0., L = 0.;
+	double x = 0., A = 0., a = 0., mm = 0, B = 0., C = 0., d = 0., D = 0., pi = 0.;
+	double y1 = TMath::Cos(theta0);
+	double W0 = 0.;
 	
 	pi = TMath::Pi();
 	mm = m[0];
@@ -87,10 +111,36 @@ double getWfunc(double *m) {
 	C=beta*(1.-x/2.);
 	d=(1.+3.*(1.-x)*(1.-x));
 	D=(beta*beta/8.)*(4.*(2.-x)*TMath::Log(1./x)-d*TMath::Log(1.-x)/x-6.+x);
-
-	W = A*B-C+D; 
 	
-	return W;
+	W0 = (alphapi/x)*((2.-2.*x+x*x)*TMath::Log((1.+y1)/(1.-y1))-x*x*y1);
+	std::cout<<"large angle"<<endl;
+	
+	return W0;
+}
+
+double getcorr(double *m) {
+	double delta = 0., beta = 0., L = 0.;
+	double x = 0., A = 0., a = 0., mm = 0, B = 0., C = 0., d = 0., D = 0., pi = 0.;
+	double y1 = TMath::Cos(theta0);
+	double W = 0.;
+	double W0_temp = 0., W00_temp = 0.;
+	pi = TMath::Pi();
+	mm = m[0];
+	x = 1.-TMath::Power(mm/sqrtS,2.);
+	L = TMath::Log(TMath::Power(sqrtS/me,2.));
+	beta = 2.*alphapi*(L-1.);
+	a  = beta-1.;	
+	A = beta*TMath::Power(x,a);
+	B = 1.+alphapi*(pi*pi/3.-1./2.)+(3./4.)*beta-(beta*beta/24.)*(L/3.+2.*pi*pi-37./4.);
+	C=beta*(1.-x/2.);
+	d=(1.+3.*(1.-x)*(1.-x));
+	D=(beta*beta/8.)*(4.*(2.-x)*TMath::Log(1./x)-d*TMath::Log(1.-x)/x-6.+x);
+	W0_temp = (alphapi/x)*((2.-2.*x+x*x)*TMath::Log((1.+y1)/(1.-y1))-x*x*y1);
+	W = A*B-C+D; 
+	delta = W/W0_temp;
+	//cout<<index[0]<<endl;
+	
+	return delta;
 }
 
 double getRatio(double *sqrts, double *xx) {
@@ -155,13 +205,13 @@ void ISR() {
 	gf->SetLineWidth(2); 
 	gf->SetLineColor(1);
 	gf->SetLineStyle(1);
-	gf->GetYaxis()->SetTitle("W(s,x)/W(s,x,0)-1");
+	gf->GetYaxis()->SetTitle("W(s,x)/W_{0}(s,x,0)-1");
 	gf->GetXaxis()->SetTitle("m [GeV]");
 	d->Divide(1,1);
 	d->cd(1);
 	gf->Draw("CA");
 	
-	TCanvas *c = new TCanvas("c","W(s,x,#theta)/W_{0}(s,x,0)",700,700);
+	TCanvas *c = new TCanvas("c","W_{0}(s,x,#theta)/W_{0}(s,x,0)",700,700);
 	c->cd(1);
 	TGraph* gf1= new TGraph(nbstep,sqrtslist,R0listx1);
 	TGraph* gf2= new TGraph(nbstep,sqrtslist,R0listx2);
@@ -171,7 +221,7 @@ void ISR() {
 	//gf2->SetMarkerStyle(21);
 	gf2->SetLineColor(1);
 	gf2->SetLineStyle(2);
-	gf2->GetYaxis()->SetTitle("W(s,x,#theta_{0})/W(s,x,0)");
+	gf2->GetYaxis()->SetTitle("W_{0}(s,x,#theta_{0})/W_{0}(s,x,0)");
 	gf2->GetXaxis()->SetTitle("#sqrt{s} GeV");
 	gf2->GetYaxis()->SetRangeUser(0.15,0.35);
 	gf2->GetYaxis()->SetTitleOffset(1.4);

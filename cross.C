@@ -17,6 +17,7 @@ void cross() {
 	Double_t threepiIM = 0.;
 	TString SIMthreepi = getbraname(1);
 	TString SThreepiIM = getbraname(9);//  
+	threepiIMreso = Resolu[0];
 	// get root file
 	TFile *findFile = new TFile("./ROOT/TREE_cutted.root","READ");
 	TFile *findFile1 = new TFile("./ROOT/TREE_Gen.root","READ");
@@ -24,11 +25,11 @@ void cross() {
 	TString Omegpi = gettreename(0);// omega pi0
 	TString Ksl = gettreename(2);// KSL
 	TString Omegam = gettreename(3);// omega gamma
-	TString Data = gettreename(10);// data
 	TString MCrest = gettreename(7);// mc rest = bkgsum2
-	
+	TString Data = gettreename(10);// data
+		
 	TTree *TData = (TTree*)findFile->Get("T"+Data+"_Pre"); // data
-	TTree *TKsl = (TTree*)findFile->Get("T"+Ksl+"_Pre");
+	TTree *TKsl = (TTree*)findFile->Get("T"+Ksl+"_Pre"); // ksl
 	TTree *TOmegpi = (TTree*)findFile->Get("T"+Omegpi+"_Pre");// omegapi
 	TTree *TOmegam = (TTree*)findFile->Get("T"+Omegam+"_Pre"); // omega gamma
 	TTree *TMCrest = (TTree*)findFile->Get("T"+MCrest+"_Pre"); // MCrest
@@ -57,7 +58,13 @@ void cross() {
 	const int binnb=200;
 	x.setBins(binnb); y.setBins(binnb);
 	double binwidth_temp = (xmax_IM-xmin_IM)/binnb;
-	//cout<<binwidth_temp<<endl;
+	std::cout<<"BIN WIDTH = "<<binwidth_temp<<endl;
+	x.setBins(1000000,"fft") ;
+	
+	// Detector response function
+   RooRealVar mg("mg","mg",1);
+   RooRealVar sg("sg","sg",threepiIMreso,0.,5.);
+	RooGaussian gauss("gauss","gauss",x,mg,sg);
 	
 	// data	
 	double N_d=0;
@@ -71,8 +78,14 @@ void cross() {
 	RooDataHist* hdata = data.binnedClone();
 	RooHistPdf hdatapdf("hdatapdf","hdatapdf",x,*hdata,0);
 	TH1D* hhdata = hdata->createHistogram("ThreepiIM",binnb);
+	
+	TH1D* HData = new TH1D("HData","data",binnb,xmin_IM,xmax_IM); 
 	TH1D* HNbkgsum = new TH1D("HNbkgsum","bkg sum in histo",binnb,xmin_IM,xmax_IM);
-	TH1D* Hfbkgsum_bin = new TH1D("Hfbkgsum_bin","bkg sum fraction in histo",binnb,xmin_IM,xmax_IM);
+	TH1D* Hfbkgsum_bin = new TH1D("Hfbkgsum_bin","bkg sum fraction in histo",binnb,xmin_IM,xmax_IM); 
+	TH1D* HNsig_bin = new TH1D("HNsig_bin","omegam candidates",binnb,xmin_IM,xmax_IM); 
+	TH1D* Heffcy_bin = new TH1D("Heffcy_bin","omegam efficiency",binnb,xmin_IM,xmax_IM);  
+	TH1D* HHratio_bin = new TH1D("HHratio_bin","omegam ration",binnb,xmin_IM,xmax_IM);
+	TH1D* HCross_bin = new TH1D("HCross_bin","omegam Born cross section",binnb,xmin_IM,xmax_IM);
 	
 	// ksl   
    double N_ksl=0, fksl_init=0;
@@ -112,6 +125,9 @@ void cross() {
    RooDataHist* homegam = omegam.binnedClone();
 	RooHistPdf homegampdf("homegampdf","homegampdf",x,*homegam,0);
 	TH1D* hhomegam = homegam->createHistogram("ThreepiIM",binnb);
+	
+	// Construct convolution
+	RooFFTConvPdf omegampdfcov("omegampdffcov","omegam (X) gauss",x,omegampdf,gauss);   
    
    // omegam generated
    double N_omegam_gen = 0;
@@ -194,6 +210,9 @@ void cross() {
    	// get bin content from data histo
    	nbdata = hhdata->GetBinContent(i);
    	errdata = hhdata->GetBinError(i);
+   	HData->SetBinContent(i,nbdata); HData->SetBinError(i,errdata);
+   	HNsig_bin->SetBinContent(i,nbdata); HNsig_bin->SetBinError(i,errdata);
+   	Heffcy_bin->SetBinContent(i,hhomegam->GetBinContent(i));
    	// calculate bkg content
    	xlow = axis_hhdata->GetBinLowEdge(i);
 		xupp = axis_hhdata->GetBinUpEdge(i);
@@ -223,30 +242,28 @@ void cross() {
    HNbkgsum_bin->Multiply(HNbkgsum_bin,Hfbkgsum_bin,1.0,1.0);
    //HNbkgsum_bin->Sumw2();
    //hhdata->Sumw2();
-   TH1D *HNsig_bin=(TH1D*)hhdata->Clone();
    //HNsig_bin->Sumw2();
    HNsig_bin->Add(HNbkgsum_bin,-1);
    // get efficiency histogram
    //hhomegam->Sumw2();
    //hhomegamgen->Sumw2();
-   TH1D *Heffcy_bin=(TH1D*)hhomegam->Clone();
+   //Heffcy_bin=(TH1D*)hhomegam->Clone();
    Heffcy_bin->Divide(Heffcy_bin,hhomegamgen);
    // histo HHratio_bin = divide histo number of omegam candidate by histo efficiency
-	TH1D *HHratio_bin=(TH1D*)HNsig_bin->Clone();
-	HHratio_bin->Divide(HHratio_bin,Heffcy_bin);
+	//TH1D *HHratio_bin=(TH1D*)HNsig_bin->Clone();
+	
 	//
    double error_nbomegam_gen = 0, p_nbomegam = 0, error_effic_omegam = 0, mvalue = 0.;
-   double Wvalue = 0.;
    for (int i = 1;i<=binsize;i++) {
    //for (int i = 1;i<=20; i++) {
    	//std::cout<<"--------------------------------------------------"<<endl;
    	//sted::cout<<"expected # bkg sum  = "<<HNbkgsum_bin->GetBinContent(i)<<"+/-"<<HNbkgsum_bin->GetBinError(i)<<endl;
    	error_nbomegam_gen = hhomegamgen->GetBinError(i);
    	p_nbomegam = hhomegam->GetBinContent(i)/hhomegamgen->GetBinContent(i);
-   	error_effic_omegam = 1.0/error_nbomegam_gen*TMath::Sqrt
+   	error_effic_omegam = (1.0/error_nbomegam_gen)*TMath::Sqrt
 (p_nbomegam*(1-p_nbomegam)); // calculate binomial error
 		Heffcy_bin->SetBinError(i,error_effic_omegam);
-   	//cout<<error_nbomegam_gen<<endl;
+   	//std::cout<<"omegam generated = "<<hhomegamgen->GetBinContent(i)<<" error_nbomegam_gen = "<<error_nbomegam_gen<<endl;
    	//cout<<effic_omegam<<endl;
    	//cout<<p_nbomegam<<endl;
    	//sted::cout<<"omegam candidate  = "<<HNsig_bin->GetBinContent(i)<<"+/-"<<HNsig_bin->GetBinError(i)<<endl;
@@ -255,11 +272,30 @@ void cross() {
    	//sted::cout<<"omegam efficiency  = "<<Heffcy_bin->GetBinContent(i)<<"+/-"<<Heffcy_bin->GetBinError(i)<<endl;
    	//check histo HHratio_bin
    	//sted::cout<<"HHratio_bin  = "<<HHratio_bin->GetBinContent(i)<<"+/-"<<HHratio_bin->GetBinError(i)<<endl;
-   	mvalue = axis_hhdata->GetBinCenter(i)/1000.;
-   	Wvalue = getWfunc(&mvalue);
-   	//std::cout<<"m value = "<<mvalue<<", W value = "<<Wvalue<<endl;
+   	
+   	
+   	HHratio_bin->SetBinContent(i,HNsig_bin->GetBinContent(i));
+   	HHratio_bin->SetBinError(i,HNsig_bin->GetBinError(i));
    }
-   
+   //
+   HHratio_bin->Divide(HHratio_bin,Heffcy_bin);
+   //
+   double W0value = 0., isrlumi = 0., corr = 0., cross_bin = 0., error_cross_bin = 0;
+   for (int i = 1;i<=binsize;i++) {
+   //for (int i = 1;i<=20; i++) {
+   	mvalue = axis_hhdata->GetBinCenter(i)/1000.;
+   	W0value = getW0func(&mvalue);
+   	corr = getcorr(&mvalue);
+   	isrlumi = W0value*2*mvalue*1e3/(sqrtS*sqrtS*1e6)*intlumi;
+   	cross_bin = HHratio_bin->GetBinContent(i)/(corr*isrlumi);
+   	error_cross_bin = HHratio_bin->GetBinError(i)/(corr*isrlumi);
+   	/*std::cout<<"m value = "<<mvalue<<", W0 value = "<<W0value<<endl;
+   	std::cout<<"isr luminosity = "<<isrlumi<<endl;
+   	std::cout<<"1 + delta = "<<corr<<endl;
+   	std::cout<<"cross section = "<<cross_bin<<"+/-"<<error_cross_bin<<endl;*/
+   	HCross_bin->SetBinContent(i,cross_bin);
+   	HCross_bin->SetBinError(i,error_cross_bin);
+   }
 	//
 	//sigfrac_bin = fracSigRange_bin->getVal();
 	//RooAbsPdf* paramPdf= rf->createHessePdf(RooArgSet(c0,c1,c2)); 
@@ -329,16 +365,17 @@ void cross() {
 	legtextsize(legb3, 0.06); //hhomegamgen
 	
 	TCanvas* b4 = new TCanvas("b4","generated omegam (MC true)",800,400);
-   hhomegamgen->Draw("histo");
+   hhomegamgen->Draw();
    
    TCanvas* b5 = new TCanvas("b5","omegam reconstructed after all cuts)",800,400);
-   hhomegam->Draw("histo"); 
+   hhomegam->Draw(); 
    
    TCanvas* b6 = new TCanvas("b6","omegam effeciency",800,400);
    Heffcy_bin->Draw(); 
    
    TCanvas* b7 = new TCanvas("b7","HHratio_bin",800,400);
    HHratio_bin->Draw();
+   l->Draw("Same");
 	
 	TCanvas* c = new TCanvas("IMfit","IMfit",800,400);
 	frame->GetXaxis()->SetTitle("M(3#pi) [MeV]");	
@@ -361,12 +398,11 @@ void cross() {
 	legc1->SetTextFont(132);
 	legc1->Draw("Same");
 	legtextsize(legc1, 0.05);
-	
-	
-	
+		
    Double_t chi2 = frame->chiSquare(3);
    std::cout<<"chi2 value = "<<chi2<<", ndf = "<<3<<endl;
    
-   TFile hf("./ROOT/HISTOS.root","recreate");
-   HHratio_bin->Write();
+   TFile hf("./ROOT/HISTOS1.root","recreate");
+   HCross_bin->Write();
+   HNsig_bin->Write();
 }

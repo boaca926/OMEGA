@@ -23,6 +23,7 @@ void MyClass::Main()
 	Double_t pi0IM = 0., mggdiffmin = 0;
 	double Eratio = 0.;
 	double rpca = 0., delta_z=0.;
+	double cospolar = 0.;
 	// get names
 	TString OMEGAPI = gettreename(0); 
 	TString KPM = gettreename(1); //std::cout<<gettreename(1)<<endl
@@ -83,6 +84,7 @@ void MyClass::Main()
 	TString SThreepiIM_rec = getbraname(22); getbraname(22); std::cout<<getbraname(22)<<endl;
 	TString SEratio = getbraname(23); getbraname(23); std::cout<<getbraname(23)<<endl;
 	TString SRpca = getbraname(24); getbraname(24); std::cout<<getbraname(24)<<endl;
+	TString SCospolar = getbraname(25); getbraname(25); std::cout<<getbraname(25)<<endl;
 	
 	TObject* treeout=0;
 	TIter treeliter(treelist);
@@ -122,6 +124,7 @@ void MyClass::Main()
 		tree_temp->Branch(SThreepiIM_rec,&threepiIM_rec,SThreepiIM_rec+"/D");
 		tree_temp->Branch(SEratio,&Eratio,SEratio+"/D");
 		tree_temp->Branch(SRpca,&rpca,SRpca+"/D");
+		tree_temp->Branch(SCospolar,&cospolar,SCospolar+"/D");
 	}	
 
 	///
@@ -626,7 +629,10 @@ void MyClass::Main()
 		pionphotonEsum = (pionphoton1kinfit.Vect()).Mag()+(pionphoton2kinfit.Vect()).Mag();
 		pi0IM = (pionphoton1kinfit+pionphoton2kinfit).M();
 		mggdiffmin=pi0IM-massneupion;
-		
+		// boost isr photon in e+ e- frame
+		TLorentzVector boostisrkinfit=Boost4Vector(ISRphotonkinfit, Boost3vector);
+		double polarangle=boostisrkinfit.Theta();
+		cospolar = TMath::Cos(polarangle);
 		/// improved eta IM selection
 		// fitted		
 		TLorentzVector ISRphotonkinfit1=Getphoton4vector(inputvectorminkinfit1(0),inputvectorminkinfit1(1),inputvectorminkinfit1(2),inputvectorminkinfit1(3));
@@ -1180,4 +1186,15 @@ Double_t MyClass::Chi2Eisrtest(TVectorD inputvector, TVectorD sigma2vector, Doub
 	
 	return chi2isrE;
 
+}
+
+TLorentzVector MyClass::Boost4Vector(TLorentzVector FourVector, TVector3 ThreeVector) {
+   
+   TLorentzVector boost4vector(0.,0.,0.,0.);
+   FourVector.Boost(ThreeVector);
+   boost4vector.SetX(FourVector.X());
+   boost4vector.SetY(FourVector.Y());
+   boost4vector.SetZ(FourVector.Z());
+   boost4vector.SetE(FourVector.E());
+   return boost4vector;
 }

@@ -379,6 +379,7 @@ public :
    TLorentzVector GetLorentzVector(TVector3 vector, Double_t mass);
    TLorentzVector Getphoton4vector(Double_t E, Double_t x, Double_t y, Double_t z);
    TLorentzVector Gettrack4vectorkinfit(Double_t curv, Double_t cotan, Double_t phi);
+   TLorentzVector Boost4Vector(TLorentzVector FourVector, TVector3 ThreeVector);
    
    TVectorD Getpiontrnb();
    TVectorD FillInputvector(Int_t size, Int_t index1, Int_t index2, Int_t index3, Int_t indtr1, Int_t indtr2);
